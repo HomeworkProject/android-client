@@ -10,6 +10,8 @@ gen/
 
 Thumbs.db
 
+*.swp
+
 .gradle
 /local.properties
 /.idea/workspace.xml
