@@ -33,7 +33,9 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -47,6 +49,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   SharedPreferences prefs;
 
   private boolean isPaused;
+  private List<DialogFragment> dialogsToShow = new ArrayList<DialogFragment>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +113,12 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   public void onResume() {
 	super.onResume();
 	isPaused = false;
+
+	while (dialogsToShow.size() > 0) {
+      DialogFragment dialog = dialogsToShow.get(0);
+	  dialog.show(getFragmentManager(), "dialogsToShow");
+	  dialogsToShow.remove(0);
+    }
   }
 
   @Override
@@ -240,9 +249,14 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
           askForUpdate(versionCode, versionName);
         } else {
           boolean userInitiated = Boolean.parseBoolean(params[1]);
-          if (userInitiated && !isPaused) {
-			DialogFragment dialog = new NoUpdateDialog();
-			dialog.show(getFragmentManager(), "noUpdateDialog");
+          if (userInitiated) {
+			if (!isPaused) {
+		      DialogFragment dialog = new NoUpdateDialog();
+		  	  dialog.show(getFragmentManager(), "noUpdateDialog");
+			} else {
+			  DialogFragment dialog = new NoUpdateDialog();
+			  dialogsToShow.add(dialog);
+			}
           }
         }
 
