@@ -5,9 +5,11 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
         key {
+			keyPassword 'dummy'
             keyAlias 'release signing key'
             storeFile file(
                     '../../Keystore/Keystore.jks')
+			storePassword 'dummy'
         }
     }
     compileSdkVersion 19
@@ -37,7 +39,7 @@ dependencies {
 
 // Ask for keystore & key password
 gradle.taskGraph.whenReady { taskGraph ->
-  if(taskGraph.hasTask(':app:assembleRelease')) {
+  if(taskGraph.hasTask(':app:packageRelease')) {
  
     def pass = ''
     if(System.console() == null) {
