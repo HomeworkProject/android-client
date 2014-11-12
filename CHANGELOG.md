@@ -1,3 +1,7 @@
+v1.3
+====
+-Show NoUpdateDialog even when Activity is paused while checking for updates
+
 v1.2
 ====
 -Fix crash when MainActivity is paused while the app is checking for new updates
