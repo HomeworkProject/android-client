@@ -1,0 +1,76 @@
+import groovy.swing.SwingBuilder
+
+apply plugin: 'com.android.application'
+
+android {
+    signingConfigs {
+        key {
+            keyAlias 'release signing key'
+            storeFile file(
+                    '../../Keystore/Keystore.jks')
+        }
+    }
+    compileSdkVersion 19
+    buildToolsVersion "20.0.0"
+    defaultConfig {
+        applicationId "paarmann.physikprofil"
+        minSdkVersion 15
+        targetSdkVersion 19
+        versionCode 3
+        versionName "1.2"
+        signingConfig signingConfigs.key
+    }
+    buildTypes {
+        release {
+            runProguard false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    productFlavors {
+    }
+}
+
+dependencies {
+    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile 'org.apache.commons:commons-io:1.3.2'
+}
+
+// Ask for keystore & key password
+gradle.taskGraph.whenReady { taskGraph ->
+  if(taskGraph.hasTask(':app:assembleRelease')) {
+ 
+    def pass = ''
+    if(System.console() == null) {
+      new SwingBuilder().edt {
+        dialog(modal: true, // Otherwise the build will continue running before you closed the dialog
+            title: 'Enter password', // Dialog title
+            alwaysOnTop: true, // pretty much what the name says
+            resizable: false, // Don't allow the user to resize the dialog
+            locationRelativeTo: null, // Place dialog in center of the screen
+            pack: true, // We need to pack the dialog (so it will take the size of it's children)
+            show: true // Let's show it
+        ) {
+          vbox { // Put everything below each other
+            label(text: "Please enter key passphrase:")
+            input = passwordField()
+            button(defaultButton: true, text: 'OK', actionPerformed: {
+              pass = input.password; // Set pass variable to value of input field
+              dispose(); // Close dialog
+            })
+          } // vbox end
+        } // dialog end
+      } // edt end
+    } else {
+      pass = System.console().readPassword("\nPlease enter key passphrase: ")
+      pass = new String(pass)
+    }
+ 
+    if(pass.size() <= 0) {
+      throw new InvalidUserDataException("You must enter a password to proceed.")
+    }
+ 
+    android.signingConfigs.key.keyPassword = pass
+    android.signingConfigs.key.storePassword = pass
+ 
+  } // end if has task
+} // end whenReady
