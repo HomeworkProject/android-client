@@ -5,14 +5,24 @@
 package paarmann.physikprofil;
 
 import android.app.Activity;
+import android.content.ClipboardManager;
+import android.content.ClipData;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseBooleanArray;
+import android.view.ActionMode;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
 
@@ -37,6 +47,46 @@ public class HomeworkDetailActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_homework_detail);
 
+	final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+	listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+	listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
+	  @Override
+	  public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+		  									boolean checked) {
+	  }
+	  @Override
+	  public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+		  case R.id.action_copy:
+			copyCurrentItems();
+			mode.finish();
+			return true;
+		  default:
+			return false;
+		}
+	  }
+	  @Override
+      public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+		MenuInflater inflater = mode.getMenuInflater();
+		inflater.inflate(R.menu.detail_context_menu, menu);
+		return true;
+	  }
+	  @Override
+	  public void onDestroyActionMode(ActionMode mode) {
+
+	  }
+	  @Override
+	  public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+		return false;
+	  }
+	});
+	listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+	  public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        listView.setItemChecked(position, true);
+		return true;
+	  }
+	});
+
     loadHomework(getIntent().getStringExtra(EXTRA_DATE));
   }
 
@@ -55,6 +105,23 @@ public class HomeworkDetailActivity extends Activity {
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
     return super.onOptionsItemSelected(item);
+  }
+
+  private void copyCurrentItems() {
+	ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+	SparseBooleanArray items = listView.getCheckedItemPositions();
+	String toCopy = "";
+	for (int i = 0; i < items.size(); i++) {
+	  if (items.get(i)) {
+        View listItem = listView.getChildAt(i);
+		TextView desc = (TextView) listItem.findViewById(R.id.textDesc);
+		toCopy += desc.getText() + (items.size() == 1 ? "" : "\n\n");
+	  }
+	}
+	ClipData data = ClipData.newPlainText("homework", toCopy);
+	clipboard.setPrimaryClip(data);
+	Toast.makeText(this, (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert", 1000).show();
   }
 
   private void loadHomework(String date) {
@@ -83,6 +150,7 @@ public class HomeworkDetailActivity extends Activity {
     }
     ListView list = (ListView) findViewById(R.id.lsViewHomework);
     list.setAdapter(new HAElementArrayAdapter(this, data));
+
   }
 
   private class DownloadHATask extends AsyncTask<String, Void, List<HAElement>> {

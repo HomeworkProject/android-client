@@ -5,31 +5,41 @@
 package paarmann.physikprofil;
 
 
+import android.app.Activity;
+import android.content.ClipboardManager;
+import android.content.ClipData;
 import android.content.Context;
+import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
 public class HAElementArrayAdapter extends ArrayAdapter<HomeworkDetailActivity.HAElement> {
 
   private List<HomeworkDetailActivity.HAElement> objects;
-  private Context context;
+  private Activity activity;
 
-  public HAElementArrayAdapter(Context context, List<HomeworkDetailActivity.HAElement> objects) {
-    super(context, R.layout.homework_list_item, objects);
+  public HAElementArrayAdapter(Activity activity, List<HomeworkDetailActivity.HAElement> objects) {
+    super(activity, R.layout.homework_list_item, objects);
     this.objects = objects;
-    this.context = context;
+    this.activity = activity;
   }
 
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
     LayoutInflater
         inflater =
-        (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     View root = inflater.inflate(R.layout.homework_list_item, parent, false);
 
     TextView title = (TextView) root.findViewById(R.id.textTitle);
@@ -50,4 +60,5 @@ public class HAElementArrayAdapter extends ArrayAdapter<HomeworkDetailActivity.H
 
     return root;
   }
+
 }
