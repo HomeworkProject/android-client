@@ -1,6 +1,7 @@
 v1.3
 ====
 -Show NoUpdateDialog even when Activity is paused while checking for updates
+-Ability to copy homework entries
 
 v1.2
 ====
