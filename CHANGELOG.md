@@ -4,6 +4,8 @@ v1.3
 
 -Ability to copy homework entries
 
+-Homework ListItems take up entire width
+
 v1.2
 ====
 -Fix crash when MainActivity is paused while the app is checking for new updates
