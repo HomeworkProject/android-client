@@ -21,6 +21,10 @@
     <string name="dates_unavailable">Termine werden in einem zukünftigen Update hinzugefügt</string>
     <string name="updating">Update wird heruntergeladen...</string>
     <string name="noUpdateDialogText">Die neueste Version ist bereits installiert.</string>
+	<string name="setReminder">Erinnerung erstellen</string>
+	<string name="reminder_datetime_picker_title">Erinnerung hinzufügen</string>
+	<string name="cancel">Abbrechen</string>
+	<string name="btnDayBeforeText">Einen Tag davor</string>
 	<string name="changelog">Diese Version enthält folgende Verbesserungen:\n-Möglicher Crash behoben\n-Überflüssiger "Settings"-Button entfernt</string>
 
 </resources>

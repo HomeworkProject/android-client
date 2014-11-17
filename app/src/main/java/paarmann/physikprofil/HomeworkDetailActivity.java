@@ -5,6 +5,7 @@
 package paarmann.physikprofil;
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.Context;
@@ -59,6 +60,10 @@ public class HomeworkDetailActivity extends Activity {
         switch (item.getItemId()) {
 		  case R.id.action_copy:
 			copyCurrentItems();
+			mode.finish();
+			return true;
+		  case R.id.action_remind:
+			setNewReminder();
 			mode.finish();
 			return true;
 		  default:
@@ -122,6 +127,23 @@ public class HomeworkDetailActivity extends Activity {
 	ClipData data = ClipData.newPlainText("homework", toCopy);
 	clipboard.setPrimaryClip(data);
 	Toast.makeText(this, (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert", 1000).show();
+  }
+
+  private void setNewReminder() {
+    DialogFragment dialog = ReminderDateTimePickerFragment.newInstance(getSelectedListItems());
+	dialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
+  }
+
+  private ArrayList<View> getSelectedListItems() {
+    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+	SparseBooleanArray selected = listView.getCheckedItemPositions();
+	ArrayList<View> selectedItems = new ArrayList<View>();
+	for (int i = 0; i < selected.size(); i++) {
+	  if (selected.get(i)) {
+		selectedItems.add(listView.getChildAt(i));
+	  }
+	}
+	return selectedItems;
   }
 
   private void loadHomework(String date) {
