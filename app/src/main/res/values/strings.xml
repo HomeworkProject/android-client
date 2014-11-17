@@ -4,6 +4,7 @@
     <string name="app_name">Physik/Bio Profil</string>
     <string name="action_settings">Settings</string>
 	<string name="action_copy">Kopieren</string>
+	<string name="action_remind">Erinnern</string>
     <string name="btnNextDay_text">Morgen</string>
     <string name="btnAfterNextDay_text">Übermorgen</string>
     <string name="allHomework">Alle Hausaufgaben ansehen</string>
