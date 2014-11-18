@@ -9,17 +9,26 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.Spinner;
+import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class ReminderDateTimePickerFragment extends DialogFragment {
 
-  public static ReminderDateTimePickerFragment newInstance(ArrayList<View> selectedListItems) {
+  private View layout;
+
+  public static ReminderDateTimePickerFragment newInstance(ArrayList<HomeworkDetailActivity.HAElement> selectedListItems) {
     ReminderDateTimePickerFragment frag = new ReminderDateTimePickerFragment();
 	Bundle args = new Bundle();
 	args.putSerializable("selectedListItems", selectedListItems);
@@ -36,26 +45,27 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     LayoutInflater inflater = getActivity().getLayoutInflater();
 
-	View layout = inflater.inflate(R.layout.reminder_datetime_picker_dialog, null);
-	Spinner dateSpinner = (Spinner) layout.findViewById(R.id.dateSpinner);
-	Spinner timeSpinner = (Spinner) layout.findViewById(R.id.timeSpinner);
+	layout = inflater.inflate(R.layout.reminder_datetime_picker_dialog, null);
+	Button dateButton = (Button) layout.findViewById(R.id.dateButton);
+	Button timeButton = (Button) layout.findViewById(R.id.timeButton);
+
+	dateButton.setText("Datum wählen");
+	timeButton.setText("Zeit wählen");
 	
-	dateSpinner.setOnTouchListener(new View.OnTouchListener() {
+	dateButton.setOnClickListener(new View.OnClickListener() {
       @Override
-	  public boolean onTouch(View view, MotionEvent event) {
+	  public void onClick(View view) {
         //TODO open calendar dialog
-		return false;
 	  }
 	});
-	timeSpinner.setOnTouchListener(new View.OnTouchListener() {
+	timeButton.setOnClickListener(new View.OnClickListener() {
 	  @Override
-	  public boolean onTouch(View view, MotionEvent event) {
+	  public void onClick(View view) {
 		//TODO open "clock" dialog
-		return false;
 	  }
 	});
 
-	ArrayList<View> selectedListItems = (ArrayList<View>) getArguments().getSerializable("selectedListItems");
+	final ArrayList<HomeworkDetailActivity.HAElement> selectedListItems = (ArrayList<HomeworkDetailActivity.HAElement>) getArguments().getSerializable("selectedListItems");
     Button btnDayBefore = (Button) layout.findViewById(R.id.btnDayBefore);
     if (selectedListItems.size() > 1) {
       btnDayBefore.setEnabled(false);
@@ -63,7 +73,18 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
       btnDayBefore.setOnClickListener(new View.OnClickListener() {
         @Override
 		public void onClick(View view) {
-		  //TODO set date to day before homework due
+		  try {
+		  Date due = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
+		  Calendar date = Calendar.getInstance();
+		  date.setTime(due);
+		  date.add(Calendar.DAY_OF_MONTH, -1);
+		  date.set(Calendar.HOUR, 14);
+		  date.set(Calendar.MINUTE, 0);
+		  date.set(Calendar.SECOND, 0);
+		  setDate(date);
+		  } catch (ParseException e) {
+		    Log.wtf("Parsing", "Error while parsing date", e);
+		  }
 	    }
 	  });
 	}
@@ -84,6 +105,17 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	  });
 
 	return builder.create();
+  }
+
+  private void setDate(Calendar date) {
+    Button dateButton = (Button) layout.findViewById(R.id.dateButton);
+	Button timeButton = (Button) layout.findViewById(R.id.timeButton);
+
+	String strDate = DateFormat.getDateInstance().format(date.getTime());
+	String strTime = new SimpleDateFormat("kk:mm").format(date.getTime());
+	
+	dateButton.setText(strDate);
+	timeButton.setText(strTime);
   }
 
 }

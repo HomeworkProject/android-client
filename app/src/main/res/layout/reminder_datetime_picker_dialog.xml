@@ -9,16 +9,24 @@
 		android:layout_height="wrap_content"
 		android:orientation="horizontal" >
 
-		<Spinner
-			android:id="@+id/dateSpinner"
+		<Button
+			android:id="@+id/dateButton"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
-		<Spinner
-			android:id="@+id/timeSpinner"
+			android:layout_height="wrap_content"
+			style="?android:attr/spinnerStyle" />
+
+		<Button
+			android:id="@+id/timeButton"
 			android:layout_width="wrap_content"
-			android:layout_height="wrap_content" />
+			android:layout_height="wrap_content"
+		    style="?android:attr/spinnerStyle" />
 
 	</LinearLayout>
+
+	<View
+		android:layout_width="match_parent"
+		android:layout_height="1dip"
+		android:background="?android:attr/dividerHorizontal" />
 
 	<Button
 		android:id="@+id/btnDayBefore"

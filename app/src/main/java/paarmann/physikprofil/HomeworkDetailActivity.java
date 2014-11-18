@@ -134,13 +134,13 @@ public class HomeworkDetailActivity extends Activity {
 	dialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
   }
 
-  private ArrayList<View> getSelectedListItems() {
+  private ArrayList<HAElement> getSelectedListItems() {
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
 	SparseBooleanArray selected = listView.getCheckedItemPositions();
-	ArrayList<View> selectedItems = new ArrayList<View>();
+	ArrayList<HAElement> selectedItems = new ArrayList<HAElement>();
 	for (int i = 0; i < selected.size(); i++) {
-	  if (selected.get(i)) {
-		selectedItems.add(listView.getChildAt(i));
+	  if (selected.valueAt(i)) {
+		selectedItems.add((HAElement) listView.getItemAtPosition(selected.keyAt(i)));
 	  }
 	}
 	return selectedItems;
