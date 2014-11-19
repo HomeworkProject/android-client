@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -52,10 +53,27 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	dateButton.setText("Datum wählen");
 	timeButton.setText("Zeit wählen");
 	
+	final ArrayList<HomeworkDetailActivity.HAElement> selectedListItems = (ArrayList<HomeworkDetailActivity.HAElement>) getArguments().getSerializable("selectedListItems");
+
 	dateButton.setOnClickListener(new View.OnClickListener() {
       @Override
 	  public void onClick(View view) {
         //TODO open calendar dialog
+		try {
+			Date initialDate = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
+			ReminderDatePickerFragment dialog = ReminderDatePickerFragment.newInstance(initialDate);
+			dialog.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+			  @Override
+			  public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
+				Calendar date = Calendar.getInstance();
+				date.set(year, month, dayOfMonth);
+				setDate(date);
+			  }
+			});
+			dialog.show(getActivity().getFragmentManager(), "reminderCalendar");
+		} catch (ParseException e) {
+		  Log.wtf("ParseDates", "error parsing date", e);
+		}
 	  }
 	});
 	timeButton.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +83,6 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	  }
 	});
 
-	final ArrayList<HomeworkDetailActivity.HAElement> selectedListItems = (ArrayList<HomeworkDetailActivity.HAElement>) getArguments().getSerializable("selectedListItems");
     Button btnDayBefore = (Button) layout.findViewById(R.id.btnDayBefore);
     if (selectedListItems.size() > 1) {
       btnDayBefore.setEnabled(false);
@@ -82,6 +99,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 		  date.set(Calendar.MINUTE, 0);
 		  date.set(Calendar.SECOND, 0);
 		  setDate(date);
+		  setTime(date);
 		  } catch (ParseException e) {
 		    Log.wtf("Parsing", "Error while parsing date", e);
 		  }
@@ -109,12 +127,13 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 
   private void setDate(Calendar date) {
     Button dateButton = (Button) layout.findViewById(R.id.dateButton);
-	Button timeButton = (Button) layout.findViewById(R.id.timeButton);
-
 	String strDate = DateFormat.getDateInstance().format(date.getTime());
-	String strTime = new SimpleDateFormat("kk:mm").format(date.getTime());
-	
 	dateButton.setText(strDate);
+  }
+
+  private void setTime(Calendar time) {
+	Button timeButton = (Button) layout.findViewById(R.id.timeButton);
+	String strTime = new SimpleDateFormat("kk:mm").format(time.getTime());
 	timeButton.setText(strTime);
   }
 
