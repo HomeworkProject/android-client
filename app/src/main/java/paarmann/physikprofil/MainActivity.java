@@ -43,6 +43,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends Activity implements DatePickerDialog.OnDateSetListener {
 
+  public final static String ACTION_REMIND = "paarmann.physikprofil.action.REMIND";
+
   public final static String PREF_NAME = "paarmann.physikprofil.sharedprefs";
   public final static String PREF_UPDATED = "paarmann.physikprofil.updated";
 

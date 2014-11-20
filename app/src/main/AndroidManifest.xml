@@ -30,6 +30,13 @@
                 android:value="paarmann.physikprofil.MainActivity" />
         </activity>
 
+		<receiver
+			android:name="ReminderBroadcastReceiver" >
+			<intent-filter>
+				<action android:name="paarmann.physikprofil.action.REMIND" />
+			</intent-filter>
+		</receiver>
+
     </application>
 
 

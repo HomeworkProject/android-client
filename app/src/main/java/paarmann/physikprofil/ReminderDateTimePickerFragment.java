@@ -4,12 +4,17 @@
 
 package paarmann.physikprofil;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -51,10 +56,10 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
     LayoutInflater inflater = getActivity().getLayoutInflater();
 
 	layout = inflater.inflate(R.layout.reminder_datetime_picker_dialog, null);
-	Button dateButton = (Button) layout.findViewById(R.id.dateButton);
-	Button timeButton = (Button) layout.findViewById(R.id.timeButton);
+	final Button dateButton = (Button) layout.findViewById(R.id.dateButton);
+	final Button timeButton = (Button) layout.findViewById(R.id.timeButton);
 
-	dateButton.setText("Datum wählen");
+    dateButton.setText("Datum wählen");
 	timeButton.setText("Zeit wählen");
 	
 	final ArrayList<HomeworkDetailActivity.HAElement> selectedListItems = (ArrayList<HomeworkDetailActivity.HAElement>) getArguments().getSerializable("selectedListItems");
@@ -134,7 +139,32 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	  .setPositiveButton(R.string.setReminder, new DialogInterface.OnClickListener() {
         @Override
 		public void onClick(DialogInterface dialog, int id) {
-		  ///TODO create new reminder
+		  //TODO create new reminder
+		  AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+		  String strDate = dateButton.getText() + " " + timeButton.getText();
+		  Date when = null;
+		  try {
+		    when = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(strDate);
+		  } catch (ParseException e) {throw new RuntimeException("Somehow, the date failed to parse");}
+          String scheme = "homework";
+		  String ssp = "";			// Date~Title~Subject~Desc\Date~Title~Subject~Desc\....
+		  for (int i = 0; i < selectedListItems.size(); i++) {
+            HomeworkDetailActivity.HAElement element = selectedListItems.get(i);
+			ssp += element.date + "~"
+		         + element.title + "~"
+		         + element.subject + "~"
+		         + element.desc + "\\";
+		  }
+
+		  Uri uri = Uri.fromParts(scheme, ssp, "");
+
+		  Intent intent = new Intent(MainActivity.ACTION_REMIND, uri, getActivity(), ReminderBroadcastReceiver.class);
+          PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+          if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+		    alarmManager.setExact(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
+		  } else {
+			alarmManager.set(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
+		  }
 		}
 	  })
 	  .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
