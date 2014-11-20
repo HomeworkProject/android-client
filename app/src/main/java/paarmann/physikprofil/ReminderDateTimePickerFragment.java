@@ -5,6 +5,7 @@
 package paarmann.physikprofil;
 
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
+import android.widget.DatePicker;
 import android.widget.TextView;
 
 import java.text.DateFormat;
@@ -61,7 +63,12 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
         //TODO open calendar dialog
 		try {
 			Date initialDate = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
-			ReminderDatePickerFragment dialog = ReminderDatePickerFragment.newInstance(initialDate);
+			Calendar initDate = Calendar.getInstance();
+			initDate.setTime(initialDate);
+			int initYear = initDate.get(Calendar.YEAR);
+			int initMonth = initDate.get(Calendar.MONTH);
+			int initDay = initDate.get(Calendar.DAY_OF_MONTH);
+			/*ReminderDatePickerFragment dialog = ReminderDatePickerFragment.newInstance(initialDate);
 			dialog.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
 			  @Override
 			  public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
@@ -70,7 +77,19 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 				setDate(date);
 			  }
 			});
-			dialog.show(getActivity().getFragmentManager(), "reminderCalendar");
+			dialog.show(getActivity().getFragmentManager(), "reminderCalendar");*/
+		  DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+			public void onDateSet(DatePicker view, int year, int month, int day) {
+              Calendar date = Calendar.getInstance();
+			  date.set(year, month, day);
+			  setDate(date);
+			}
+		  };
+	      DatePickerDialog dialog = new DatePickerDialog(getActivity(), listener, initYear, initMonth, initDay); 
+		  dialog.getDatePicker().setSpinnersShown(false);
+		  dialog.getDatePicker().setCalendarViewShown(true);
+		  dialog.show();
 		} catch (ParseException e) {
 		  Log.wtf("ParseDates", "error parsing date", e);
 		}
