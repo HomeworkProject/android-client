@@ -8,6 +8,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.Button;
 import android.widget.CalendarView;
 import android.widget.DatePicker;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -60,24 +62,13 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	dateButton.setOnClickListener(new View.OnClickListener() {
       @Override
 	  public void onClick(View view) {
-        //TODO open calendar dialog
 		try {
-			Date initialDate = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
-			Calendar initDate = Calendar.getInstance();
-			initDate.setTime(initialDate);
-			int initYear = initDate.get(Calendar.YEAR);
-			int initMonth = initDate.get(Calendar.MONTH);
-			int initDay = initDate.get(Calendar.DAY_OF_MONTH);
-			/*ReminderDatePickerFragment dialog = ReminderDatePickerFragment.newInstance(initialDate);
-			dialog.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
-			  @Override
-			  public void onSelectedDayChange(CalendarView view, int year, int month, int dayOfMonth) {
-				Calendar date = Calendar.getInstance();
-				date.set(year, month, dayOfMonth);
-				setDate(date);
-			  }
-			});
-			dialog.show(getActivity().getFragmentManager(), "reminderCalendar");*/
+          Date initialDate = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
+          Calendar initDate = Calendar.getInstance();
+          initDate.setTime(initialDate);
+          int initYear = initDate.get(Calendar.YEAR);
+          int initMonth = initDate.get(Calendar.MONTH);
+          int initDay = initDate.get(Calendar.DAY_OF_MONTH);
 		  DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             @Override
 			public void onDateSet(DatePicker view, int year, int month, int day) {
@@ -98,7 +89,19 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	timeButton.setOnClickListener(new View.OnClickListener() {
 	  @Override
 	  public void onClick(View view) {
-		//TODO open "clock" dialog
+		int initialHour = 14;
+		int initialMinute = 00;
+		TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+          @Override
+		  public void onTimeSet(TimePicker view, int hour, int minute) {
+            Calendar time = Calendar.getInstance();
+			time.set(Calendar.HOUR_OF_DAY, hour);
+			time.set(Calendar.MINUTE, minute);
+			setTime(time);
+		  }
+		};
+		TimePickerDialog dialog = new TimePickerDialog(getActivity(), listener, initialHour, initialMinute, true);
+		dialog.show();
 	  }
 	});
 
@@ -152,7 +155,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 
   private void setTime(Calendar time) {
 	Button timeButton = (Button) layout.findViewById(R.id.timeButton);
-	String strTime = new SimpleDateFormat("kk:mm").format(time.getTime());
+	String strTime = new SimpleDateFormat("HH:mm").format(time.getTime());
 	timeButton.setText(strTime);
   }
 
