@@ -49,7 +49,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 	return frag;
   }
 
-  private ReminderDateTimePickerFragment() {
+  public ReminderDateTimePickerFragment() {
 	super();
   }
 
