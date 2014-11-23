@@ -43,6 +43,9 @@ public class HomeworkDetailActivity extends Activity {
 
   public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
 
+  private DialogFragment reminderDialog;
+  private ActionMode mActionMode;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -74,11 +77,12 @@ public class HomeworkDetailActivity extends Activity {
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.detail_context_menu, menu);
+        mActionMode = mode;
         return true;
       }
       @Override
       public void onDestroyActionMode(ActionMode mode) {
-
+        mActionMode = null;
       }
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
@@ -95,6 +99,16 @@ public class HomeworkDetailActivity extends Activity {
     loadHomework(getIntent().getStringExtra(EXTRA_DATE));
   }
 
+  @Override
+  public void onSaveInstanceState(Bundle outState) {
+    if (reminderDialog != null) {
+      reminderDialog.dismiss();
+    }
+    if (mActionMode != null) {
+      mActionMode.finish();
+    }
+    super.onSaveInstanceState(outState);
+  }
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,8 +144,8 @@ public class HomeworkDetailActivity extends Activity {
   }
 
   private void setNewReminder() {
-    DialogFragment dialog = ReminderDateTimePickerFragment.newInstance(getSelectedListItems());
-    dialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
+    reminderDialog = ReminderDateTimePickerFragment.newInstance(getSelectedListItems());
+    reminderDialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
   }
 
   private ArrayList<HAElement> getSelectedListItems() {
