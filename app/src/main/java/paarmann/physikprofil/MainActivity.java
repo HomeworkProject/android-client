@@ -47,6 +47,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
 
   public final static String PREF_NAME = "paarmann.physikprofil.sharedprefs";
   public final static String PREF_UPDATED = "paarmann.physikprofil.updated";
+  public final static String PREF_SETREMINDERS = "paarmann.physikprofil.reminders";
 
   SharedPreferences prefs;
 
@@ -84,7 +85,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
       File file = new File(Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk");
       file.delete();
 	  
-	  showChangelog();
+      showChangelog();
     }
 
     checkForUpdates(false);
@@ -107,19 +108,19 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
 
   @Override
   public void onPause() {
-	super.onPause();
-	isPaused = true;
+    super.onPause();
+    isPaused = true;
   }
 
   @Override
   public void onResume() {
-	super.onResume();
-	isPaused = false;
+    super.onResume();
+    isPaused = false;
 
-	while (dialogsToShow.size() > 0) {
+    while (dialogsToShow.size() > 0) {
       DialogFragment dialog = dialogsToShow.get(0);
-	  dialog.show(getFragmentManager(), "dialogsToShow");
-	  dialogsToShow.remove(0);
+      dialog.show(getFragmentManager(), "dialogsToShow");
+      dialogsToShow.remove(0);
     }
   }
 
@@ -140,9 +141,17 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
       case R.id.action_update:
         checkForUpdates(true);
         return true;
+      case R.id.action_manageReminders:
+        startManageRemindersActivity();
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
+  }
+
+  private void startManageRemindersActivity() {
+    Intent manageReminders = new Intent(this, ManageRemindersActivity.class);
+    startActivity(manageReminders);
   }
 
   public void onBtnAllHomeworkClick(View view) {
@@ -218,8 +227,8 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   
   private void showChangelog() {
     ChangelogDialog dialog = new ChangelogDialog();
-	dialog.setChangelog(getResources().getString(R.string.changelog));
-	dialog.show(getFragmentManager(), "changelogDialog");
+    dialog.setChangelog(getResources().getString(R.string.changelog));
+    dialog.show(getFragmentManager(), "changelogDialog");
   }
 
   private class CheckForUpdateTask extends AsyncTask<String, Void, Void> {
@@ -252,13 +261,13 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
         } else {
           boolean userInitiated = Boolean.parseBoolean(params[1]);
           if (userInitiated) {
-			if (!isPaused) {
-		      DialogFragment dialog = new NoUpdateDialog();
-		  	  dialog.show(getFragmentManager(), "noUpdateDialog");
-			} else {
-			  DialogFragment dialog = new NoUpdateDialog();
-			  dialogsToShow.add(dialog);
-			}
+            if (!isPaused) {
+              DialogFragment dialog = new NoUpdateDialog();
+              dialog.show(getFragmentManager(), "noUpdateDialog");
+            } else {
+              DialogFragment dialog = new NoUpdateDialog();
+              dialogsToShow.add(dialog);
+            }
           }
         }
 

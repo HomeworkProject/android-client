@@ -48,49 +48,49 @@ public class HomeworkDetailActivity extends Activity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_homework_detail);
 
-	final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
-	listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
-	listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
-	  @Override
-	  public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
-		  									boolean checked) {
-	  }
-	  @Override
-	  public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+    final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+    listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+    listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
+      @Override
+      public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
+                                            boolean checked) {
+      }
+      @Override
+      public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
-		  case R.id.action_copy:
-			copyCurrentItems();
-			mode.finish();
-			return true;
-		  case R.id.action_remind:
-			setNewReminder();
-			mode.finish();
-			return true;
-		  default:
-			return false;
-		}
-	  }
-	  @Override
+          case R.id.action_copy:
+            copyCurrentItems();
+            mode.finish();
+            return true;
+          case R.id.action_remind:
+            setNewReminder();
+            mode.finish();
+            return true;
+          default:
+            return false;
+        }
+      }
+      @Override
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		MenuInflater inflater = mode.getMenuInflater();
-		inflater.inflate(R.menu.detail_context_menu, menu);
-		return true;
-	  }
-	  @Override
-	  public void onDestroyActionMode(ActionMode mode) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.detail_context_menu, menu);
+        return true;
+      }
+      @Override
+      public void onDestroyActionMode(ActionMode mode) {
 
-	  }
-	  @Override
-	  public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-		return false;
-	  }
-	});
-	listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-	  public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+      }
+      @Override
+      public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+      }
+    });
+    listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+      public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         listView.setItemChecked(position, true);
-		return true;
-	  }
-	});
+        return true;
+      }
+    });
 
     loadHomework(getIntent().getStringExtra(EXTRA_DATE));
   }
@@ -113,37 +113,37 @@ public class HomeworkDetailActivity extends Activity {
   }
 
   private void copyCurrentItems() {
-	ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
-	SparseBooleanArray items = listView.getCheckedItemPositions();
-	String toCopy = "";
-	for (int i = 0; i < items.size(); i++) {
-	  if (items.get(i)) {
+    SparseBooleanArray items = listView.getCheckedItemPositions();
+    String toCopy = "";
+    for (int i = 0; i < items.size(); i++) {
+      if (items.get(i)) {
         View listItem = listView.getChildAt(i);
-		TextView desc = (TextView) listItem.findViewById(R.id.textDesc);
-		toCopy += desc.getText() + (items.size() == 1 ? "" : "\n\n");
-	  }
-	}
-	ClipData data = ClipData.newPlainText("homework", toCopy);
-	clipboard.setPrimaryClip(data);
-	Toast.makeText(this, (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert", 1000).show();
+        TextView desc = (TextView) listItem.findViewById(R.id.textDesc);
+        toCopy += desc.getText() + (items.size() == 1 ? "" : "\n\n");
+      }
+    }
+    ClipData data = ClipData.newPlainText("homework", toCopy);
+    clipboard.setPrimaryClip(data);
+    Toast.makeText(this, (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert", 1000).show();
   }
 
   private void setNewReminder() {
     DialogFragment dialog = ReminderDateTimePickerFragment.newInstance(getSelectedListItems());
-	dialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
+    dialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
   }
 
   private ArrayList<HAElement> getSelectedListItems() {
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
-	SparseBooleanArray selected = listView.getCheckedItemPositions();
-	ArrayList<HAElement> selectedItems = new ArrayList<HAElement>();
-	for (int i = 0; i < selected.size(); i++) {
-	  if (selected.valueAt(i)) {
-		selectedItems.add((HAElement) listView.getItemAtPosition(selected.keyAt(i)));
-	  }
-	}
-	return selectedItems;
+    SparseBooleanArray selected = listView.getCheckedItemPositions();
+    ArrayList<HAElement> selectedItems = new ArrayList<HAElement>();
+    for (int i = 0; i < selected.size(); i++) {
+      if (selected.valueAt(i)) {
+        selectedItems.add((HAElement) listView.getItemAtPosition(selected.keyAt(i)));
+      }
+    }
+    return selectedItems;
   }
 
   private void loadHomework(String date) {
@@ -245,6 +245,7 @@ public class HomeworkDetailActivity extends Activity {
           continue;
         }
 //        try {
+        element.id = id;
         element.date = properties.next();
         element.title = properties.next();
         element.subject = properties.next();
@@ -262,6 +263,7 @@ public class HomeworkDetailActivity extends Activity {
 
   public static class HAElement {
 
+    public int id;
     public String date;
     public String title;
     public String subject;

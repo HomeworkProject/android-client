@@ -5,4 +5,8 @@
         android:title="@string/updateText"
         android:orderInCategory="99"
         android:showAsAction="never" />
+    <item android:id="@+id/action_manageReminders"
+      android:title="@string/manageRemindersText"
+      android:orderInCategory="98"
+      android:showAsAction="never" />
 </menu>

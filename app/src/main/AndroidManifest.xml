@@ -5,7 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -29,13 +30,27 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="paarmann.physikprofil.MainActivity" />
         </activity>
+        <activity
+          android:name=".ManageRemindersActivity"
+          android:label="@string/title_activity_manage_reminders"
+          android:parentActivityName=".MainActivity" >
+          <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value="paarmann.physikprofil.MainActivity" />
+        </activity>
 
-		<receiver
-			android:name="ReminderBroadcastReceiver" >
-			<intent-filter>
-				<action android:name="paarmann.physikprofil.action.REMIND" />
-			</intent-filter>
-		</receiver>
+        <receiver
+            android:name=".ReminderBroadcastReceiver" >
+          <intent-filter>
+            <action android:name="paarmann.physikprofil.action.REMIND" />
+          </intent-filter>
+        </receiver>
+        <receiver
+          android:name=".BootCompleteBroadcastReceiver" >
+          <intent-filter>
+            <action android:name="android.intent.action.BOOT_COMPLETED" />
+          </intent-filter>
+        </receiver>
 
     </application>
 

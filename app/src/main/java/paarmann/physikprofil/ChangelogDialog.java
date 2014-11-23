@@ -15,23 +15,23 @@ public class ChangelogDialog extends DialogFragment {
   private String changelog = "";
 
   public ChangelogDialog() {
-	super();
+    super();
   }
 
   public void setChangelog(String changelog) {
-	this.changelog = changelog;
+    this.changelog = changelog;
   }
 
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-	builder.setMessage(changelog)
-		.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-		  @Override
-		  public void onClick(DialogInterface dialog, int which) {
-		    // Just let the dialog close
-		  }
-		});
-	return builder.create();
+    builder.setMessage(changelog)
+        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            // Just let the dialog close
+          }
+        });
+    return builder.create();
   }
 }
