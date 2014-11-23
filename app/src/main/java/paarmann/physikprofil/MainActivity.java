@@ -52,7 +52,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   SharedPreferences prefs;
 
   private boolean isPaused;
-  private List<DialogFragment> dialogsToShow = new ArrayList<DialogFragment>();
+  private static List<DialogFragment> dialogsToShow = new ArrayList<DialogFragment>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
