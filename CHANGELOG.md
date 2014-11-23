@@ -1,3 +1,11 @@
+v1.4
+====
+-Possibility to let yourself be reminded of homework
+
+-Fix bug, where NoUpdateDialog might not be shown
+
+-Fix bug, where the app would crash if exited while certain dialogs were open
+
 v1.3
 ====
 -Show NoUpdateDialog even when Activity is paused while checking for updates

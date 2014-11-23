@@ -29,6 +29,6 @@
     <string name="cancel">Abbrechen</string>
     <string name="btnDayBeforeText">Einen Tag davor</string>
     <string name="manageRemindersText">Erinnerungen</string>
-    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-Möglicher Crash behoben\n-Überflüssiger "Settings"-Button entfernt</string>
+    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-Möglicher Crash behoben\n-Erinnerungen für Hausaufgaben\n-Hausaufgaben kopieren</string>
 
 </resources>
