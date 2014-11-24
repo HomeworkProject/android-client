@@ -14,6 +14,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -48,6 +49,8 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   public final static String PREF_NAME = "paarmann.physikprofil.sharedprefs";
   public final static String PREF_UPDATED = "paarmann.physikprofil.updated";
   public final static String PREF_SETREMINDERS = "paarmann.physikprofil.reminders";
+  public final static String PREF_FILTERSUBJECTS = "paarmann.physikprofil.FilterSubjects";
+  public final static String PREF_CHOSENSUBJECTS = "paarmann.physikprofil.ChosenSubjects";
 
   SharedPreferences prefs;
 
@@ -58,6 +61,8 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
     initTabs();
 
@@ -144,6 +149,9 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
       case R.id.action_manageReminders:
         startManageRemindersActivity();
         return true;
+      case R.id.action_settings:
+        startSettingsActivity();
+        return true;
       default:
         return super.onOptionsItemSelected(item);
     }
@@ -152,6 +160,11 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   private void startManageRemindersActivity() {
     Intent manageReminders = new Intent(this, ManageRemindersActivity.class);
     startActivity(manageReminders);
+  }
+  
+  private void startSettingsActivity() {
+    Intent settings = new Intent(this, SettingsActivity.class);
+    startActivity(settings);
   }
 
   public void onBtnAllHomeworkClick(View view) {

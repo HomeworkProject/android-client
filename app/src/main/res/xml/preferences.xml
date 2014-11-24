@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+  <PreferenceCategory
+    android:title="@string/pref_category_filter_title"
+    android:key="paarmann.physikprofil.CategoryFilter" >
+
+      <CheckBoxPreference
+        android:key="paarmann.physikprofil.FilterSubjects"
+        android:title="@string/pref_filter"
+        android:summary="@string/pref_filter_summary"
+        android:defaultValue="false" />
+
+      <EditTextPreference
+        android:key="paarmann.physikprofil.ChosenSubjects"
+        android:title="@string/pref_subjects"
+        android:summary="@string/pref_subjects_summary"
+        android:defaultValue="@string/pref_subjects_default" />
+
+  </PreferenceCategory>
+
+</PreferenceScreen>

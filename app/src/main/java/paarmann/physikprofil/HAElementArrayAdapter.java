@@ -9,6 +9,8 @@ import android.app.Activity;
 import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -22,6 +24,8 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class HAElementArrayAdapter extends ArrayAdapter<HomeworkDetailActivity.HAElement> {
@@ -31,8 +35,8 @@ public class HAElementArrayAdapter extends ArrayAdapter<HomeworkDetailActivity.H
 
   public HAElementArrayAdapter(Activity activity, List<HomeworkDetailActivity.HAElement> objects) {
     super(activity, R.layout.homework_list_item, objects);
-    this.objects = objects;
     this.activity = activity;
+    this.objects = objects;
   }
 
   @Override

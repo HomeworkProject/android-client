@@ -9,8 +9,10 @@ import android.app.DialogFragment;
 import android.content.ClipboardManager;
 import android.content.ClipData;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -31,6 +33,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -184,9 +187,30 @@ public class HomeworkDetailActivity extends Activity {
       TextView emptyView = (TextView) findViewById(R.id.emptyView);
       emptyView.setText("Keine Hausaufgaben!");
     }
-    ListView list = (ListView) findViewById(R.id.lsViewHomework);
-    list.setAdapter(new HAElementArrayAdapter(this, data));
 
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    boolean filter = prefs.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
+    String chosenSubjects = prefs.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
+    
+    List<HAElement> filteredData;
+
+    if (filter) {
+      List<HAElement> displayedObjects = new ArrayList<HAElement>();
+      List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
+
+      for (int i = 0; i < data.size(); i++) {
+        if (displayedSubjects.contains(data.get(i).subject)) {
+          displayedObjects.add(data.get(i));
+        }
+      }
+
+      filteredData = displayedObjects;
+    } else {
+      filteredData = data;
+    }
+
+    ListView list = (ListView) findViewById(R.id.lsViewHomework);
+    list.setAdapter(new HAElementArrayAdapter(this, filteredData));
   }
 
   private class DownloadHATask extends AsyncTask<String, Void, List<HAElement>> {
