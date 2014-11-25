@@ -47,6 +47,9 @@ public class SettingsActivity extends Activity {
       super.onResume();
       getPreferenceScreen().getSharedPreferences()
         .registerOnSharedPreferenceChangeListener(this);
+      onSharedPreferenceChanged(
+          getPreferenceScreen().getSharedPreferences(),
+          MainActivity.PREF_FILTERSUBJECTS);
     }
 
     @Override
