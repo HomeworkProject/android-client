@@ -168,6 +168,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
 
   private void loadHomework() {
     TextView emptyView = (TextView) findViewById(R.id.emptyView);
+    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setEmptyView(emptyView);
     HomeworkUpdater loader = new HomeworkUpdater(this);
     loader.setOnHomeworkLoadedListener(this);
@@ -265,8 +266,8 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     list.setAdapter(new HAElementArrayAdapter(this, selectedData));
   }
 
-  public static class HAElement {
-
+  public static class HAElement implements java.io.Serializable {
+    private static final long serialVersionUID = 0L;
     public int id;
     public String date;
     public String title;

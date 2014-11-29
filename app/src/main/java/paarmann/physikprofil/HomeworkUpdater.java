@@ -7,11 +7,16 @@ package paarmann.physikprofil;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.ConnectException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -27,6 +32,8 @@ import javax.net.ssl.HttpsURLConnection;
 import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
 
 public class HomeworkUpdater {
+
+  public static String HOMEWORK_FILE = "homework.ser";
 
   public interface OnHomeworkLoadedListener {
     public void setData(List<HAElement> data);
@@ -58,13 +65,15 @@ public class HomeworkUpdater {
   }
 
   public void downloadHomework() {
+    Log.i("Homework", "Downloading homework");
     DownloadTask task = new DownloadTask();
     task.execute();
   }
 
   public void loadHomeworkFromFile() {
-    //FileTask task = new FileTask();
-    //task.execute();
+    Log.i("Homework", "Loading homework from file");
+    FileTask task = new FileTask();
+    task.execute();
   }
 
   /**
@@ -77,6 +86,54 @@ public class HomeworkUpdater {
   public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
     long diffInMillies = date2.getTime() - date1.getTime();
     return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+  }
+
+  private boolean saveHomeworkToFile(List<HAElement> data) {
+    ArrayList<HAElement> homework = new ArrayList<HAElement>();
+    homework.addAll(data);
+    try {
+      FileOutputStream fos = context.openFileOutput(HOMEWORK_FILE, Context.MODE_PRIVATE);
+      ObjectOutputStream oos = new ObjectOutputStream(fos);
+      oos.writeObject(homework);
+      oos.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+      Log.e("Homework", "Failed to save homework", e);
+      return false;
+    }
+    return true;
+  }
+
+  private class FileTask extends AsyncTask<Void, Void, List<HAElement>> {
+    @Override
+    protected List<HAElement> doInBackground(Void... params) {
+      try {
+        FileInputStream fis = context.openFileInput(HOMEWORK_FILE);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        Object readObject = ois.readObject();
+        ois.close();
+
+        if (readObject != null && readObject instanceof ArrayList) {
+          return (ArrayList<HAElement>) readObject;
+        }
+      } catch (IOException e) {
+        Log.e("Homework", "Failed to load homework from file", e);
+      } catch (ClassNotFoundException e) {
+        Log.e("Homework", "Failed to load homework from file", e);
+      }
+      return null;
+    }
+
+    @Override
+    protected void onPostExecute(List<HAElement> result) {
+      if (result != null) {
+        if (listener != null) {
+          listener.setData(result);
+        }
+      } else {
+        downloadHomework();
+      }
+    }
   }
 
   private class DownloadTask extends AsyncTask<Void, Void, List<HAElement>> {
@@ -103,6 +160,13 @@ public class HomeworkUpdater {
       if (listener != null) {
         listener.setData(result);
       }
+      saveHomeworkToFile(result);
+
+      Date now = new Date();
+      SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
+      SharedPreferences.Editor editor = prefs.edit();
+      editor.putLong(MainActivity.PREF_LASTUPDATED, now.getTime());
+      editor.commit();
     }
 
     private List<HAElement> downloadHA() throws IOException, ConnectException {
