@@ -49,8 +49,10 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   public final static String PREF_NAME = "paarmann.physikprofil.sharedprefs";
   public final static String PREF_UPDATED = "paarmann.physikprofil.updated";
   public final static String PREF_SETREMINDERS = "paarmann.physikprofil.reminders";
+  public final static String PREF_LASTUPDATED = "paarmann.physikprofil.lastupdated";
   public final static String PREF_FILTERSUBJECTS = "paarmann.physikprofil.FilterSubjects";
   public final static String PREF_CHOSENSUBJECTS = "paarmann.physikprofil.ChosenSubjects";
+  public final static String PREF_AUTOUPDATES = "paarmann.physikprofil.AutomaticUpdates";
 
   SharedPreferences prefs;
 

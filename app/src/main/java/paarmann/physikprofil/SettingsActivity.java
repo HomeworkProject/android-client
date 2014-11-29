@@ -39,6 +39,14 @@ public class SettingsActivity extends Activity {
         } else {
           filterPref.setSummary(getResources().getString(R.string.pref_filter_summary));
         }
+      } else if (key.equals(MainActivity.PREF_AUTOUPDATES)) {
+        Preference updatePref = findPreference(key);
+        boolean autoUpdate = preferences.getBoolean(key, false);
+        if (autoUpdate) {
+          updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary_true));
+        } else {
+          updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary));
+        }
       }
     }
 
@@ -50,6 +58,9 @@ public class SettingsActivity extends Activity {
       onSharedPreferenceChanged(
           getPreferenceScreen().getSharedPreferences(),
           MainActivity.PREF_FILTERSUBJECTS);
+      onSharedPreferenceChanged(
+          getPreferenceScreen().getSharedPreferences(),
+          MainActivity.PREF_AUTOUPDATES);
     }
 
     @Override
