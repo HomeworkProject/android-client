@@ -33,16 +33,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
 
-public class HomeworkDetailActivity extends Activity {
+public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.OnHomeworkLoadedListener {
 
   public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
 
@@ -99,7 +102,7 @@ public class HomeworkDetailActivity extends Activity {
       }
     });
 
-    loadHomework(getIntent().getStringExtra(EXTRA_DATE));
+    loadHomework();
   }
 
   @Override
@@ -163,26 +166,16 @@ public class HomeworkDetailActivity extends Activity {
     return selectedItems;
   }
 
-  private void loadHomework(String date) {
-    boolean following = false;
-
-    if (date.equals("all")) {
-      Calendar cal = Calendar.getInstance();
-      cal.add(Calendar.DAY_OF_MONTH, 1);
-      int month = cal.get(Calendar.MONTH) + 1;
-      date = cal.get(Calendar.YEAR) + "-" + month + "-" + cal.get(Calendar.DAY_OF_MONTH);
-      following = true;
-    }
-
-    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+  private void loadHomework() {
     TextView emptyView = (TextView) findViewById(R.id.emptyView);
     listView.setEmptyView(emptyView);
-
-    DownloadHATask task = new DownloadHATask();
-    task.execute(date, String.valueOf(following), getResources().getString(R.string.server_uri));
+    HomeworkUpdater loader = new HomeworkUpdater(this);
+    loader.setOnHomeworkLoadedListener(this);
+    loader.getData();
   }
 
-  private void setData(List<HAElement> data) {
+  @Override
+  public void setData(List<HAElement> data) {
     if (data.isEmpty()) {
       TextView emptyView = (TextView) findViewById(R.id.emptyView);
       emptyView.setText("Keine Hausaufgaben!");
@@ -209,95 +202,68 @@ public class HomeworkDetailActivity extends Activity {
       filteredData = data;
     }
 
-    ListView list = (ListView) findViewById(R.id.lsViewHomework);
-    list.setAdapter(new HAElementArrayAdapter(this, filteredData));
-  }
-
-  private class DownloadHATask extends AsyncTask<String, Void, List<HAElement>> {
-
-    private HAElement errorElement = new HAElement();
-    List<HAElement> errorList = new ArrayList<HAElement>();
-
-    @Override
-    protected List<HAElement> doInBackground(String... params) {
-      errorElement.title = "";
-      errorElement.subject = "";
-      errorElement.date = "";
-
-      String date = params[0];
-      boolean following = Boolean.valueOf(params[1]);
-      String server = params[2];
-
-      String url = server + "/homework.php?date=" + date + (following ? "&following=true" : "");
-
+    List<HAElement> selectedData = new ArrayList<HAElement>();
+    String strDate = getIntent().getStringExtra(EXTRA_DATE);
+    boolean all;
+    Date date = new Date();
+    if (strDate.equals("all")) {
+      Calendar cal = Calendar.getInstance();
+      cal.add(Calendar.DAY_OF_MONTH, 1);
+      date = cal.getTime();
+      all = true;
+    } else {
       try {
-        return downloadHA(url);
-      } catch (IOException e) {
-        Log.e("HomeworkDetailActivity.DownloadHATask", "ERROR: 1", e);
-        errorElement.desc = "Es konnte keine Verbindung zum Server hergestellt werden.";
-        errorList.add(errorElement);
-        return errorList;
+        date = new SimpleDateFormat("yyyy-MM-dd").parse(strDate);
+      } catch (ParseException e) {
+        Log.wtf("HomeworkParsing", "Invalid date format: ", e);
       }
+      all = false;
     }
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    cal.set(Calendar.HOUR, 00);
+    cal.set(Calendar.MINUTE, 00);
+    date = cal.getTime();
 
-    @Override
-    protected void onPostExecute(List<HAElement> result) {
-      setData(result);
-    }
-
-    private List<HAElement> downloadHA(String myurl) throws IOException, ConnectException {
-      InputStream is;
-
-      Log.d("HomeworkDetailActivity.DownloadHATask", "URL to download HA: " + myurl);
-
-      URL url = new URL(myurl);
-      HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-      conn.setReadTimeout(10000);
-      conn.setConnectTimeout(15000);
-      conn.setRequestMethod("GET");
-      conn.setDoInput(true);
-      conn.connect();
-
-      is = conn.getInputStream();
-
-      String serverResponse = IOUtils.toString(is, "windows-1252");
-
-      List<HAElement> homework = new ArrayList<HAElement>();
-
-      Scanner elements = new Scanner(serverResponse);
-      elements.useDelimiter("\\\\");
-      while (elements.hasNext()) {
-        HAElement element = new HAElement();
-        Scanner properties = new Scanner(elements.next());
-        properties.useDelimiter("~");
-        if (!properties.hasNext()) {
-          continue;
-        }
-        int id = Integer.valueOf(properties.next());
-        if (id == 0) {
-          element.date = "";
-          element.title = "Keine Hausaufgaben!";
-          element.subject = "";
-          element.desc = "Wir haben keine Hausaufgaben!";
-          homework.add(element);
-          continue;
-        }
-//        try {
-        element.id = id;
-        element.date = properties.next();
-        element.title = properties.next();
-        element.subject = properties.next();
-        element.desc = properties.next();
-        homework.add(element);
-//        } catch (NoSuchElementException e) {
-//          Log.d("HomeworkDetailActivity.DownloadHATask", element.date + element.title + element.subject + element.desc);
-//        }
+    for (int i = 0; i < filteredData.size(); i++) {
+      Date elemDate = new Date();
+      try {
+        elemDate = new SimpleDateFormat("yyyy-MM-dd").parse(filteredData.get(i).date);
+      } catch (ParseException e) {
+        continue;
       }
 
-      return homework;
+      if (all) {
+        if (elemDate.getTime() >= date.getTime()) {
+          selectedData.add(filteredData.get(i));
+        }
+      } else {
+        Calendar elemCal = Calendar.getInstance();
+        elemCal.setTime(elemDate);
+        if (elemCal.get(Calendar.MONTH) == cal.get(Calendar.MONTH) &&
+            elemCal.get(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH)) {
+          selectedData.add(filteredData.get(i));
+        }
+      }
+
     }
+
+    if (selectedData.size() == 0) {
+      HAElement noHomework = new HAElement();
+      noHomework.date = "";
+      noHomework.title = "Keine Hausaufgaben!";
+      noHomework.subject = "";
+      noHomework.desc = "Wir haben keine Hausaufgaben!";
+      selectedData.add(noHomework);
+    }
+
+    Log.d("============================all", data.size()+ "");
+    Log.d("=======================filtered", filteredData.size()+ "");
+    Log.d("=======================selected", selectedData.size()+ "");
+
+    ListView list = (ListView) findViewById(R.id.lsViewHomework);
+    list.setAdapter(new HAElementArrayAdapter(this, selectedData));
   }
-
 
   public static class HAElement {
 
