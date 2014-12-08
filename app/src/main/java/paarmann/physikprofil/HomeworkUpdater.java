@@ -210,7 +210,7 @@ public class HomeworkUpdater {
         element.id = id;
         element.date = properties.next();
         element.title = properties.next();
-        element.subject = properties.next();
+        element.subject = properties.next().trim();
         element.desc = properties.next();
         homework.add(element);
       }
