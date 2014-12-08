@@ -60,6 +60,9 @@
           </intent-filter>
         </receiver>
 
+        <service
+          android:enabled="true" android:name=".AutomaticUpdateService" />
+
     </application>
 
 
