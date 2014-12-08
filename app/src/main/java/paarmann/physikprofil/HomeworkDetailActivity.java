@@ -207,6 +207,9 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     String strDate = getIntent().getStringExtra(EXTRA_DATE);
     boolean all;
     Date date = new Date();
+
+    SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
     if (strDate.equals("all")) {
       Calendar cal = Calendar.getInstance();
       cal.add(Calendar.DAY_OF_MONTH, 1);
@@ -214,7 +217,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       all = true;
     } else {
       try {
-        date = new SimpleDateFormat("yyyy-MM-dd").parse(strDate);
+        date = dateFormatter.parse(strDate);
       } catch (ParseException e) {
         Log.wtf("HomeworkParsing", "Invalid date format: ", e);
       }
@@ -222,15 +225,19 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     }
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
-    cal.set(Calendar.HOUR, 00);
+    cal.set(Calendar.HOUR_OF_DAY, 00);
     cal.set(Calendar.MINUTE, 00);
+    cal.set(Calendar.SECOND, 00);
+    cal.set(Calendar.MILLISECOND, 00);
+
     date = cal.getTime();
 
     for (int i = 0; i < filteredData.size(); i++) {
       Date elemDate = new Date();
       try {
-        elemDate = new SimpleDateFormat("yyyy-MM-dd").parse(filteredData.get(i).date);
+        elemDate = dateFormatter.parse(filteredData.get(i).date);
       } catch (ParseException e) {
+        Log.e("Homework", "Failed parsing homework date: ", e);
         continue;
       }
 
@@ -257,10 +264,6 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       noHomework.desc = "Wir haben keine Hausaufgaben!";
       selectedData.add(noHomework);
     }
-
-    Log.d("============================all", data.size()+ "");
-    Log.d("=======================filtered", filteredData.size()+ "");
-    Log.d("=======================selected", selectedData.size()+ "");
 
     ListView list = (ListView) findViewById(R.id.lsViewHomework);
     list.setAdapter(new HAElementArrayAdapter(this, selectedData));
