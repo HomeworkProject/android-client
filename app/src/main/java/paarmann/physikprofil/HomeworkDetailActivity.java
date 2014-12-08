@@ -198,9 +198,16 @@ public class HomeworkDetailActivity extends Activity {
       List<HAElement> displayedObjects = new ArrayList<HAElement>();
       List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
 
+      for (int i = 0; i < displayedSubjects.size(); i++) {
+        Log.d("Homework", displayedSubjects.get(i));
+      }
+
       for (int i = 0; i < data.size(); i++) {
         if (displayedSubjects.contains(data.get(i).subject)) {
           displayedObjects.add(data.get(i));
+          Log.d("Homework", "Adding " + data.get(i).title + " to displayedObjects");
+        } else {
+          Log.d("Homework", "Not adding " + data.get(i).title + " with subject " + data.get(i).subject);
         }
       }
 
@@ -286,7 +293,7 @@ public class HomeworkDetailActivity extends Activity {
         element.id = id;
         element.date = properties.next();
         element.title = properties.next();
-        element.subject = properties.next();
+        element.subject = properties.next().trim();
         element.desc = properties.next();
         homework.add(element);
 //        } catch (NoSuchElementException e) {
