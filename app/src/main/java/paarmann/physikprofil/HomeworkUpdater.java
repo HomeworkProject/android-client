@@ -67,13 +67,13 @@ public class HomeworkUpdater {
   public void downloadHomework() {
     Log.i("Homework", "Downloading homework");
     DownloadTask task = new DownloadTask();
-    task.execute();
+    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void)null);
   }
 
   public void loadHomeworkFromFile() {
     Log.i("Homework", "Loading homework from file");
     FileTask task = new FileTask();
-    task.execute();
+    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void)null);
   }
 
   /**
@@ -121,6 +121,7 @@ public class HomeworkUpdater {
       } catch (ClassNotFoundException e) {
         Log.e("Homework", "Failed to load homework from file", e);
       }
+      Log.e("Homework", "ERROR reading list from file.");
       return null;
     }
 
