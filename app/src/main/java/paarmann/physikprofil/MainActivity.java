@@ -45,12 +45,15 @@ import javax.net.ssl.HttpsURLConnection;
 public class MainActivity extends Activity implements DatePickerDialog.OnDateSetListener {
 
   public final static String ACTION_REMIND = "paarmann.physikprofil.action.REMIND";
+  public final static String ACTION_UPDATEHOMEWORK = "paarmann.physikprofil.action.UPDATEHOMEWORK";
 
   public final static String PREF_NAME = "paarmann.physikprofil.sharedprefs";
   public final static String PREF_UPDATED = "paarmann.physikprofil.updated";
   public final static String PREF_SETREMINDERS = "paarmann.physikprofil.reminders";
+  public final static String PREF_LASTUPDATED = "paarmann.physikprofil.lastupdated";
   public final static String PREF_FILTERSUBJECTS = "paarmann.physikprofil.FilterSubjects";
   public final static String PREF_CHOSENSUBJECTS = "paarmann.physikprofil.ChosenSubjects";
+  public final static String PREF_AUTOUPDATES = "paarmann.physikprofil.AutomaticUpdates";
 
   SharedPreferences prefs;
 
