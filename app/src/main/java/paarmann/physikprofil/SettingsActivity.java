@@ -43,23 +43,10 @@ public class SettingsActivity extends Activity {
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
-      if (key.equals(MainActivity.PREF_FILTERSUBJECTS)) {
-        Preference filterPref = findPreference(key);
-        boolean filter = preferences.getBoolean(key, false);
-        if (filter) {
-          filterPref.setSummary(getResources().getString(R.string.pref_filter_summary_true));
-        } else {
-          filterPref.setSummary(getResources().getString(R.string.pref_filter_summary));
-        }
-      } else if (key.equals(MainActivity.PREF_AUTOUPDATES)) {
-        Preference updatePref = findPreference(key);
+      updateSummary(preferences, key);
+
+      if (key.equals(MainActivity.PREF_AUTOUPDATES)) {
         boolean autoUpdate = preferences.getBoolean(key, false);
-        //Update summary text
-        if (autoUpdate) {
-          updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary_true));
-        } else {
-          updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary));
-        }
 
         //Register/Unregister alarms for updates
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
@@ -97,17 +84,35 @@ public class SettingsActivity extends Activity {
       }
     }
 
+    private void updateSummary(SharedPreferences preferences, String key) {
+      if (key.equals(MainActivity.PREF_FILTERSUBJECTS)) {
+        Preference filterPref = findPreference(key);
+        boolean filter = preferences.getBoolean(key, false);
+        if (filter) {
+          filterPref.setSummary(getResources().getString(R.string.pref_filter_summary_true));
+        } else {
+          filterPref.setSummary(getResources().getString(R.string.pref_filter_summary));
+        }
+      } else if (key.equals(MainActivity.PREF_AUTOUPDATES)) {
+        Preference updatePref = findPreference(key);
+        boolean autoUpdate = preferences.getBoolean(key, false);
+        if (autoUpdate) {
+          updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary_true));
+        } else {
+          updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary));
+        }
+      }
+    }
+
     @Override
     public void onResume() {
       super.onResume();
-      getPreferenceScreen().getSharedPreferences()
-        .registerOnSharedPreferenceChangeListener(this);
-      onSharedPreferenceChanged(
-          getPreferenceScreen().getSharedPreferences(),
-          MainActivity.PREF_FILTERSUBJECTS);
-      onSharedPreferenceChanged(
-          getPreferenceScreen().getSharedPreferences(),
-          MainActivity.PREF_AUTOUPDATES);
+      SharedPreferences preferences = getPreferenceScreen().getSharedPreferences();
+
+      preferences.registerOnSharedPreferenceChangeListener(this);
+
+      updateSummary(preferences, MainActivity.PREF_FILTERSUBJECTS);
+      updateSummary(preferences, MainActivity.PREF_AUTOUPDATES);
     }
 
     @Override
