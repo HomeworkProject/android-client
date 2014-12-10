@@ -60,11 +60,11 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
       PendingIntent piAfternoon = PendingIntent.getService(context, 2, intentAfternoon, 0);
 
       Calendar afterSchool = Calendar.getInstance();
-      afterSchool.set(Calendar.HOUR, 14);
-      afterSchool.set(Calendar.MINUTE, 00);
+      afterSchool.set(Calendar.HOUR_OF_DAY, 14);
+      afterSchool.set(Calendar.MINUTE, 15);
       Calendar afternoon = Calendar.getInstance();
-      afternoon.set(Calendar.HOUR, 19);
-      afternoon.set(Calendar.MINUTE, 25);
+      afternoon.set(Calendar.HOUR_OF_DAY, 17);
+      afternoon.set(Calendar.MINUTE, 15);
       
       long oneDayMillis = 24 * 60 * 60 * 1000;
 
