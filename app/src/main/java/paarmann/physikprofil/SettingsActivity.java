@@ -24,13 +24,31 @@ public class SettingsActivity extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    SettingsFragment fragment = new SettingsFragment();
+    fragment.setContext(this);
+
     getFragmentManager().beginTransaction()
-      .replace(android.R.id.content, new SettingsFragment())
+      .replace(android.R.id.content, fragment)
       .commit();
   }
 
-  public class SettingsFragment extends PreferenceFragment
+  @Override
+  public void onResume() {
+    super.onResume();
+    
+    SettingsFragment fragment = new SettingsFragment();
+    fragment.setContext(this);
+
+    getFragmentManager().beginTransaction()
+      .replace(android.R.id.content, fragment)
+      .commit();
+  }
+
+  public static class SettingsFragment extends PreferenceFragment
                 implements SharedPreferences.OnSharedPreferenceChangeListener {
+
+    private Context context;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -41,6 +59,10 @@ public class SettingsActivity extends Activity {
       super();
     }
 
+    public void setContext(Context context) {
+      this.context = context;
+    }
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
       updateSummary(preferences, key);
@@ -49,18 +71,18 @@ public class SettingsActivity extends Activity {
         boolean autoUpdate = preferences.getBoolean(key, false);
 
         //Register/Unregister alarms for updates
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Uri uriAfterSchool = Uri.fromParts("homeworkUpdate", "afterSchool", "");
         Uri uriAfternoon = Uri.fromParts("homeworkUpdate", "afternoon", "");
 
         Intent intentAfterSchool = new Intent(MainActivity.ACTION_UPDATEHOMEWORK, uriAfterSchool,
-           SettingsActivity.this, AutomaticUpdateService.class);
+           context, AutomaticUpdateService.class);
         Intent intentAfternoon = new Intent(MainActivity.ACTION_UPDATEHOMEWORK, uriAfternoon,
-           SettingsActivity.this, AutomaticUpdateService.class); 
+           context, AutomaticUpdateService.class); 
 
-        PendingIntent piAfterSchool = PendingIntent.getService(SettingsActivity.this,
+        PendingIntent piAfterSchool = PendingIntent.getService(context,
             1, intentAfterSchool, 0);
-        PendingIntent piAfternoon = PendingIntent.getService(SettingsActivity.this,
+        PendingIntent piAfternoon = PendingIntent.getService(context,
             2, intentAfternoon, 0);
 
         if (autoUpdate) {
