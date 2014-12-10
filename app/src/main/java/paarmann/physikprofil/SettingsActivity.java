@@ -78,16 +78,13 @@ public class SettingsActivity extends Activity {
 
         if (autoUpdate) {
           Calendar afterSchool = Calendar.getInstance();
-          afterSchool.set(Calendar.HOUR, 14);
-          afterSchool.set(Calendar.MINUTE, 00);
+          afterSchool.set(Calendar.HOUR_OF_DAY, 14);
+          afterSchool.set(Calendar.MINUTE, 15);
           Calendar afternoon = Calendar.getInstance();
-          afternoon.set(Calendar.HOUR, 16); //TODO IMPORTANT Change back to 17
-          afternoon.set(Calendar.MINUTE, 39);
+          afternoon.set(Calendar.HOUR_OF_DAY, 17);
+          afternoon.set(Calendar.MINUTE, 15);
 
           long oneDayMillis = 24 * 60 * 60 * 1000;
-
-          Log.d("Homework", "Setting automatic update alarm for " + afterSchool.getTimeInMillis());
-          Log.d("Homework", "Setting automatic update alarm for " + afternoon.getTimeInMillis());
 
           alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, afterSchool.getTimeInMillis(),
               oneDayMillis, piAfterSchool);
