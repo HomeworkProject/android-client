@@ -197,7 +197,6 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
           displayedObjects.add(data.get(i));
         }
       }
-
       filteredData = displayedObjects;
     } else {
       filteredData = data;
