@@ -43,14 +43,14 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 
   public static ReminderDateTimePickerFragment newInstance(ArrayList<HomeworkDetailActivity.HAElement> selectedListItems) {
     ReminderDateTimePickerFragment frag = new ReminderDateTimePickerFragment();
-	Bundle args = new Bundle();
-	args.putSerializable("selectedListItems", selectedListItems);
-	frag.setArguments(args);
-	return frag;
+    Bundle args = new Bundle();
+    args.putSerializable("selectedListItems", selectedListItems);
+    frag.setArguments(args);
+    return frag;
   }
 
   public ReminderDateTimePickerFragment() {
-	super();
+    super();
   }
 
   @Override

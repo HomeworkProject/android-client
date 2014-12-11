@@ -6,8 +6,12 @@ package paarmann.physikprofil;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -47,7 +51,7 @@ public class SettingsActivity extends Activity {
   public static class SettingsFragment extends PreferenceFragment
                 implements SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private Context context;
+    private SettingsActivity context;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,7 @@ public class SettingsActivity extends Activity {
       super();
     }
 
-    public void setContext(Context context) {
+    public void setContext(SettingsActivity context) {
       this.context = context;
     }
 
@@ -103,6 +107,11 @@ public class SettingsActivity extends Activity {
           alarmManager.cancel(piAfterSchool);
           alarmManager.cancel(piAfternoon);
         }
+      } else if (key.equals(MainActivity.PREF_AUTOREMINDERS)) {
+        if (!preferences.getBoolean(MainActivity.PREF_AUTOUPDATES, false)) {
+          DialogFragment warningDialog = new WarningNoAutoUpdatesDialog();
+          warningDialog.show(context.getFragmentManager(), "warningNoAutoUpdatesDialog");
+        }
       }
     }
 
@@ -123,6 +132,14 @@ public class SettingsActivity extends Activity {
         } else {
           updatePref.setSummary(getResources().getString(R.string.pref_autoupdates_summary));
         }
+      } else if (key.equals(MainActivity.PREF_AUTOREMINDERS)) {
+        Preference reminderPref = findPreference(key);
+        boolean autoReminders = preferences.getBoolean(key, false);
+        if (autoReminders) {
+          reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary_true));
+        } else {
+          reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary));
+        }
       }
     }
 
@@ -135,6 +152,7 @@ public class SettingsActivity extends Activity {
 
       updateSummary(preferences, MainActivity.PREF_FILTERSUBJECTS);
       updateSummary(preferences, MainActivity.PREF_AUTOUPDATES);
+      updateSummary(preferences, MainActivity.PREF_AUTOREMINDERS);
     }
 
     @Override
@@ -143,6 +161,27 @@ public class SettingsActivity extends Activity {
       getPreferenceScreen().getSharedPreferences()
         .unregisterOnSharedPreferenceChangeListener(this);
     }
+  }
+
+  private static class WarningNoAutoUpdatesDialog extends DialogFragment {
+
+    public WarningNoAutoUpdatesDialog() {
+      super();
+    }
+
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+      builder.setMessage(R.string.noAutoUpdatesDialogText)
+        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
+            //Just let the dialog close
+          }
+        });
+      return builder.create();
+    }
+
   }
 
 }

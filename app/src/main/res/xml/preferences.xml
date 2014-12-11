@@ -19,13 +19,19 @@
   </PreferenceCategory>
 
   <PreferenceCategory
-    android:title="@string/pref_category_automatic_updates_title"
-    android:key="paarmann.physikprofil.CategoryAutomaticUpdates" >
+    android:title="@string/pref_category_automatic_reminders_title"
+    android:key="paarmann.physikprofil.CategoryAutomaticReminders" >
 
     <CheckBoxPreference
       android:key="paarmann.physikprofil.AutomaticUpdates"
       android:title="@string/pref_autoupdates"
       android:summary="@string/pref_autoupdates_summary"
+      android:defaultValue="false" />
+
+    <CheckBoxPreference
+      android:key="paarmann.physikprofil.AutomaticReminders"
+      android:title="@string/pref_autoreminders"
+      android:summary="@string/pref_autoreminders_summary"
       android:defaultValue="false" />
 
   </PreferenceCategory>

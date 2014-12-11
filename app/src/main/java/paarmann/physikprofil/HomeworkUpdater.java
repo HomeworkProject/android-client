@@ -131,6 +131,7 @@ public class HomeworkUpdater {
         if (listener != null) {
           listener.setData(result);
         }
+        AutomaticReminderManager.setReminders(context, result);
       } else {
         downloadHomework();
       }
@@ -168,6 +169,8 @@ public class HomeworkUpdater {
       SharedPreferences.Editor editor = prefs.edit();
       editor.putLong(MainActivity.PREF_LASTUPDATED, now.getTime());
       editor.commit();
+
+      AutomaticReminderManager.setReminders(context, result);
     }
 
     private List<HAElement> downloadHA() throws IOException, ConnectException {
