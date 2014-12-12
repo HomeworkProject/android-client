@@ -147,7 +147,9 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
               Date when = null;
               try {
                 when = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(strDate);
-              } catch (ParseException e) {throw new RuntimeException("Somehow, the date failed to parse");}
+              } catch (ParseException e) {
+                return; //No date and/or no time set
+              }
               String scheme = "homework";
               String ssp = when.getTime() + "\\";			// AlarmTime\id~Date~Title~Subject~Desc\id~Date~Title~Subject~Desc\....
               for (int i = 0; i < selectedListItems.size(); i++) {
