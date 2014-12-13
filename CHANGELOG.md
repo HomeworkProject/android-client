@@ -1,3 +1,13 @@
+v1.5
+====
+-Offline cache
+
+-Filter homework by subject
+
+-Automatic reminders
+
+-Fix several bugs ands crashes
+
 v1.4
 ====
 -Possibility to let yourself be reminded of homework
