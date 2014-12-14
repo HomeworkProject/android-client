@@ -108,7 +108,8 @@ public class SettingsActivity extends Activity {
           alarmManager.cancel(piAfternoon);
         }
       } else if (key.equals(MainActivity.PREF_AUTOREMINDERS)) {
-        if (!preferences.getBoolean(MainActivity.PREF_AUTOUPDATES, false)) {
+        if (!preferences.getBoolean(MainActivity.PREF_AUTOUPDATES, false)
+            && preferences.getBoolean(MainActivity.PREF_AUTOREMINDERS, false)) {
           DialogFragment warningDialog = new WarningNoAutoUpdatesDialog();
           warningDialog.show(context.getFragmentManager(), "warningNoAutoUpdatesDialog");
         }

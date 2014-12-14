@@ -32,6 +32,11 @@ public abstract class AutomaticReminderManager {
     Set<String> setReminders = new HashSet<String>();
     
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+
+    if (!settings.getBoolean(MainActivity.PREF_AUTOREMINDERS, false)) {
+      return;
+    }
+
     String chosenSubjects = settings.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
     List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
 
