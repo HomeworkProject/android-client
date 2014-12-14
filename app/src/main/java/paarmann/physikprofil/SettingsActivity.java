@@ -164,7 +164,7 @@ public class SettingsActivity extends Activity {
     }
   }
 
-  private static class WarningNoAutoUpdatesDialog extends DialogFragment {
+  public static class WarningNoAutoUpdatesDialog extends DialogFragment {
 
     public WarningNoAutoUpdatesDialog() {
       super();
