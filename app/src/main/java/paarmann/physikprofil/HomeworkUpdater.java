@@ -51,12 +51,16 @@ public class HomeworkUpdater {
   }
 
   public void getData() {
+    getData(false);
+  }
+
+  public void getData(boolean forceDownload) {
     Date now = new Date();
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
     Date lastUpdated = new Date(prefs.getLong(MainActivity.PREF_LASTUPDATED, 0));
     long diffMinutes = getDateDiff(lastUpdated, now, TimeUnit.MINUTES);
 
-    if (diffMinutes >= 90) {
+    if (diffMinutes >= 90 || forceDownload) {
       //Last updated longer than 90 minutes ago
       downloadHomework();
     } else {

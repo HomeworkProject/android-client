@@ -129,7 +129,13 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     // automatically handle clicks on the Home/Up button, so long
     // as you specify a parent activity in AndroidManifest.xml.
     int id = item.getItemId();
-    return super.onOptionsItemSelected(item);
+    switch (id) {
+      case R.id.action_refresh:
+        loadHomework(true);
+        return true;
+      default:
+        return super.onOptionsItemSelected(item);
+    }
   }
 
   private void copyCurrentItems() {
@@ -167,12 +173,28 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
   }
 
   private void loadHomework() {
+    loadHomework(false);
+  }
+
+  private void loadHomework(boolean forceDownload) {
     TextView emptyView = (TextView) findViewById(R.id.emptyView);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setEmptyView(emptyView);
+    if (forceDownload) {
+      clearData();
+    }
     HomeworkUpdater loader = new HomeworkUpdater(this);
     loader.setOnHomeworkLoadedListener(this);
-    loader.getData();
+    loader.getData(forceDownload);
+  }
+
+  private void clearData() {
+    TextView emptyView = (TextView) findViewById(R.id.emptyView);
+    emptyView.setText(getResources().getString(R.string.emptyText));
+
+    ListView lsView = (ListView) findViewById(R.id.lsViewHomework);
+    lsView.setEmptyView(emptyView);
+    lsView.setAdapter(new HAElementArrayAdapter(this, new ArrayList<HAElement>()));
   }
 
   @Override
