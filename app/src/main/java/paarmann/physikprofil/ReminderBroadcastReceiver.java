@@ -61,8 +61,12 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     PendingIntent pendingClickIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
     String notificationText = "";
+    int notificationId = 0;
     for (int i = 0; i < elements.size(); i++) {
       notificationText += elements.get(i).title;
+      notificationId += elements.get(i).id; //Not guaranteed to always be unique,
+                                            //but convenient and extremely unlikely
+                                            //to cause problems
       if (i != elements.size() - 1) {
         notificationText += ", ";
       }
@@ -80,7 +84,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
           .setSound(soundUri);
 
     NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    notificationManager.notify(0, builder.build());
+    notificationManager.notify(notificationId, builder.build());
 
     Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     vib.vibrate(1000);
