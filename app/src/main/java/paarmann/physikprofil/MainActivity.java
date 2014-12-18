@@ -55,6 +55,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   public final static String PREF_CHOSENSUBJECTS = "paarmann.physikprofil.ChosenSubjects";
   public final static String PREF_AUTOUPDATES = "paarmann.physikprofil.AutomaticUpdates";
   public final static String PREF_AUTOREMINDERS = "paarmann.physikprofil.AutomaticReminders";
+  public final static String PREF_MOBILEDATA = "paarmann.physikprofil.UseMobileData";
 
   SharedPreferences prefs;
 

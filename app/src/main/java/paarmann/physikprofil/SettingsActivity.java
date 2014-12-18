@@ -141,6 +141,14 @@ public class SettingsActivity extends Activity {
         } else {
           reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary));
         }
+      } else if (key.equals(MainActivity.PREF_MOBILEDATA)) {
+        Preference dataPref = findPreference(key);
+        boolean useMobile = preferences.getBoolean(key, true);
+        if (useMobile) {
+          dataPref.setSummary(getResources().getString(R.string.pref_mobile_data_summary));
+        } else {
+          dataPref.setSummary(getResources().getString(R.string.pref_mobile_data_summary_false));
+        }
       }
     }
 
@@ -154,6 +162,7 @@ public class SettingsActivity extends Activity {
       updateSummary(preferences, MainActivity.PREF_FILTERSUBJECTS);
       updateSummary(preferences, MainActivity.PREF_AUTOUPDATES);
       updateSummary(preferences, MainActivity.PREF_AUTOREMINDERS);
+      updateSummary(preferences, MainActivity.PREF_MOBILEDATA);
     }
 
     @Override

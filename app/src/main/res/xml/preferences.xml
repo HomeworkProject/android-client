@@ -36,4 +36,16 @@
 
   </PreferenceCategory>
 
+  <PreferenceCategory
+    android:title="@string/pref_category_data_usage"
+    android:key="paarmann.physikprofil.CategoryDataUsage" >
+
+    <CheckBoxPreference
+      android:key="paarmann.physikprofil.UseMobileData"
+      android:title="@string/pref_mobile_data"
+      android:summary="@string/pref_mobile_data_summary"
+      android:defaultValue="true" />
+
+  </PreferenceCategory>
+
 </PreferenceScreen>

@@ -6,7 +6,10 @@ package paarmann.physikprofil;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.apache.commons.io.IOUtils;
@@ -193,6 +196,7 @@ public class HomeworkUpdater {
     @Override
     protected void onPostExecute(List<HAElement> result) {
       if (error) {
+        Log.i("Homework", "Could not download homework, instead loading from file.");
         FileTask task = new FileTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, true);
         return;
@@ -212,6 +216,20 @@ public class HomeworkUpdater {
     }
 
     private List<HAElement> downloadHA() throws IOException, ConnectException {
+      SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+      boolean useMobile = settings.getBoolean(MainActivity.PREF_MOBILEDATA, true);
+      boolean mobileActive = false;
+
+      ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      NetworkInfo netinfo = cm.getActiveNetworkInfo();
+      if (netinfo.getTypeName().equalsIgnoreCase("MOBILE")) {
+        mobileActive = true;
+      }
+
+      if (!useMobile && mobileActive) {
+        throw new IOException("User chose to not use mobile data");
+      }
+
       InputStream is;
 
       String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());

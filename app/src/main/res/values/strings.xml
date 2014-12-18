@@ -34,6 +34,7 @@
     <string name="refreshText">Aktualisieren</string>
     <string name="pref_category_filter_title">Fächer und Kurse</string>
     <string name="pref_category_automatic_reminders_title">Automatische Aktualisierungen</string>
+    <string name="pref_category_data_usage">Datennutzung</string>
     <string name="pref_filter">Fächer und Kurse filtern</string>
     <string name="pref_filter_summary">Es werden alle Hausaufgaben angezeigt</string>
     <string name="pref_filter_summary_true">Es werden nur Hausaufgaben für die angegebenen Fächer und Kurse angezeigt</string>
@@ -46,6 +47,9 @@
     <string name="pref_autoreminders">Automatische Erinnerungen</string>
     <string name="pref_autoreminders_summary">Es werden nicht automatisch Erinnerungen erstellt.</string>
     <string name="pref_autoreminders_summary_true">Es wird für alle Hausaufgaben eine automatische Erinnerung erstellt.</string>
+    <string name="pref_mobile_data">Mobile Daten benutzen</string>
+    <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
+    <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>
     <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-Offline cache\n-Hausaufgaben nach Fach filtern\n-Automatische Erinnerungen\n-Mehrere Bugs behoben</string>
 
 </resources>
