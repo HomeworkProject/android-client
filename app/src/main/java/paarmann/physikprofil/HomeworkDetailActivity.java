@@ -215,7 +215,8 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
 
       for (int i = 0; i < data.size(); i++) {
-        if (displayedSubjects.contains(data.get(i).subject)) {
+        if (displayedSubjects.contains(data.get(i).subject)
+            || data.get(i).subject.equals("")) {
           displayedObjects.add(data.get(i));
         }
       }
@@ -254,6 +255,10 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     date = cal.getTime();
 
     for (int i = 0; i < filteredData.size(); i++) {
+      if (filteredData.get(i).date.equals("")) {
+        selectedData.add(filteredData.get(i));
+        continue;
+      }
       Date elemDate = new Date();
       try {
         elemDate = dateFormatter.parse(filteredData.get(i).date);

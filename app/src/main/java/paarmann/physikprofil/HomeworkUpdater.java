@@ -77,7 +77,7 @@ public class HomeworkUpdater {
   public void loadHomeworkFromFile() {
     Log.i("Homework", "Loading homework from file");
     FileTask task = new FileTask();
-    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void)null);
+    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
   }
 
   /**
@@ -108,9 +108,12 @@ public class HomeworkUpdater {
     return true;
   }
 
-  private class FileTask extends AsyncTask<Void, Void, List<HAElement>> {
+  private class FileTask extends AsyncTask<Boolean, Void, List<HAElement>> {
+    private boolean triedDownload;
+
     @Override
-    protected List<HAElement> doInBackground(Void... params) {
+    protected List<HAElement> doInBackground(Boolean... params) {
+      triedDownload = params[0];
       try {
         FileInputStream fis = context.openFileInput(HOMEWORK_FILE);
         ObjectInputStream ois = new ObjectInputStream(fis);
@@ -132,12 +135,35 @@ public class HomeworkUpdater {
     @Override
     protected void onPostExecute(List<HAElement> result) {
       if (result != null) {
+        if (triedDownload) {
+          HAElement warning = new HAElement();
+          warning.id = 1;
+          warning.date = "";
+          warning.title = "Achtung";
+          warning.subject = "";
+          warning.desc = "Die Hausaufgaben konnten nicht neu heruntergeladen werden, diese Daten könnten veraltet sein.";
+          result.add(0, warning);
+        }
         if (listener != null) {
           listener.setData(result);
         }
         AutomaticReminderManager.setReminders(context, result);
       } else {
-        downloadHomework();
+        if (!triedDownload) {
+          downloadHomework();
+        } else {
+          result = new ArrayList<HAElement>();
+          HAElement error = new HAElement();
+          error.id = 0;
+          error.date = "";
+          error.title = "Fehler";
+          error.subject = "";
+          error.desc = "Die Hausaufgaben konnten weder heruntergeladen werden noch konnten gespeicherte Daten verwendet werden.";
+          result.add(error);
+          if (listener != null) {
+            listener.setData(result);
+          }
+        }
       }
     }
   }
@@ -145,6 +171,7 @@ public class HomeworkUpdater {
   private class DownloadTask extends AsyncTask<Void, Void, List<HAElement>> {
     private HAElement errorElement = new HAElement();
     List<HAElement> errorList = new ArrayList<HAElement>();
+    boolean error = false;
 
     @Override
     protected List<HAElement> doInBackground(Void... params) {
@@ -155,14 +182,21 @@ public class HomeworkUpdater {
       try {
         return downloadHA();
       } catch (IOException e) {
-        errorElement.desc = "Es konnte keine Verbindung zum Server hergestellt werden.";
+        /*errorElement.desc = "Es konnte keine Verbindung zum Server hergestellt werden.";
         errorList.add(errorElement);
-        return errorList;
+        return errorList;*/
+        error = true;
+        return null;
       }
     }
 
     @Override
     protected void onPostExecute(List<HAElement> result) {
+      if (error) {
+        FileTask task = new FileTask();
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, true);
+        return;
+      }
       if (listener != null) {
         listener.setData(result);
       }
