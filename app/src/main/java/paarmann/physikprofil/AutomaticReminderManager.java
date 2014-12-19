@@ -45,6 +45,10 @@ public abstract class AutomaticReminderManager {
     }
 
     for (HAElement element : homework) {
+      if (element.subject == null || element.subject.equals("")) {
+        continue;
+      }
+
       Date when = null;
       try {
         when = new SimpleDateFormat("yyyy-MM-dd").parse(element.date);
