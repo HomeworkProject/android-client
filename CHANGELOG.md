@@ -1,3 +1,15 @@
+v1.6
+====
+-Possibility to mark homework as done
+
+-Refresh button added
+
+-Use offline cache if no internet connection is present
+
+-Setting to limit mobile data usage
+
+-Bug fixed where notifications would not always be shown
+
 v1.5
 ====
 -Offline cache

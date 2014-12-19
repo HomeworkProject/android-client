@@ -51,6 +51,6 @@
     <string name="pref_mobile_data">Mobile Daten benutzen</string>
     <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
     <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>
-    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-Offline cache\n-Hausaufgaben nach Fach filtern\n-Automatische Erinnerungen\n-Mehrere Bugs behoben</string>
+    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-Hausaufgaben als erledigt markieren\n-Aktualisieren Button\n-Offline Cache wird benutzt falls keine Internetverbindung vorhanden ist\n-Möglichkeit keine mobilen Daten zu benutzen\n-Bug Fix</string>
 
 </resources>
