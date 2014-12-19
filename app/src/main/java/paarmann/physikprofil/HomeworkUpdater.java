@@ -147,10 +147,10 @@ public class HomeworkUpdater {
           warning.desc = "Die Hausaufgaben konnten nicht neu heruntergeladen werden, diese Daten könnten veraltet sein.";
           result.add(0, warning);
         }
+        AutomaticReminderManager.setReminders(context, result);
         if (listener != null) {
           listener.setData(result);
         }
-        AutomaticReminderManager.setReminders(context, result);
       } else {
         if (!triedDownload) {
           downloadHomework();
@@ -201,18 +201,17 @@ public class HomeworkUpdater {
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, true);
         return;
       }
+      AutomaticReminderManager.setReminders(context, result);
+      saveHomeworkToFile(result);
       if (listener != null) {
         listener.setData(result);
       }
-      saveHomeworkToFile(result);
 
       Date now = new Date();
       SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
       SharedPreferences.Editor editor = prefs.edit();
       editor.putLong(MainActivity.PREF_LASTUPDATED, now.getTime());
       editor.commit();
-
-      AutomaticReminderManager.setReminders(context, result);
     }
 
     private List<HAElement> downloadHA() throws IOException, ConnectException {
@@ -222,7 +221,7 @@ public class HomeworkUpdater {
 
       ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
       NetworkInfo netinfo = cm.getActiveNetworkInfo();
-      if (netinfo.getTypeName().equalsIgnoreCase("MOBILE")) {
+      if (netinfo != null && netinfo.getTypeName().equalsIgnoreCase("MOBILE")) {
         mobileActive = true;
       }
 

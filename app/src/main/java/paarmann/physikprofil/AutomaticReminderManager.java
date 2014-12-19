@@ -30,6 +30,7 @@ public abstract class AutomaticReminderManager {
   public static void setReminders(Context context, List<HAElement> homework) {
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
     Set<String> setReminders = new HashSet<String>();
+    Set<String> doneItems;
     
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
@@ -44,8 +45,17 @@ public abstract class AutomaticReminderManager {
       setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
     }
 
+    doneItems = prefs.getStringSet(MainActivity.PREF_DONEITEMS, null);
+    if (doneItems == null) {
+      doneItems = new HashSet<String>();
+    }
+
     for (HAElement element : homework) {
       if (element.subject == null || element.subject.equals("")) {
+        continue;
+      }
+
+      if (doneItems.contains(element.id + "~" + element.title)) {
         continue;
       }
 
@@ -90,11 +100,11 @@ public abstract class AutomaticReminderManager {
 
         setReminders.add(ssp);
       }
-      
-      SharedPreferences.Editor editor = prefs.edit();
-      editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
-      editor.commit();
     }
+
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
+    editor.commit();
   }
 
 }

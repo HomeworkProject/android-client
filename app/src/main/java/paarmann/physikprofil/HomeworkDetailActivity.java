@@ -39,8 +39,10 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -60,9 +62,19 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
     listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
+      private List<Integer> checkedItems = new ArrayList<Integer>();
+      private boolean markItemsDone = true;
+
       @Override
       public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
                                             boolean checked) {
+        if (checked) {
+          checkedItems.add(position);
+        } else {
+          checkedItems.remove(checkedItems.indexOf(position));
+        }
+
+        mode.invalidate();
       }
       @Override
       public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
@@ -73,6 +85,15 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
             return true;
           case R.id.action_remind:
             setNewReminder();
+            mode.finish();
+            return true;
+          case R.id.action_done:
+            if (markItemsDone) {
+              markCurrentItemsAsDone();
+            } else {
+              markCurrentItemsAsNotDone();
+            }
+            loadHomework();
             mode.finish();
             return true;
           default:
@@ -92,7 +113,28 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       }
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        return false;
+        SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
+        Set<String> doneItems = prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
+        boolean unmarkItems = false;
+        for (int position : checkedItems) {
+          HAElement element = (HAElement) listView.getItemAtPosition(position);
+          if (doneItems.contains(element.id + "~" + element.title.replace(" [Erledigt]", ""))) {
+            unmarkItems = true;
+            break;
+          }
+        }
+
+        MenuItem item = menu.findItem(R.id.action_done);
+        if (unmarkItems) {
+          item.setIcon(R.drawable.ic_action_cancel);
+          item.setTitle("Als nicht erledigt markieren");
+          markItemsDone = false;
+        } else {
+          item.setIcon(R.drawable.ic_action_edit);
+          item.setTitle(R.string.action_done);
+          markItemsDone = true;
+        }
+        return true;
       }
     });
     listView.setOnItemLongClickListener(new OnItemLongClickListener() {
@@ -158,6 +200,43 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
   private void setNewReminder() {
     reminderDialog = ReminderDateTimePickerFragment.newInstance(getSelectedListItems());
     reminderDialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
+  }
+
+  private void markCurrentItemsAsDone() {
+    List<HAElement> selectedItems = getSelectedListItems();
+    Set<String> doneItems = new HashSet<String>();
+    SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
+    
+    if (prefs.contains(MainActivity.PREF_DONEITEMS)) {
+      doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS, null));
+    }
+
+    for (HAElement element : selectedItems) {
+      doneItems.add(element.id + "~" + element.title);
+    }
+
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putStringSet(MainActivity.PREF_DONEITEMS, doneItems);
+    editor.commit();
+  }
+
+  private void markCurrentItemsAsNotDone() {
+    List<HAElement> selectedItems = getSelectedListItems();
+    Set<String> doneItems = new HashSet<String>();
+    SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
+
+    if (prefs.contains(MainActivity.PREF_DONEITEMS)) {
+      doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS, null));
+    }
+
+    for (HAElement element : selectedItems) {
+      element.title = element.title.replace(" [Erledigt]", "");
+      doneItems.remove(element.id + "~" + element.title);
+    }
+
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putStringSet(MainActivity.PREF_DONEITEMS, doneItems);
+    editor.commit();
   }
 
   private ArrayList<HAElement> getSelectedListItems() {
@@ -281,6 +360,19 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       }
 
     }
+
+    SharedPreferences preferences = getSharedPreferences(MainActivity.PREF_NAME, 0);
+    Set<String> doneItems = preferences.getStringSet(MainActivity.PREF_DONEITEMS, null);
+    if (doneItems == null) {
+      doneItems = new HashSet<String>();
+    }
+
+    for (HAElement element : selectedData) {
+      if (doneItems.contains(element.id + "~" + element.title)) {
+        element.title += " [Erledigt]";
+      }
+    }
+
 
     if (selectedData.size() == 0) {
       HAElement noHomework = new HAElement();

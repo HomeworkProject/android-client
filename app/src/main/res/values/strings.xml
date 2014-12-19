@@ -6,6 +6,7 @@
     <string name="action_remind">Erinnern</string>
     <string name="action_reminder_delete">Löschen</string>
     <string name="action_settings">Einstellungen</string>
+    <string name="action_done">Als erledigt markieren</string>
     <string name="btnNextDay_text">Morgen</string>
     <string name="btnAfterNextDay_text">Übermorgen</string>
     <string name="allHomework">Alle Hausaufgaben ansehen</string>
