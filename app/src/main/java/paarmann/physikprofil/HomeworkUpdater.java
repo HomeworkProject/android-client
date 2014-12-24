@@ -35,6 +35,8 @@ import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
 
 public class HomeworkUpdater {
 
+  public static final String TAG = "HomeworkUpdater";
+
   public static String HOMEWORK_FILE = "homework.ser";
 
   public interface OnHomeworkLoadedListener {
@@ -71,13 +73,13 @@ public class HomeworkUpdater {
   }
 
   public void downloadHomework() {
-    Log.i("Homework", "Downloading homework");
+    Log.i(TAG, "Downloading homework");
     DownloadTask task = new DownloadTask();
     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void)null);
   }
 
   public void loadHomeworkFromFile() {
-    Log.i("Homework", "Loading homework from file");
+    Log.i(TAG, "Loading homework from file");
     FileTask task = new FileTask();
     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
   }
@@ -104,7 +106,7 @@ public class HomeworkUpdater {
       oos.close();
     } catch (IOException e) {
       e.printStackTrace();
-      Log.e("Homework", "Failed to save homework", e);
+      Log.e(TAG, "Failed to save homework", e);
       return false;
     }
     return true;
@@ -126,11 +128,11 @@ public class HomeworkUpdater {
           return (ArrayList<HAElement>) readObject;
         }
       } catch (IOException e) {
-        Log.e("Homework", "Failed to load homework from file", e);
+        Log.e(TAG, "Failed to load homework from file", e);
       } catch (ClassNotFoundException e) {
-        Log.e("Homework", "Failed to load homework from file", e);
+        Log.e(TAG, "Failed to load homework from file", e);
       }
-      Log.e("Homework", "ERROR reading list from file.");
+      Log.e(TAG, "ERROR reading list from file.");
       return null;
     }
 
@@ -195,7 +197,7 @@ public class HomeworkUpdater {
     @Override
     protected void onPostExecute(List<HAElement> result) {
       if (error) {
-        Log.i("Homework", "Could not download homework, instead loading from file.");
+        Log.i(TAG, "Could not download homework, instead loading from file.");
         FileTask task = new FileTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, true);
         return;

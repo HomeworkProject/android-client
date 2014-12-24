@@ -23,6 +23,8 @@ import java.util.HashSet;
 
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
+  public static final String TAG = "ReminderBroadcastReceiver";
+
   @Override
   public void onReceive(Context context, Intent intent) {
     Uri data = intent.getData();

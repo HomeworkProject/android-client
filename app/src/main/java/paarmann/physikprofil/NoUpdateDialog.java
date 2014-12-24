@@ -12,6 +12,8 @@ import android.os.Bundle;
 
 public class NoUpdateDialog extends DialogFragment {
 
+  public static final String TAG = "NoUpdateDialog";
+
   public NoUpdateDialog() {
     super();
   }

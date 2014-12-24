@@ -12,6 +12,8 @@ import android.os.Bundle;
 
 public class ChangelogDialog extends DialogFragment {
 
+  public static final String TAG = "ChangelogDialog";
+
   private String changelog = "";
 
   public ChangelogDialog() {

@@ -48,6 +48,8 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.OnHomeworkLoadedListener {
 
+  public static final String TAG = "HomeworkDetailActivity";
+
   public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
 
   private DialogFragment reminderDialog;
@@ -319,7 +321,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       try {
         date = dateFormatter.parse(strDate);
       } catch (ParseException e) {
-        Log.wtf("HomeworkParsing", "Invalid date format: ", e);
+        Log.wtf(TAG, "Invalid date format: ", e);
       }
       all = false;
     }
@@ -341,7 +343,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       try {
         elemDate = dateFormatter.parse(filteredData.get(i).date);
       } catch (ParseException e) {
-        Log.e("Homework", "Failed parsing homework date: ", e);
+        Log.e(TAG, "Failed parsing homework date: ", e);
         continue;
       }
 

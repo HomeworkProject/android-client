@@ -15,6 +15,8 @@ import java.util.Calendar;
 public class DatePickerFragment extends DialogFragment
     implements DatePickerDialog.OnDateSetListener {
 
+  public static final String TAG = "DatePickerFragment";
+
   private DatePickerDialog.OnDateSetListener listener;
 
   @Override

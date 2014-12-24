@@ -43,19 +43,21 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends Activity implements DatePickerDialog.OnDateSetListener {
 
-  public final static String ACTION_REMIND = "paarmann.physikprofil.action.REMIND";
-  public final static String ACTION_UPDATEHOMEWORK = "paarmann.physikprofil.action.UPDATEHOMEWORK";
+  public static final String TAG = "MainActivity";
 
-  public final static String PREF_NAME = "paarmann.physikprofil.sharedprefs";
-  public final static String PREF_UPDATED = "paarmann.physikprofil.updated";
-  public final static String PREF_SETREMINDERS = "paarmann.physikprofil.reminders";
-  public final static String PREF_LASTUPDATED = "paarmann.physikprofil.lastupdated";
-  public final static String PREF_DONEITEMS = "paarmann.physikprofil.doneitems";
-  public final static String PREF_FILTERSUBJECTS = "paarmann.physikprofil.FilterSubjects";
-  public final static String PREF_CHOSENSUBJECTS = "paarmann.physikprofil.ChosenSubjects";
-  public final static String PREF_AUTOUPDATES = "paarmann.physikprofil.AutomaticUpdates";
-  public final static String PREF_AUTOREMINDERS = "paarmann.physikprofil.AutomaticReminders";
-  public final static String PREF_MOBILEDATA = "paarmann.physikprofil.UseMobileData";
+  public static final String ACTION_REMIND = "paarmann.physikprofil.action.REMIND";
+  public static final String ACTION_UPDATEHOMEWORK = "paarmann.physikprofil.action.UPDATEHOMEWORK";
+
+  public static final String PREF_NAME = "paarmann.physikprofil.sharedprefs";
+  public static final String PREF_UPDATED = "paarmann.physikprofil.updated";
+  public static final String PREF_SETREMINDERS = "paarmann.physikprofil.reminders";
+  public static final String PREF_LASTUPDATED = "paarmann.physikprofil.lastupdated";
+  public static final String PREF_DONEITEMS = "paarmann.physikprofil.doneitems";
+  public static final String PREF_FILTERSUBJECTS = "paarmann.physikprofil.FilterSubjects";
+  public static final String PREF_CHOSENSUBJECTS = "paarmann.physikprofil.ChosenSubjects";
+  public static final String PREF_AUTOUPDATES = "paarmann.physikprofil.AutomaticUpdates";
+  public static final String PREF_AUTOREMINDERS = "paarmann.physikprofil.AutomaticReminders";
+  public static final String PREF_MOBILEDATA = "paarmann.physikprofil.UseMobileData";
 
   SharedPreferences prefs;
 
@@ -327,7 +329,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
         output.close();
         input.close();
       } catch (Exception e) {
-        Log.e("MainActivity", "Update failed!", e);
+        Log.e(TAG, "Update failed!", e);
       }
       return path;
     }

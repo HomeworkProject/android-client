@@ -26,6 +26,8 @@ import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
 
 public abstract class AutomaticReminderManager {
 
+  public static final String TAG = "AutomaticReminderManager";
+
   public static void setReminders(Context context, List<HAElement> homework) {
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
     Set<String> setReminders = new HashSet<String>();

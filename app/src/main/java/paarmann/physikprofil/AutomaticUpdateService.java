@@ -14,6 +14,8 @@ import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
 
 public class AutomaticUpdateService extends IntentService implements HomeworkUpdater.OnHomeworkLoadedListener {
 
+  public static final String TAG = "AutoamticUpdateService";
+
   private boolean done;
 
   public AutomaticUpdateService() {
@@ -22,7 +24,7 @@ public class AutomaticUpdateService extends IntentService implements HomeworkUpd
 
   @Override
   protected void onHandleIntent(Intent intent) {
-    Log.i("AutomaticUpdateService", "Starting update of homework data");
+    Log.i(TAG, "Starting update of homework data");
 
     done = false;
     HomeworkUpdater updater = new HomeworkUpdater(this);
@@ -37,7 +39,7 @@ public class AutomaticUpdateService extends IntentService implements HomeworkUpd
       }
     }
 
-    Log.i("AutomaticUpdateService", "Finished update of homework data");
+    Log.i(TAG, "Finished update of homework data");
   }
 
   @Override

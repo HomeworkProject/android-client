@@ -17,6 +17,8 @@ import java.util.List;
 
 public class ReminderArrayAdapter extends ArrayAdapter<ManageRemindersActivity.Reminder> {
 
+  public static final String TAG = "ReminderArrayAdapter";
+
   private List<ManageRemindersActivity.Reminder> objects;
   private Context context;
 

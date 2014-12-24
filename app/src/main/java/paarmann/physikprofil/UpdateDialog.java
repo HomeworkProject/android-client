@@ -13,6 +13,8 @@ import android.os.Bundle;
 
 public class UpdateDialog extends DialogFragment {
 
+  public static final String TAG = "UpdateDialog";
+
   private String newVersionName;
 
   public UpdateDialog() {
@@ -37,7 +39,7 @@ public class UpdateDialog extends DialogFragment {
     }).setNegativeButton("Nicht jetzt", new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        Log.d("Update", "Not updating after user input");
+        Log.d(TAG, "Not updating after user input");
       }
     });
     return builder.create();

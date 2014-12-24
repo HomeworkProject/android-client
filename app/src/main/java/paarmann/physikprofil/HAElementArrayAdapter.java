@@ -29,6 +29,8 @@ import java.util.List;
 
 public class HAElementArrayAdapter extends ArrayAdapter<HomeworkDetailActivity.HAElement> {
 
+  public static final String TAG = "HAElementArrayAdapter";
+
   private List<HomeworkDetailActivity.HAElement> objects;
   private Activity activity;
 

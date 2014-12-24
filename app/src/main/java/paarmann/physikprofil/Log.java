@@ -12,6 +12,8 @@ public final class Log {
    * a lot cleaner.
    */
 
+  public static final String TAG = "Log";
+
   public static final String APP_NAME = "PhysikBioProfil";
 
   private Log() {

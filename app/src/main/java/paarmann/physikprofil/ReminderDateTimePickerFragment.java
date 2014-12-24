@@ -17,7 +17,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,6 +37,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ReminderDateTimePickerFragment extends DialogFragment {
+
+  public static final String TAG = "ReminderDateTimePickerFragment";
 
   private View layout;
 
@@ -90,7 +91,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
             dialog.getDatePicker().setCalendarViewShown(true);
             dialog.show();
           } catch (ParseException e) {
-            Log.wtf("ParseDates", "error parsing date", e);
+            Log.wtf(TAG, "error parsing date", e);
           }
         }
       });
@@ -131,7 +132,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
             setDate(date);
             setTime(date);
           } catch (ParseException e) {
-            Log.wtf("Parsing", "Error while parsing date", e);
+            Log.wtf(TAG, "Error while parsing date", e);
           }
         }
       });

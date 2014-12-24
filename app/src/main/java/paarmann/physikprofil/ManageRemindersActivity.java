@@ -32,6 +32,8 @@ import java.util.Iterator;
 
 public class ManageRemindersActivity extends Activity {
 
+  public static final String TAG = "ManageRemindersActivity";
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

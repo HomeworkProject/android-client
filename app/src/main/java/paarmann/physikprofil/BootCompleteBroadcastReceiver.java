@@ -20,12 +20,14 @@ import java.util.Iterator;
 
 public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 
+  public static final String TAG = "BootCompleteBroadcastReceiver";
+
   @Override
   public void onReceive(Context context, Intent intent) {
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
 
-    Log.i("Homework", "Setting reminder alarms again...");
+    Log.i(TAG, "Setting reminder alarms again...");
 
     if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
       Set<String> setReminders = prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null);
@@ -45,7 +47,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
     }
 
     if (prefs.getBoolean(MainActivity.PREF_AUTOUPDATES, false)) {
-      Log.i("Homework", "Setting automatic update alarms again...");
+      Log.i(TAG, "Setting automatic update alarms again...");
 
       Uri uriAfterSchool = Uri.fromParts("homeworkUpdate", "afterSchool", "");
       Uri uriAfternoon = Uri.fromParts("homeworkUpdate", "afternoon", "");

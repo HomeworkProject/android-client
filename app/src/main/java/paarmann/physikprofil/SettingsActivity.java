@@ -23,6 +23,8 @@ import java.util.Calendar;
 
 public class SettingsActivity extends Activity {
 
+  public static final String TAG = "SettingsActivity";
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
