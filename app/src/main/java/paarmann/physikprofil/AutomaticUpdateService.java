@@ -7,7 +7,6 @@ package paarmann.physikprofil;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import java.util.List;
 
