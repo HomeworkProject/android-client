@@ -48,6 +48,8 @@
     <string name="pref_autoreminders">Automatische Erinnerungen</string>
     <string name="pref_autoreminders_summary">Es werden nicht automatisch Erinnerungen erstellt.</string>
     <string name="pref_autoreminders_summary_true">Es wird für alle Hausaufgaben eine automatische Erinnerung erstellt.</string>
+    <string name="pref_remindertime">Uhrzeit für automatische Erinnerungen</string>
+    <string name="pref_remindertime_summary">Die Uhrzeit für die automatische Erinnerungen gesetzt werden.</string>
     <string name="pref_mobile_data">Mobile Daten benutzen</string>
     <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
     <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>

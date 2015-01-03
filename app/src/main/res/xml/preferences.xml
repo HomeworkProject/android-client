@@ -34,6 +34,12 @@
       android:summary="@string/pref_autoreminders_summary"
       android:defaultValue="false" />
 
+     <paarmann.physikprofil.TimePreference
+      android:key="paarmann.physikprofil.ReminderTime"
+      android:title="@string/pref_remindertime"
+      android:summary="@string/pref_remindertime_summary"
+      android:defaultValue="1420290000000" />
+
   </PreferenceCategory>
 
   <PreferenceCategory

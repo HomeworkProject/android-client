@@ -63,11 +63,13 @@ public abstract class AutomaticReminderManager {
       Date when = null;
       try {
         when = new SimpleDateFormat("yyyy-MM-dd").parse(element.date);
+        Calendar reminderTime = Calendar.getInstance();
+        reminderTime.setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
         Calendar cal = Calendar.getInstance();
         cal.setTime(when);
         cal.add(Calendar.DAY_OF_MONTH, -1);
-        cal.set(Calendar.HOUR_OF_DAY, 14);
-        cal.set(Calendar.MINUTE, 00);
+        cal.set(Calendar.HOUR_OF_DAY, reminderTime.get(Calendar.HOUR_OF_DAY));
+        cal.set(Calendar.MINUTE, reminderTime.get(Calendar.MINUTE));
         when = cal.getTime();
       } catch (ParseException e) {
         throw new RuntimeException("The date '" + element.date + "' could not be parsed");
@@ -81,7 +83,7 @@ public abstract class AutomaticReminderManager {
       String ssp = when.getTime() + "\\";
       ssp += element.id + "~"
         + element.date + "~"
-        + element.title + "~"
+        + element.title + " [Automatisch]" + "~"
         + element.subject + "~"
         + element.desc + "\\";
 
