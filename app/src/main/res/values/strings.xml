@@ -48,6 +48,8 @@
     <string name="pref_autoreminders">Automatische Erinnerungen</string>
     <string name="pref_autoreminders_summary">Es werden nicht automatisch Erinnerungen erstellt.</string>
     <string name="pref_autoreminders_summary_true">Es wird für alle Hausaufgaben eine automatische Erinnerung erstellt.</string>
+    <string name="pref_reminderday">(WIP)Tag für automatische Erinnerungen</string>
+    <string name="pref_reminderday_summary">(WIP)Für wie viele Tage bevor die Hausaufgabe fertig sein muss automatische Erinnerungen gesetzt werden.</string>
     <string name="pref_remindertime">Uhrzeit für automatische Erinnerungen</string>
     <string name="pref_remindertime_summary">Die Uhrzeit für die automatische Erinnerungen gesetzt werden.</string>
     <string name="pref_mobile_data">Mobile Daten benutzen</string>

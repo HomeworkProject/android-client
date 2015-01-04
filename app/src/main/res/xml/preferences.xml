@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/paarmann.physikprofil" >
   <PreferenceCategory
     android:title="@string/pref_category_filter_title"
     android:key="paarmann.physikprofil.CategoryFilter" >
@@ -33,6 +35,14 @@
       android:title="@string/pref_autoreminders"
       android:summary="@string/pref_autoreminders_summary"
       android:defaultValue="false" />
+
+    <paarmann.physikprofil.NumberPickerPreference
+      android:key="paarmann.physikprofil.ReminderDay"
+      android:title="@string/pref_reminderday"
+      android:summary="@string/pref_reminderday_summary"
+      custom:maxValue="14"
+      custom:minValue="1"
+      android:defaultValue="1" />
 
      <paarmann.physikprofil.TimePreference
       android:key="paarmann.physikprofil.ReminderTime"

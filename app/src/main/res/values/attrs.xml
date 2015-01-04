@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Credit for this goes to jackos2500 (https://gist.github.com/jackos2500/9997104)
+-->
+<resources>
+    <declare-styleable name="NumberPickerPreference">
+        <attr name="minValue" format="integer"/>
+        <attr name="maxValue" format="integer"/>
+    </declare-styleable>
+</resources>

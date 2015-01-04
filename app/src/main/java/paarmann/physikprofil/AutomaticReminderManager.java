@@ -67,7 +67,7 @@ public abstract class AutomaticReminderManager {
         reminderTime.setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
         Calendar cal = Calendar.getInstance();
         cal.setTime(when);
-        cal.add(Calendar.DAY_OF_MONTH, -1);
+        cal.add(Calendar.DAY_OF_MONTH, -settings.getInt(MainActivity.PREF_REMINDERDAY, 1));
         cal.set(Calendar.HOUR_OF_DAY, reminderTime.get(Calendar.HOUR_OF_DAY));
         cal.set(Calendar.MINUTE, reminderTime.get(Calendar.MINUTE));
         when = cal.getTime();
