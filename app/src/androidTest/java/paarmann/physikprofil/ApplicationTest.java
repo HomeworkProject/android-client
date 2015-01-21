@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015  Sebastian Paarmann
+ * Licensed under the MIT license, see the LICENSE file
+ */
+
 package paarmann.physikprofil;
 
 import android.app.Application;
