@@ -115,10 +115,8 @@ public class SettingsActivity extends Activity {
           warningDialog.show(context.getFragmentManager(), "warningNoAutoUpdatesDialog");
         }
       } else if (key.equals(MainActivity.PREF_REMINDERDAY) || key.equals(MainActivity.PREF_REMINDERTIME)) {
-        SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.remove(MainActivity.PREF_SETREMINDERS);
-        editor.commit();
+        AutomaticReminderManager.deleteAutomaticReminders(context);
+        new HomeworkUpdater(context).getData();
       }
     }
 

@@ -110,4 +110,25 @@ public abstract class AutomaticReminderManager {
     editor.commit();
   }
 
+  public static void deleteAutomaticReminders(Context context) {
+    SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
+    Set<String> setReminders = new HashSet<String>();
+    Set<String> leftReminders = new HashSet<String>();
+
+    if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
+      setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
+    }
+
+    for (String ssp : setReminders) {
+      String[] parts = ssp.split("~");
+      String title = parts[2];
+      if (!title.endsWith(" [Automatisch]")) {
+        leftReminders.add(ssp);
+      }
+    }
+
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putStringSet(MainActivity.PREF_SETREMINDERS, leftReminders);
+    editor.commit();
+  }
 }
