@@ -132,4 +132,44 @@ public abstract class AutomaticReminderManager {
     editor.putStringSet(MainActivity.PREF_SETREMINDERS, leftReminders);
     editor.commit();
   }
+
+  public static void deleteAutomaticReminder(Context context,
+                                             HAElement element) {
+    SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
+    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
+    Set<String> setReminders = new HashSet<String>();
+
+    if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
+      setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
+    }
+
+    Date when = null;
+    try {
+      when = new SimpleDateFormat("yyyy-MM-dd").parse(element.date);
+      Calendar reminderTime = Calendar.getInstance();
+      reminderTime.setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(when);
+      cal.add(Calendar.DAY_OF_MONTH, -settings.getInt(MainActivity.PREF_REMINDERDAY, 1));
+      cal.set(Calendar.HOUR_OF_DAY, reminderTime.get(Calendar.HOUR_OF_DAY));
+      cal.set(Calendar.MINUTE, reminderTime.get(Calendar.MINUTE));
+      when = cal.getTime();
+    } catch (ParseException e) {
+      throw new RuntimeException("The date '" + element.date + "' could not be parsed");
+    }
+
+    String scheme = "homework";
+    String ssp = when.getTime() + "\\";
+    ssp += element.id + "~"
+      + element.date + "~"
+      + element.title + " [Automatisch]" + "~"
+      + element.subject + "~"
+      + element.desc + "\\";
+
+    setReminders.remove(ssp);
+
+    SharedPreferences.Editor editor = prefs.edit();
+    editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
+    editor.commit();
+  }
 }

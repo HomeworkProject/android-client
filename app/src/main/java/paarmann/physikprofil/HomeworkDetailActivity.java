@@ -215,6 +215,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
 
     for (HAElement element : selectedItems) {
       doneItems.add(element.id + "~" + element.title);
+      AutomaticReminderManager.deleteAutomaticReminder(this, element);
     }
 
     SharedPreferences.Editor editor = prefs.edit();
