@@ -18,6 +18,12 @@
         android:summary="@string/pref_subjects_summary"
         android:defaultValue="@string/pref_subjects_default" />
 
+      <CheckBoxPreference
+          android:key="paarmann.physikprofil.HomeworkToday"
+          android:title="@string/pref_homeworktoday"
+          android:summary="@string/pref_homeworktoday_summary"
+          android:defaultValue="false" />
+
   </PreferenceCategory>
 
   <PreferenceCategory

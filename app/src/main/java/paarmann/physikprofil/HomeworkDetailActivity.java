@@ -316,7 +316,9 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
 
     if (strDate.equals("all")) {
       Calendar cal = Calendar.getInstance();
-      cal.add(Calendar.DAY_OF_MONTH, 1);
+      if (!prefs.getBoolean(MainActivity.PREF_HOMEWORKTODAY, false)) {
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+      }
       date = cal.getTime();
       all = true;
     } else {

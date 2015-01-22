@@ -154,6 +154,14 @@ public class SettingsActivity extends Activity {
         } else {
           dataPref.setSummary(getResources().getString(R.string.pref_mobile_data_summary_false));
         }
+      } else if (key.equals(MainActivity.PREF_HOMEWORKTODAY)) {
+        Preference todayPref = findPreference(key);
+        boolean showToday = preferences.getBoolean(key, false);
+        if (showToday) {
+          todayPref.setSummary(getResources().getString(R.string.pref_homeworktoday_summary_true));
+        } else {
+          todayPref.setSummary(getResources().getString(R.string.pref_homeworktoday_summary));
+        }
       }
     }
 
