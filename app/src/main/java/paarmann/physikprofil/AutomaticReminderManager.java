@@ -52,6 +52,19 @@ public abstract class AutomaticReminderManager {
       doneItems = new HashSet<String>();
     }
 
+    // Clean up the deleted reminder data
+    Set<String> deletedReminders = new HashSet<String>();
+    if (prefs.contains(MainActivity.PREF_DELETEDREMINDERS)) {
+      deletedReminders.addAll(prefs.getStringSet(MainActivity.PREF_DELETEDREMINDERS, null));
+    }
+    for (String ssp : deletedReminders) {
+      Date when = new Date();
+      when.setTime(Long.valueOf(ssp.split("\\\\")[0]));
+      if (HomeworkUpdater.getDateDiff(new Date(), when, TimeUnit.MILLISECONDS) < 0) {
+        deletedReminders.remove(ssp);
+      }
+    }
+
     for (HAElement element : homework) {
       if (element.subject == null || element.subject.equals("")) {
         continue;
@@ -88,6 +101,11 @@ public abstract class AutomaticReminderManager {
         + element.subject + "~"
         + element.desc + "\\";
 
+      // Check if reminder was already deleted once, don't re-create it if it was
+      if (deletedReminders != null && deletedReminders.contains(ssp)) {
+        continue;
+      }
+
       boolean filterSubjects = settings.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
       if (!setReminders.contains(ssp) && (displayedSubjects.contains(element.subject) || !filterSubjects)) {
         Uri uri = Uri.fromParts(scheme, ssp, "");
@@ -108,6 +126,7 @@ public abstract class AutomaticReminderManager {
 
     SharedPreferences.Editor editor = prefs.edit();
     editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
+    editor.putStringSet(MainActivity.PREF_DELETEDREMINDERS, deletedReminders);
     editor.commit();
   }
 

@@ -127,6 +127,14 @@ public class ManageRemindersActivity extends Activity {
 
     List<Reminder> selectedReminders = getSelectedListItems();
     AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+    Set<String> deletedReminders = new HashSet<String>();
+    Set<String> savedReminders = new HashSet<String>();
+    savedReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
+    if (prefs.contains(MainActivity.PREF_DELETEDREMINDERS)) {
+      deletedReminders.addAll(prefs.getStringSet(MainActivity.PREF_DELETEDREMINDERS, null));
+    }
+
     for (Reminder reminder : selectedReminders) {
       Date when = new Date(Long.valueOf(reminder.date));
       String scheme = "homework";
@@ -138,12 +146,18 @@ public class ManageRemindersActivity extends Activity {
 
       alarmManager.cancel(pendingIntent);
 
-      Set<String> savedReminders = new HashSet<String>();
-      savedReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
       savedReminders.remove(ssp);
-      editor.putStringSet(MainActivity.PREF_SETREMINDERS, savedReminders);
-      editor.commit();
+
+      // Check if it is an automatic reminder, and prevent it from being created again if it is
+      if (reminder.title.endsWith(" [Automatisch]")) {
+        deletedReminders.add(ssp);
+      }
+
     }
+
+    editor.putStringSet(MainActivity.PREF_DELETEDREMINDERS, deletedReminders);
+    editor.putStringSet(MainActivity.PREF_SETREMINDERS, savedReminders);
+    editor.commit();
 
     loadReminders();
   }
