@@ -24,15 +24,12 @@ import java.net.ConnectException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
-
-import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
 
 public class HomeworkUpdater {
 
@@ -41,6 +38,7 @@ public class HomeworkUpdater {
   public static String HOMEWORK_FILE = "homework.ser";
 
   public interface OnHomeworkLoadedListener {
+
     public void setData(List<HAElement> data);
   }
 
@@ -76,7 +74,7 @@ public class HomeworkUpdater {
   public void downloadHomework() {
     Log.i(TAG, "Downloading homework");
     DownloadTask task = new DownloadTask();
-    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void)null);
+    task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
   }
 
   public void loadHomeworkFromFile() {
@@ -87,14 +85,15 @@ public class HomeworkUpdater {
 
   /**
    * Get a diff between two dates
-   * @param date1 the oldest date
-   * @param date2 the newest date
+   *
+   * @param date1    the oldest date
+   * @param date2    the newest date
    * @param timeUnit the unit in which you want the diff
    * @return the diff value, in the provided unit
    */
   public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
     long diffInMillies = date2.getTime() - date1.getTime();
-    return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
+    return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
   }
 
   private boolean saveHomeworkToFile(List<HAElement> data) {
@@ -114,6 +113,7 @@ public class HomeworkUpdater {
   }
 
   private class FileTask extends AsyncTask<Boolean, Void, List<HAElement>> {
+
     private boolean triedDownload;
 
     @Override
@@ -146,7 +146,8 @@ public class HomeworkUpdater {
           warning.date = "";
           warning.title = "Achtung";
           warning.subject = "";
-          warning.desc = "Die Hausaufgaben konnten nicht neu heruntergeladen werden, diese Daten könnten veraltet sein.";
+          warning.desc =
+              "Die Hausaufgaben konnten nicht neu heruntergeladen werden, diese Daten könnten veraltet sein.";
           result.add(0, warning);
         }
         AutomaticReminderManager.setReminders(context, result);
@@ -163,7 +164,8 @@ public class HomeworkUpdater {
           error.date = "";
           error.title = "Fehler";
           error.subject = "";
-          error.desc = "Die Hausaufgaben konnten weder heruntergeladen werden noch konnten gespeicherte Daten verwendet werden.";
+          error.desc =
+              "Die Hausaufgaben konnten weder heruntergeladen werden noch konnten gespeicherte Daten verwendet werden.";
           result.add(error);
           if (listener != null) {
             listener.setData(result);
@@ -174,6 +176,7 @@ public class HomeworkUpdater {
   }
 
   private class DownloadTask extends AsyncTask<Void, Void, List<HAElement>> {
+
     private HAElement errorElement = new HAElement();
     List<HAElement> errorList = new ArrayList<HAElement>();
     boolean error = false;
@@ -221,7 +224,9 @@ public class HomeworkUpdater {
       boolean useMobile = settings.getBoolean(MainActivity.PREF_MOBILEDATA, true);
       boolean mobileActive = false;
 
-      ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+      ConnectivityManager
+          cm =
+          (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
       NetworkInfo netinfo = cm.getActiveNetworkInfo();
       if (netinfo != null && netinfo.getTypeName().equalsIgnoreCase("MOBILE")) {
         mobileActive = true;

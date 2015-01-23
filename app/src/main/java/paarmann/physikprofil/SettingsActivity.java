@@ -34,24 +34,24 @@ public class SettingsActivity extends Activity {
     fragment.setContext(this);
 
     getFragmentManager().beginTransaction()
-      .replace(android.R.id.content, fragment)
-      .commit();
+        .replace(android.R.id.content, fragment)
+        .commit();
   }
 
   @Override
   public void onResume() {
     super.onResume();
-    
+
     SettingsFragment fragment = new SettingsFragment();
     fragment.setContext(this);
 
     getFragmentManager().beginTransaction()
-      .replace(android.R.id.content, fragment)
-      .commit();
+        .replace(android.R.id.content, fragment)
+        .commit();
   }
 
   public static class SettingsFragment extends PreferenceFragment
-                implements SharedPreferences.OnSharedPreferenceChangeListener {
+      implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     private SettingsActivity context;
 
@@ -82,14 +82,14 @@ public class SettingsActivity extends Activity {
         Uri uriAfternoon = Uri.fromParts("homeworkUpdate", "afternoon", "");
 
         Intent intentAfterSchool = new Intent(MainActivity.ACTION_UPDATEHOMEWORK, uriAfterSchool,
-           context, AutomaticUpdateService.class);
+                                              context, AutomaticUpdateService.class);
         Intent intentAfternoon = new Intent(MainActivity.ACTION_UPDATEHOMEWORK, uriAfternoon,
-           context, AutomaticUpdateService.class); 
+                                            context, AutomaticUpdateService.class);
 
         PendingIntent piAfterSchool = PendingIntent.getService(context,
-            1, intentAfterSchool, 0);
+                                                               1, intentAfterSchool, 0);
         PendingIntent piAfternoon = PendingIntent.getService(context,
-            2, intentAfternoon, 0);
+                                                             2, intentAfternoon, 0);
 
         if (autoUpdate) {
           Calendar afterSchool = Calendar.getInstance();
@@ -102,9 +102,9 @@ public class SettingsActivity extends Activity {
           long oneDayMillis = 24 * 60 * 60 * 1000;
 
           alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, afterSchool.getTimeInMillis(),
-              oneDayMillis, piAfterSchool);
+                                    oneDayMillis, piAfterSchool);
           alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, afternoon.getTimeInMillis(),
-              oneDayMillis, piAfternoon);
+                                    oneDayMillis, piAfternoon);
         } else {
           alarmManager.cancel(piAfterSchool);
           alarmManager.cancel(piAfternoon);
@@ -115,7 +115,8 @@ public class SettingsActivity extends Activity {
           DialogFragment warningDialog = new WarningNoAutoUpdatesDialog();
           warningDialog.show(context.getFragmentManager(), "warningNoAutoUpdatesDialog");
         }
-      } else if (key.equals(MainActivity.PREF_REMINDERDAY) || key.equals(MainActivity.PREF_REMINDERTIME)) {
+      } else if (key.equals(MainActivity.PREF_REMINDERDAY) || key
+          .equals(MainActivity.PREF_REMINDERTIME)) {
         AutomaticReminderManager.deleteAutomaticReminders(context);
         new HomeworkUpdater(context).getData();
       }
@@ -142,7 +143,8 @@ public class SettingsActivity extends Activity {
         Preference reminderPref = findPreference(key);
         boolean autoReminders = preferences.getBoolean(key, false);
         if (autoReminders) {
-          reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary_true));
+          reminderPref
+              .setSummary(getResources().getString(R.string.pref_autoreminders_summary_true));
         } else {
           reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary));
         }
@@ -182,7 +184,7 @@ public class SettingsActivity extends Activity {
     public void onPause() {
       super.onPause();
       getPreferenceScreen().getSharedPreferences()
-        .unregisterOnSharedPreferenceChangeListener(this);
+          .unregisterOnSharedPreferenceChangeListener(this);
     }
   }
 
@@ -196,12 +198,12 @@ public class SettingsActivity extends Activity {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
       AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
       builder.setMessage(R.string.noAutoUpdatesDialogText)
-        .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialog, int which) {
-            //Just let the dialog close
-          }
-        });
+          .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              //Just let the dialog close
+            }
+          });
       return builder.create();
     }
 

@@ -99,9 +99,12 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
     }
     if (prefs.getBoolean(PREF_UPDATED, false)) {
       prefs.edit().putBoolean(PREF_UPDATED, false).apply();
-      File file = new File(Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk");
+      File
+          file =
+          new File(
+              Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk");
       file.delete();
-	  
+
       showChangelog();
     }
 
@@ -173,7 +176,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
     Intent manageReminders = new Intent(this, ManageRemindersActivity.class);
     startActivity(manageReminders);
   }
-  
+
   private void startSettingsActivity() {
     Intent settings = new Intent(this, SettingsActivity.class);
     startActivity(settings);
@@ -236,7 +239,8 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   }
 
   public void checkForUpdates(boolean userInitiated) {
-    new CheckForUpdateTask().execute(getResources().getString(R.string.server_uri), String.valueOf(userInitiated));
+    new CheckForUpdateTask()
+        .execute(getResources().getString(R.string.server_uri), String.valueOf(userInitiated));
   }
 
   private void askForUpdate(int newVersionCode, String newVersionName) {
@@ -247,9 +251,10 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   public void update() {
     findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
     findViewById(R.id.txtUpdating).setVisibility(View.VISIBLE);
-    new UpdateTask().execute(getResources().getString(R.string.server_uri) + "/app/physikbioapp-latest.apk");
+    new UpdateTask()
+        .execute(getResources().getString(R.string.server_uri) + "/app/physikbioapp-latest.apk");
   }
-  
+
   private void showChangelog() {
     ChangelogDialog dialog = new ChangelogDialog();
     dialog.setChangelog(getResources().getString(R.string.changelog));
@@ -257,6 +262,7 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
   }
 
   private class CheckForUpdateTask extends AsyncTask<String, Void, Void> {
+
     @Override
     protected Void doInBackground(String... params) {
       InputStream is;
@@ -311,7 +317,9 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
 
     @Override
     protected String doInBackground(String... params) {
-      String path = Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk";
+      String
+          path =
+          Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk";
       try {
         URL url = new URL(params[0]);
         URLConnection connection = url.openConnection();

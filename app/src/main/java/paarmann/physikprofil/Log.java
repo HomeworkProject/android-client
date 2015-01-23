@@ -34,7 +34,7 @@ public final class Log {
 
   public static int v(String tag, String msg, Throwable tr) {
     return println(android.util.Log.VERBOSE,
-        tag, msg, tr);
+                   tag, msg, tr);
   }
 
   public static int d(String tag, String msg) {
@@ -43,7 +43,7 @@ public final class Log {
 
   public static int d(String tag, String msg, Throwable tr) {
     return println(android.util.Log.DEBUG,
-        tag, msg, tr);
+                   tag, msg, tr);
   }
 
   public static int i(String tag, String msg) {
@@ -52,7 +52,7 @@ public final class Log {
 
   public static int i(String tag, String msg, Throwable tr) {
     return println(android.util.Log.INFO,
-        tag, msg, tr);
+                   tag, msg, tr);
   }
 
   public static int w(String tag, String msg) {
@@ -65,7 +65,7 @@ public final class Log {
 
   public static int w(String tag, String msg, Throwable tr) {
     return println(android.util.Log.WARN,
-        tag, msg, tr);
+                   tag, msg, tr);
   }
 
   public static int e(String tag, String msg) {
@@ -74,7 +74,7 @@ public final class Log {
 
   public static int e(String tag, String msg, Throwable tr) {
     return println(android.util.Log.ERROR,
-        tag, msg, tr);
+                   tag, msg, tr);
   }
 
   public static int wtf(String tag, String msg) {
@@ -87,7 +87,7 @@ public final class Log {
 
   public static int wtf(String tag, String msg, Throwable tr) {
     return println(android.util.Log.ASSERT,
-        tag, msg, tr);
+                   tag, msg, tr);
   }
 
   public static int println(int priority, String tag, String msg) {

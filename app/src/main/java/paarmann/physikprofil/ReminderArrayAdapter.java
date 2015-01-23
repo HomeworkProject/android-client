@@ -6,9 +6,9 @@
 package paarmann.physikprofil;
 
 import android.content.Context;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.LayoutInflater;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -32,7 +32,7 @@ public class ReminderArrayAdapter extends ArrayAdapter<ManageRemindersActivity.R
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
     LayoutInflater inflater =
-      (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     View root = inflater.inflate(R.layout.reminder_list_item, parent, false);
 
     TextView title = (TextView) root.findViewById(R.id.reminderTitle);

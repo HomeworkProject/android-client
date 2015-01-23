@@ -7,11 +7,10 @@ package paarmann.physikprofil;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.SparseBooleanArray;
@@ -20,34 +19,25 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
-import javax.net.ssl.HttpsURLConnection;
 
-
-public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.OnHomeworkLoadedListener {
+public class HomeworkDetailActivity extends Activity
+    implements HomeworkUpdater.OnHomeworkLoadedListener {
 
   public static final String TAG = "HomeworkDetailActivity";
 
@@ -78,6 +68,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
 
         mode.invalidate();
       }
+
       @Override
       public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
@@ -102,6 +93,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
             return false;
         }
       }
+
       @Override
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
@@ -109,14 +101,18 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
         mActionMode = mode;
         return true;
       }
+
       @Override
       public void onDestroyActionMode(ActionMode mode) {
         mActionMode = null;
       }
+
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-        Set<String> doneItems = prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
+        Set<String>
+            doneItems =
+            prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
         boolean unmarkItems = false;
         for (int position : checkedItems) {
           HAElement element = (HAElement) listView.getItemAtPosition(position);
@@ -196,7 +192,9 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     }
     ClipData data = ClipData.newPlainText("homework", toCopy);
     clipboard.setPrimaryClip(data);
-    Toast.makeText(this, (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert", 1000).show();
+    Toast.makeText(this,
+                   (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert",
+                   1000).show();
   }
 
   private void setNewReminder() {
@@ -208,7 +206,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     List<HAElement> selectedItems = getSelectedListItems();
     Set<String> doneItems = new HashSet<String>();
     SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-    
+
     if (prefs.contains(MainActivity.PREF_DONEITEMS)) {
       doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS, null));
     }
@@ -289,7 +287,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     boolean filter = prefs.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
     String chosenSubjects = prefs.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
-    
+
     List<HAElement> filteredData;
 
     if (filter) {
@@ -378,7 +376,6 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       }
     }
 
-
     if (selectedData.size() == 0) {
       HAElement noHomework = new HAElement();
       noHomework.date = "";
@@ -392,13 +389,6 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     list.setAdapter(new HAElementArrayAdapter(this, selectedData));
   }
 
-  public static class HAElement implements java.io.Serializable {
-    private static final long serialVersionUID = 0L;
-    public int id;
-    public String date;
-    public String title;
-    public String subject;
-    public String desc;
-  }
+
 
 }

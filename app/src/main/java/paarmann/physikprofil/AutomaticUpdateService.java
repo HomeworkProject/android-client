@@ -6,14 +6,12 @@
 package paarmann.physikprofil;
 
 import android.app.IntentService;
-import android.content.Context;
 import android.content.Intent;
 
 import java.util.List;
 
-import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
-
-public class AutomaticUpdateService extends IntentService implements HomeworkUpdater.OnHomeworkLoadedListener {
+public class AutomaticUpdateService extends IntentService
+    implements HomeworkUpdater.OnHomeworkLoadedListener {
 
   public static final String TAG = "AutoamticUpdateService";
 

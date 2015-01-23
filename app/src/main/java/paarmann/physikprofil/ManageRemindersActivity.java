@@ -24,12 +24,12 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import java.util.Date;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public class ManageRemindersActivity extends Activity {
 
@@ -49,8 +49,9 @@ public class ManageRemindersActivity extends Activity {
       @Override
       public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
                                             boolean checked) {
-      
+
       }
+
       @Override
       public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
@@ -62,16 +63,19 @@ public class ManageRemindersActivity extends Activity {
             return false;
         }
       }
+
       @Override
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.manage_reminders_context_menu, menu);
         return true;
       }
+
       @Override
       public void onDestroyActionMode(ActionMode mode) {
 
       }
+
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         return false;
@@ -90,7 +94,7 @@ public class ManageRemindersActivity extends Activity {
 
   private void loadReminders() {
     SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-    
+
     if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
       Set<String> setReminders = prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null);
       List<Reminder> reminders = new ArrayList<Reminder>();
@@ -101,7 +105,7 @@ public class ManageRemindersActivity extends Activity {
 
         reminder.ssp = strReminder;
         reminder.title = "";
-        
+
         String[] strElements = reminder.ssp.split("\\\\");
         reminder.date = strElements[0];
         for (int i = 1; i < strElements.length; i++) {
@@ -141,7 +145,9 @@ public class ManageRemindersActivity extends Activity {
       String ssp = reminder.ssp;
       Uri uri = Uri.fromParts(scheme, ssp, "");
 
-      Intent intent = new Intent(MainActivity.ACTION_REMIND, uri, this, ReminderBroadcastReceiver.class);
+      Intent
+          intent =
+          new Intent(MainActivity.ACTION_REMIND, uri, this, ReminderBroadcastReceiver.class);
       PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
       alarmManager.cancel(pendingIntent);
@@ -175,6 +181,7 @@ public class ManageRemindersActivity extends Activity {
   }
 
   public static class Reminder {
+
     public String ssp;
     public String title;
     public String date;

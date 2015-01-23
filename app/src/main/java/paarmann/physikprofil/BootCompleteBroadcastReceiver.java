@@ -13,11 +13,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Set;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 
@@ -36,8 +34,10 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
         String currentReminder = it.next();
         long when = Long.valueOf(currentReminder.split("\\\\")[0]);
         Uri uri = Uri.fromParts("homework", currentReminder, "");
-        
-        Intent alarmIntent = new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
+
+        Intent
+            alarmIntent =
+            new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
           alarmManager.setExact(AlarmManager.RTC_WAKEUP, when, pendingIntent);
@@ -54,9 +54,9 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
       Uri uriAfternoon = Uri.fromParts("homeworkUpdate", "afternoon", "");
 
       Intent intentAfterSchool = new Intent(MainActivity.ACTION_UPDATEHOMEWORK, uriAfterSchool,
-          context, AutomaticUpdateService.class);
+                                            context, AutomaticUpdateService.class);
       Intent intentAfternoon = new Intent(MainActivity.ACTION_UPDATEHOMEWORK, uriAfternoon,
-          context, AutomaticUpdateService.class);
+                                          context, AutomaticUpdateService.class);
 
       PendingIntent piAfterSchool = PendingIntent.getService(context, 1, intentAfterSchool, 0);
       PendingIntent piAfternoon = PendingIntent.getService(context, 2, intentAfternoon, 0);
@@ -67,13 +67,13 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
       Calendar afternoon = Calendar.getInstance();
       afternoon.set(Calendar.HOUR_OF_DAY, 17);
       afternoon.set(Calendar.MINUTE, 15);
-      
+
       long oneDayMillis = 24 * 60 * 60 * 1000;
 
       alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, afterSchool.getTimeInMillis(),
-          oneDayMillis, piAfterSchool);
+                                oneDayMillis, piAfterSchool);
       alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, afternoon.getTimeInMillis(),
-          oneDayMillis, piAfternoon);
+                                oneDayMillis, piAfternoon);
     }
   }
 

@@ -8,8 +8,8 @@ package paarmann.physikprofil;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.preference.PreferenceManager;
 
@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import static paarmann.physikprofil.HomeworkDetailActivity.HAElement;
-
 public abstract class AutomaticReminderManager {
 
   public static final String TAG = "AutomaticReminderManager";
@@ -33,7 +31,7 @@ public abstract class AutomaticReminderManager {
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
     Set<String> setReminders = new HashSet<String>();
     Set<String> doneItems;
-    
+
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
     if (!settings.getBoolean(MainActivity.PREF_AUTOREMINDERS, false)) {
@@ -78,7 +76,8 @@ public abstract class AutomaticReminderManager {
       try {
         when = new SimpleDateFormat("yyyy-MM-dd").parse(element.date);
         Calendar reminderTime = Calendar.getInstance();
-        reminderTime.setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
+        reminderTime
+            .setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
         Calendar cal = Calendar.getInstance();
         cal.setTime(when);
         cal.add(Calendar.DAY_OF_MONTH, -settings.getInt(MainActivity.PREF_REMINDERDAY, 1));
@@ -92,14 +91,14 @@ public abstract class AutomaticReminderManager {
       if (HomeworkUpdater.getDateDiff(new Date(), when, TimeUnit.MILLISECONDS) < 0) {
         continue;
       }
-      
+
       String scheme = "homework";
       String ssp = when.getTime() + "\\";
       ssp += element.id + "~"
-        + element.date + "~"
-        + element.title + " [Automatisch]" + "~"
-        + element.subject + "~"
-        + element.desc + "\\";
+             + element.date + "~"
+             + element.title + " [Automatisch]" + "~"
+             + element.subject + "~"
+             + element.desc + "\\";
 
       // Check if reminder was already deleted once, don't re-create it if it was
       if (deletedReminders.contains(ssp)) {
@@ -107,12 +106,15 @@ public abstract class AutomaticReminderManager {
       }
 
       boolean filterSubjects = settings.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
-      if (!setReminders.contains(ssp) && (displayedSubjects.contains(element.subject) || !filterSubjects)) {
+      if (!setReminders.contains(ssp) && (displayedSubjects.contains(element.subject)
+                                          || !filterSubjects)) {
         Uri uri = Uri.fromParts(scheme, ssp, "");
 
-        Intent intent = new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
+        Intent
+            intent =
+            new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
-        
+
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
           alarmManager.setExact(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
@@ -166,7 +168,8 @@ public abstract class AutomaticReminderManager {
     try {
       when = new SimpleDateFormat("yyyy-MM-dd").parse(element.date);
       Calendar reminderTime = Calendar.getInstance();
-      reminderTime.setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
+      reminderTime
+          .setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
       Calendar cal = Calendar.getInstance();
       cal.setTime(when);
       cal.add(Calendar.DAY_OF_MONTH, -settings.getInt(MainActivity.PREF_REMINDERDAY, 1));
@@ -180,10 +183,10 @@ public abstract class AutomaticReminderManager {
     String scheme = "homework";
     String ssp = when.getTime() + "\\";
     ssp += element.id + "~"
-      + element.date + "~"
-      + element.title + " [Automatisch]" + "~"
-      + element.subject + "~"
-      + element.desc + "\\";
+           + element.date + "~"
+           + element.title + " [Automatisch]" + "~"
+           + element.subject + "~"
+           + element.desc + "\\";
 
     setReminders.remove(ssp);
 

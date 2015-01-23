@@ -16,11 +16,10 @@ import android.content.SharedPreferences;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
-import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
@@ -39,11 +38,13 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
     editor.commit();
 
-    ArrayList<HomeworkDetailActivity.HAElement> elements = new ArrayList<HomeworkDetailActivity.HAElement>();
+    ArrayList<HAElement>
+        elements =
+        new ArrayList<HAElement>();
     String[] strElements = ssp.split("\\\\");
     for (int i = 1; i < strElements.length; i++) {
       if (strElements[i] != null && strElements[i].length() != 0) {
-        HomeworkDetailActivity.HAElement element = new HomeworkDetailActivity.HAElement();
+        HAElement element = new HAElement();
         String[] parts = strElements[i].split("~");
         element.id = Integer.valueOf(parts[0]);
         element.date = parts[1];
@@ -61,15 +62,17 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     stackBuilder.addParentStack(HomeworkDetailActivity.class);
     stackBuilder.addNextIntent(clickIntent);
 
-    PendingIntent pendingClickIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent
+        pendingClickIntent =
+        stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
     String notificationText = "";
     int notificationId = 0;
     for (int i = 0; i < elements.size(); i++) {
       notificationText += elements.get(i).title;
       notificationId += elements.get(i).id; //Not guaranteed to always be unique,
-                                            //but convenient and extremely unlikely
-                                            //to cause problems
+      //but convenient and extremely unlikely
+      //to cause problems
       if (i != elements.size() - 1) {
         notificationText += ", ";
       }
@@ -78,15 +81,17 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
     Notification.Builder builder =
-          new Notification.Builder(context)
-          .setSmallIcon(R.drawable.ic_launcher)
-          .setContentTitle("Hausaufgaben")
-          .setContentText(notificationText)
-          .setAutoCancel(true)
-          .setContentIntent(pendingClickIntent)
-          .setSound(soundUri);
+        new Notification.Builder(context)
+            .setSmallIcon(R.drawable.ic_launcher)
+            .setContentTitle("Hausaufgaben")
+            .setContentText(notificationText)
+            .setAutoCancel(true)
+            .setContentIntent(pendingClickIntent)
+            .setSound(soundUri);
 
-    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    NotificationManager
+        notificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     notificationManager.notify(notificationId, builder.build());
 
     Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
