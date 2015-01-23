@@ -102,7 +102,7 @@ public abstract class AutomaticReminderManager {
         + element.desc + "\\";
 
       // Check if reminder was already deleted once, don't re-create it if it was
-      if (deletedReminders != null && deletedReminders.contains(ssp)) {
+      if (deletedReminders.contains(ssp)) {
         continue;
       }
 
