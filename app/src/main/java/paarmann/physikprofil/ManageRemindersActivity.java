@@ -97,28 +97,28 @@ public class ManageRemindersActivity extends Activity {
 
     if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
       Set<String> setReminders = prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null);
-      List<Reminder> reminders = new ArrayList<Reminder>();
+      //List<Reminder> reminders = new ArrayList<Reminder>();
+      List<Reminder> reminders = Reminder.createFromSspSet(setReminders);
 
-      for (Iterator<String> it = setReminders.iterator(); it.hasNext(); ) {
-        String strReminder = it.next();
-        Reminder reminder = new Reminder();
-
-        reminder.ssp = strReminder;
-        reminder.title = "";
-
-        String[] strElements = reminder.ssp.split("\\\\");
-        reminder.date = strElements[0];
-        for (int i = 1; i < strElements.length; i++) {
-          if (strElements[i] != null && strElements[i].length() != 0) {
-            String[] parts = strElements[i].split("~");
-            reminder.title += parts[2];
-            if (i != strElements.length - 1) {
-              reminder.title += ", ";
-            }
-          }
-        }
-        reminders.add(reminder);
-      }
+//      for (String strReminder : setReminders) {
+//        Reminder reminder = new Reminder();
+//
+//        reminder.ssp = strReminder;
+//        reminder.title = "";
+//
+//        String[] strElements = reminder.ssp.split("\\\\");
+//        reminder.date = strElements[0];
+//        for (int i = 1; i < strElements.length; i++) {
+//          if (strElements[i] != null && strElements[i].length() != 0) {
+//            String[] parts = strElements[i].split("~");
+//            reminder.title += parts[2];
+//            if (i != strElements.length - 1) {
+//              reminder.title += ", ";
+//            }
+//          }
+//        }
+//        reminders.add(reminder);
+//      }
 
       ListView list = (ListView) findViewById(R.id.lsViewReminders);
       list.setAdapter(new ReminderArrayAdapter(this, reminders));
@@ -178,13 +178,6 @@ public class ManageRemindersActivity extends Activity {
       }
     }
     return selectedItems;
-  }
-
-  public static class Reminder {
-
-    public String ssp;
-    public String title;
-    public String date;
   }
 
 }

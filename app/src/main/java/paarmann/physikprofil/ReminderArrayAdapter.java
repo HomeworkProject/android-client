@@ -16,14 +16,14 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class ReminderArrayAdapter extends ArrayAdapter<ManageRemindersActivity.Reminder> {
+public class ReminderArrayAdapter extends ArrayAdapter<Reminder> {
 
   public static final String TAG = "ReminderArrayAdapter";
 
-  private List<ManageRemindersActivity.Reminder> objects;
+  private List<Reminder> objects;
   private Context context;
 
-  public ReminderArrayAdapter(Context context, List<ManageRemindersActivity.Reminder> objects) {
+  public ReminderArrayAdapter(Context context, List<Reminder> objects) {
     super(context, R.layout.reminder_list_item, objects);
     this.objects = objects;
     this.context = context;
