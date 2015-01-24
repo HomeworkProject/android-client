@@ -38,9 +38,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
     editor.commit();
 
-    ArrayList<HAElement>
-        elements =
-        new ArrayList<HAElement>();
+    ArrayList<HAElement> elements = new ArrayList<HAElement>();
     String[] strElements = ssp.split("\\\\");
     for (int i = 1; i < strElements.length; i++) {
       if (strElements[i] != null && strElements[i].length() != 0) {

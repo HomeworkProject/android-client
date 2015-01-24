@@ -212,6 +212,7 @@ public class HomeworkDetailActivity extends Activity
     }
 
     for (HAElement element : selectedItems) {
+      element.flags = element.flags | HAElement.FLAG_DONE;
       doneItems.add(element.id + "~" + element.title);
       AutomaticReminderManager.deleteAutomaticReminder(this, element);
     }
@@ -231,6 +232,7 @@ public class HomeworkDetailActivity extends Activity
     }
 
     for (HAElement element : selectedItems) {
+      element.flags = element.flags & (~HAElement.FLAG_DONE);
       element.title = element.title.replace(" [Erledigt]", "");
       doneItems.remove(element.id + "~" + element.title);
     }
@@ -378,6 +380,7 @@ public class HomeworkDetailActivity extends Activity
 
     if (selectedData.size() == 0) {
       HAElement noHomework = new HAElement();
+      noHomework.id = 0;
       noHomework.date = "";
       noHomework.title = "Keine Hausaufgaben!";
       noHomework.subject = "";

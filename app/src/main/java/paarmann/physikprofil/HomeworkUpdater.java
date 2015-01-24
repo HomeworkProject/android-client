@@ -26,7 +26,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -142,7 +141,8 @@ public class HomeworkUpdater {
       if (result != null) {
         if (triedDownload) {
           HAElement warning = new HAElement();
-          warning.id = 1;
+          warning.id = 0;
+          warning.flags = HAElement.FLAG_WARN;
           warning.date = "";
           warning.title = "Achtung";
           warning.subject = "";
@@ -161,6 +161,7 @@ public class HomeworkUpdater {
           result = new ArrayList<HAElement>();
           HAElement error = new HAElement();
           error.id = 0;
+          error.flags = HAElement.FLAG_ERROR;
           error.date = "";
           error.title = "Fehler";
           error.subject = "";
@@ -253,34 +254,7 @@ public class HomeworkUpdater {
 
       String serverResponse = IOUtils.toString(is, "windows-1252");
 
-      List<HAElement> homework = new ArrayList<HAElement>();
-
-      Scanner elements = new Scanner(serverResponse);
-      elements.useDelimiter("\\\\");
-      while (elements.hasNext()) {
-        HAElement element = new HAElement();
-        Scanner properties = new Scanner(elements.next());
-        properties.useDelimiter("~");
-        if (!properties.hasNext()) {
-          continue;
-        }
-        int id = Integer.valueOf(properties.next());
-        if (id == 0) {
-          element.date = "";
-          element.title = "Keine Hausaufgaben!";
-          element.subject = "";
-          element.desc = "Wir haben keine Hausaufgaben!";
-          homework.add(element);
-          continue;
-        }
-        element.id = id;
-        element.date = properties.next();
-        element.title = properties.next();
-        element.subject = properties.next().trim();
-        element.desc = properties.next();
-        homework.add(element);
-      }
-      return homework;
+      return HAElement.createFromSsp(serverResponse);
     }
   }
 

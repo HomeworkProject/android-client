@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 
 import java.util.Calendar;
 import java.util.Iterator;
@@ -30,8 +31,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 
     if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
       Set<String> setReminders = prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null);
-      for (Iterator<String> it = setReminders.iterator(); it.hasNext(); ) {
-        String currentReminder = it.next();
+      for (String currentReminder : setReminders) {
         long when = Long.valueOf(currentReminder.split("\\\\")[0]);
         Uri uri = Uri.fromParts("homework", currentReminder, "");
 
@@ -39,7 +39,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
             alarmIntent =
             new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
           alarmManager.setExact(AlarmManager.RTC_WAKEUP, when, pendingIntent);
         } else {
           alarmManager.set(AlarmManager.RTC_WAKEUP, when, pendingIntent);
