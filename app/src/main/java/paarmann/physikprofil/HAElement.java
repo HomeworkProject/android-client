@@ -28,6 +28,11 @@ public class HAElement implements java.io.Serializable {
     flags = 0x0;
   }
 
+  @Deprecated
+  public String getSsp() {
+    return id + "~" + date + "~" + title + "~" + subject;
+  }
+
   public static List<HAElement> createFromSsp(String input) {
     List<HAElement> homework = new ArrayList<HAElement>();
 

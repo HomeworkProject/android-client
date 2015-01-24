@@ -116,7 +116,14 @@ public class HomeworkDetailActivity extends Activity
         boolean unmarkItems = false;
         for (int position : checkedItems) {
           HAElement element = (HAElement) listView.getItemAtPosition(position);
-          if (doneItems.contains(element.id + "~" + element.title.replace(" [Erledigt]", ""))) {
+          HAElement copy = new HAElement();
+          copy.id = element.id;
+          copy.flags = element.flags;
+          copy.date = element.date;
+          copy.title = element.title.replace(" [Erledigt]", "");
+          copy.subject = element.subject;
+          copy.desc = element.desc;
+          if (doneItems.contains(copy.getSsp())) {
             unmarkItems = true;
             break;
           }
@@ -213,7 +220,7 @@ public class HomeworkDetailActivity extends Activity
 
     for (HAElement element : selectedItems) {
       element.flags = element.flags | HAElement.FLAG_DONE;
-      doneItems.add(element.id + "~" + element.title);
+      doneItems.add(element.getSsp());
       AutomaticReminderManager.deleteAutomaticReminder(this, element);
     }
 
@@ -234,7 +241,7 @@ public class HomeworkDetailActivity extends Activity
     for (HAElement element : selectedItems) {
       element.flags = element.flags & (~HAElement.FLAG_DONE);
       element.title = element.title.replace(" [Erledigt]", "");
-      doneItems.remove(element.id + "~" + element.title);
+      doneItems.remove(element.getSsp());
     }
 
     SharedPreferences.Editor editor = prefs.edit();
@@ -373,7 +380,7 @@ public class HomeworkDetailActivity extends Activity
     }
 
     for (HAElement element : selectedData) {
-      if (doneItems.contains(element.id + "~" + element.title)) {
+      if (doneItems.contains(element.getSsp())) {
         element.title += " [Erledigt]";
       }
     }
