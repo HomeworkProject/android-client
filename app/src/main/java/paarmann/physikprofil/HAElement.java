@@ -5,7 +5,10 @@
 
 package paarmann.physikprofil;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -13,8 +16,8 @@ public class HAElement implements java.io.Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  public static int FLAG_DONE  = 0x1;
-  public static int FLAG_WARN  = 0x2;
+  public static int FLAG_DONE = 0x1;
+  public static int FLAG_WARN = 0x2;
   public static int FLAG_ERROR = 0x4;
 
   public int id;
@@ -24,13 +27,24 @@ public class HAElement implements java.io.Serializable {
   public String subject;
   public String desc;
 
+  private SimpleDateFormat dateFormat;
+
   public HAElement() {
     flags = 0x0;
+    dateFormat = new SimpleDateFormat("yyyy-MM-dd");
   }
 
   @Deprecated
   public String getSsp() {
     return id + "~" + date + "~" + title + "~" + subject;
+  }
+
+  public Date getDate() throws ParseException {
+    return dateFormat.parse(date);
+  }
+
+  public String getDate(String format) throws ParseException {
+    return new SimpleDateFormat(format).format(getDate());
   }
 
   public static List<HAElement> createFromSsp(String input) {

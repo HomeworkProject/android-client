@@ -15,7 +15,6 @@ import android.net.Uri;
 import android.os.Build;
 
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.Set;
 
 public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
@@ -29,21 +28,19 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 
     Log.i(TAG, "Setting reminder alarms again...");
 
-    if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
-      Set<String> setReminders = prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null);
-      for (String currentReminder : setReminders) {
-        long when = Long.valueOf(currentReminder.split("\\\\")[0]);
-        Uri uri = Uri.fromParts("homework", currentReminder, "");
+    Set<Reminder> setReminders = Reminder.loadSavedReminders(context);
+    for (Reminder currentReminder : setReminders) {
+      long when = currentReminder.getDate().getTime();
+      Uri uri = currentReminder.toUri();
 
-        Intent
-            alarmIntent =
-            new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-          alarmManager.setExact(AlarmManager.RTC_WAKEUP, when, pendingIntent);
-        } else {
-          alarmManager.set(AlarmManager.RTC_WAKEUP, when, pendingIntent);
-        }
+      Intent
+          alarmIntent =
+          new Intent(MainActivity.ACTION_REMIND, uri, context, ReminderBroadcastReceiver.class);
+      PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, when, pendingIntent);
+      } else {
+        alarmManager.set(AlarmManager.RTC_WAKEUP, when, pendingIntent);
       }
     }
 

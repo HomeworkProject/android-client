@@ -19,6 +19,7 @@ import android.os.Vibrator;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
@@ -28,30 +29,8 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
     Uri data = intent.getData();
-    String ssp = data.getSchemeSpecificPart();
 
-    SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
-    SharedPreferences.Editor editor = prefs.edit();
-    Set<String> setReminders = new HashSet<String>();
-    setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
-    setReminders.remove(ssp);
-    editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
-    editor.commit();
-
-    ArrayList<HAElement> elements = new ArrayList<HAElement>();
-    String[] strElements = ssp.split("\\\\");
-    for (int i = 1; i < strElements.length; i++) {
-      if (strElements[i] != null && strElements[i].length() != 0) {
-        HAElement element = new HAElement();
-        String[] parts = strElements[i].split("~");
-        element.id = Integer.valueOf(parts[0]);
-        element.date = parts[1];
-        element.title = parts[2];
-        element.subject = parts[3];
-        element.desc = parts[4];
-        elements.add(element);
-      }
-    }
+    Reminder reminder = Reminder.fromUri(context, data);
 
     Intent clickIntent = new Intent(context, HomeworkDetailActivity.class);
     clickIntent.putExtra(HomeworkDetailActivity.EXTRA_DATE, "all");
@@ -65,12 +44,9 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
     String notificationText = "";
-    int notificationId = 0;
+    List<HAElement> elements = reminder.getHAElements();
     for (int i = 0; i < elements.size(); i++) {
       notificationText += elements.get(i).title;
-      notificationId += elements.get(i).id; //Not guaranteed to always be unique,
-      //but convenient and extremely unlikely
-      //to cause problems
       if (i != elements.size() - 1) {
         notificationText += ", ";
       }
@@ -90,7 +66,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     NotificationManager
         notificationManager =
         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    notificationManager.notify(notificationId, builder.build());
+    notificationManager.notify(reminder.getId(), builder.build());
 
     Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     vib.vibrate(1000);

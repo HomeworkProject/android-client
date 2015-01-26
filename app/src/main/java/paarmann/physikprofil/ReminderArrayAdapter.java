@@ -38,10 +38,9 @@ public class ReminderArrayAdapter extends ArrayAdapter<Reminder> {
     TextView title = (TextView) root.findViewById(R.id.reminderTitle);
     TextView date = (TextView) root.findViewById(R.id.reminderDate);
 
-    Date dDate = new Date(Long.valueOf(objects.get(position).date));
-    String strDate = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(dDate);
+    String strDate = objects.get(position).getDate("dd.MM.yyyy HH:mm");
 
-    title.setText(objects.get(position).title);
+    title.setText(objects.get(position).getTitle());
     date.setText(strDate);
 
     return root;
