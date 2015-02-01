@@ -1,3 +1,15 @@
+v1.7
+====
+- Setting to determine if homework of today is shown
+
+- Automatic reminders are deleted if corresponding homework is marked as done
+
+- Settings to control when automatic reminders are set
+
+- Automatic reminders are not re-created when they are deleted once
+
+- Changed references to E1b to E2b
+
 v1.6
 ====
 - Possibility to mark homework as done
