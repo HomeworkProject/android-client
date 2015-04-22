@@ -68,6 +68,8 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
         (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
     notificationManager.notify(reminder.getId(), builder.build());
 
+    reminder.delete(context);
+
     Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
     vib.vibrate(1000);
   }

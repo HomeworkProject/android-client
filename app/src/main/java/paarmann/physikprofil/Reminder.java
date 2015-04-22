@@ -176,7 +176,7 @@ public class Reminder implements Serializable {
   }
 
   private static HashMap<Integer, Reminder> loadDeletedRemindersInternal(Context context) {
-    if (!invalidatedDeletedReminders) {
+    if (!invalidatedDeletedReminders || cachedDeletedReminders == null) {
       return cachedDeletedReminders;
     }
     try {
