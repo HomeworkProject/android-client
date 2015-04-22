@@ -10,6 +10,9 @@ import android.content.Intent;
 
 import java.util.List;
 
+/**
+ * Service that updates homework data in the background.
+ */
 public class AutomaticUpdateService extends IntentService
     implements HomeworkUpdater.OnHomeworkLoadedListener {
 

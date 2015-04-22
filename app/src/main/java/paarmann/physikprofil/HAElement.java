@@ -12,16 +12,23 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Represents a homework element and provides various helper methods.
+ */
 public class HAElement implements java.io.Serializable {
 
   private static final long serialVersionUID = 1L;
 
+  /** Was marked as done by user */
   public static int FLAG_DONE = 0x1;
+  /** Is a pseudo element for displaying a warning to the user */
   public static int FLAG_WARN = 0x2;
+  /** Is a pseudo element for displaying an error to the user */
   public static int FLAG_ERROR = 0x4;
 
   public int id;
   public int flags;
+  /** Due date of the element, must be of the form yyyy-MM-dd. */
   public String date;
   public String title;
   public String subject;
@@ -34,19 +41,46 @@ public class HAElement implements java.io.Serializable {
     dateFormat = new SimpleDateFormat("yyyy-MM-dd");
   }
 
+  /**
+   * Constructs a scheme-specific part to represent this element in URIs.
+   * Should not be used anymore, representation of homework elements in URIs is no longer necessary.
+   *
+   * @return the scheme-specific part
+   */
   @Deprecated
   public String getSsp() {
     return id + "~" + date + "~" + title + "~" + subject;
   }
 
+  /**
+   * Parses the date of this element to a {@code Date} object.
+   *
+   * @return the parsed {@link Date}
+   * @throws ParseException if the date is not in the format yyyy-MM-dd.
+   */
   public Date getDate() throws ParseException {
     return dateFormat.parse(date);
   }
 
+  /**
+   * Parses the date of this element to {@code Date} object, using the specified format.
+   *
+   * @param format the date format to use when parsing the date. See {@link SimpleDateFormat} for formatting values.
+   * @return the parsed {@link Date}
+   * @throws ParseException if the date is not in the specified format.
+   */
   public String getDate(String format) throws ParseException {
     return new SimpleDateFormat(format).format(getDate());
   }
 
+  /**
+   * Creates homework elements based on a scheme-specific part.
+   * <p>
+   * This expects the ssp to be in the following format: {@code id1~date1~title1~subject1~desc1\id2~date2~title2...}.
+   *
+   * @param input the scheme-specific part from which to create the elements
+   * @return the created homework elements
+   */
   public static List<HAElement> createFromSsp(String input) {
     List<HAElement> homework = new ArrayList<HAElement>();
 
@@ -62,6 +96,12 @@ public class HAElement implements java.io.Serializable {
     return homework;
   }
 
+  /**
+   * Creates a single homework element from a string of the following format: {@code id~date~title~subject~desc}.
+   *
+   * @param input the string from which to create the element
+   * @return the created homework element, null if string does not contain {@code ~}
+   */
   public static HAElement createSingleFromString(String input) {
     HAElement elem = new HAElement();
     Scanner props = new Scanner(input);

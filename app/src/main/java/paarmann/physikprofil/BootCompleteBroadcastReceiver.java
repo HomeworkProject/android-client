@@ -17,6 +17,9 @@ import android.os.Build;
 import java.util.Calendar;
 import java.util.Set;
 
+/**
+ * Broadcast receiver for re-registering all alarms in the system after a reboot.
+ */
 public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 
   public static final String TAG = "BootCompleteBroadcastReceiver";
@@ -28,6 +31,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
 
     Log.i(TAG, "Setting reminder alarms again...");
 
+    // Re-register alarms for all saved reminders
     Set<Reminder> setReminders = Reminder.loadSavedReminders(context);
     for (Reminder currentReminder : setReminders) {
       long when = currentReminder.getDate().getTime();
@@ -44,6 +48,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
       }
     }
 
+    // Re-register alarms for automatic updates
     if (prefs.getBoolean(MainActivity.PREF_AUTOUPDATES, false)) {
       Log.i(TAG, "Setting automatic update alarms again...");
 

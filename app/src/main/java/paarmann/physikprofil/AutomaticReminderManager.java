@@ -23,10 +23,31 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Helper class to manage automatic reminders.
+ * <p>
+ * This class provides several static helper methods for dealing with automatic reminders.
+ */
 public abstract class AutomaticReminderManager {
 
   public static final String TAG = "AutomaticReminderManager";
 
+  /**
+   * Updates the automatic reminders for the specified homework.
+   * <p>
+   * This sets a new automatic reminder for every homework element passed, following these rules:
+   * <ul>
+   *  <li>If a reminder for a homework element already exists, no new one is created
+   *  <li>If filtering by subject is activated and the subject should not be displayed, no reminder is set
+   *  <li>No reminder is created if the homework element was marked as done
+   *  <li>If an automatic reminder would be in the past, it is not created
+   *  <li>If a reminder for a homework element was already deleted once, no new one is created
+   * </ul>
+   *
+   * @throws RuntimeException if the date of one of the homework elements can't be parsed
+   * @param context the context to use for shared preferences and file handling
+   * @param homework the homework elements for which automatic reminders should be created
+   */
   public static void setReminders(Context context, List<HAElement> homework) {
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
     Set<Reminder> setReminders = Reminder.loadSavedReminders(context);
@@ -111,6 +132,11 @@ public abstract class AutomaticReminderManager {
     }
   }
 
+  /**
+   * Deletes all automatic reminders.
+   *
+   * @param context the context to use for shared preferences and file handling
+   */
   public static void deleteAutomaticReminders(Context context) {
     Set<Reminder> reminders = Reminder.loadSavedReminders(context);
     for (Reminder reminder : reminders) {
@@ -120,6 +146,13 @@ public abstract class AutomaticReminderManager {
     }
   }
 
+  /**
+   * Deletes the automatic reminder for the specified homework element, if it exists.
+   *
+   * @throws RuntimeException if the date of the homework element can't be parsed
+   * @param context the context to use for shared preferences and file handling
+   * @param element the homework element whose automatic reminder should be deleted
+   */
   public static void deleteAutomaticReminder(Context context,
                                              HAElement element) {
     SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
