@@ -83,7 +83,7 @@ public class HomeworkUpdater {
   /**
    * Create a new {@code AsyncTask} for downloading the homework and returning it.
    */
-  private void downloadHomework() {
+  public void downloadHomework() {
     Log.i(TAG, "Downloading homework");
     DownloadTask task = new DownloadTask();
     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
