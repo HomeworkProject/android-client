@@ -7,8 +7,6 @@ Modified by Sebastian Paarmann in 2015
 */
 package paarmann.physikprofil;
 
-import java.util.Calendar;
-
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.text.format.DateFormat;
@@ -18,6 +16,7 @@ import android.widget.TimePicker;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import java.util.Calendar;
 
 
 public class TimePreference extends DialogPreference {
@@ -26,8 +25,6 @@ public class TimePreference extends DialogPreference {
 
   private Calendar _value;
   private boolean _isValueSet;
-
-
 
 // region Constructors
 
@@ -49,10 +46,7 @@ public class TimePreference extends DialogPreference {
     _value = null;
   }
 
-
 // endregion
-
-
 
 // region Event Handlers
 
@@ -66,7 +60,6 @@ public class TimePreference extends DialogPreference {
 
     return _timeView;
   }
-
 
 
   @Override
@@ -84,18 +77,16 @@ public class TimePreference extends DialogPreference {
       defaultValue = 0L;
     }
 
-
     if (restorePersistedValue) {
       _value = Calendar.getInstance();
-      _value.setTimeInMillis(this.getPersistedLong((Long)defaultValue));
+      _value.setTimeInMillis(this.getPersistedLong((Long) defaultValue));
       _isValueSet = true;
       return;
     }
 
-
     Calendar newValue = Calendar.getInstance();
 
-    newValue.setTimeInMillis((Long)defaultValue);
+    newValue.setTimeInMillis((Long) defaultValue);
 
     this.setValue(_value);
   }
@@ -117,10 +108,7 @@ public class TimePreference extends DialogPreference {
     }
   }
 
-
 // endregion
-
-
 
 // region Getters/Setters
 
@@ -150,7 +138,6 @@ public class TimePreference extends DialogPreference {
   public CharSequence getSummary() {
     return (_value == null) ? null : DateFormatUtils.format(_value, "HH:mm");
   }
-
 
 // endregion
 }

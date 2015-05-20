@@ -7,11 +7,10 @@ package paarmann.physikprofil;
 
 import android.app.Activity;
 import android.app.DialogFragment;
-import android.content.ClipboardManager;
 import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.SparseBooleanArray;
@@ -20,37 +19,33 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.commons.io.IOUtils;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.ConnectException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.text.ParseException;
-import java.util.Arrays;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
-import javax.net.ssl.HttpsURLConnection;
-
-
-public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.OnHomeworkLoadedListener {
+/**
+ * Displays a list of homework elements and provides an interface for various actions on them.
+ * Users can set reminders, mark homework as done/not done and copy them to the clipboard.
+ * Data is provided by {@link HomeworkUpdater}.
+ */
+public class HomeworkDetailActivity extends Activity
+    implements HomeworkUpdater.OnHomeworkLoadedListener {
 
   public static final String TAG = "HomeworkDetailActivity";
 
+  /** Extra for specifying the date. Can be {@code 'all'} or a date in yyyy-mm-DD  */
   public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
 
   private DialogFragment reminderDialog;
@@ -64,7 +59,11 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
     listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
+      // All items currently selected
       private List<Integer> checkedItems = new ArrayList<Integer>();
+
+      // If true, selected items should be marked as done when the done button is pressed.
+      // If false, instead mark them as not done if they aren't already.
       private boolean markItemsDone = true;
 
       @Override
@@ -78,6 +77,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
 
         mode.invalidate();
       }
+
       @Override
       public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
@@ -102,6 +102,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
             return false;
         }
       }
+
       @Override
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
@@ -109,18 +110,31 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
         mActionMode = mode;
         return true;
       }
+
       @Override
       public void onDestroyActionMode(ActionMode mode) {
         mActionMode = null;
       }
+
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-        Set<String> doneItems = prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
+        Set<String>
+            doneItems =
+            prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
         boolean unmarkItems = false;
         for (int position : checkedItems) {
+          // Check if item is already marked as done, see also markItemsDone. (Done items are not yet
+          // using the new HAElement system)
           HAElement element = (HAElement) listView.getItemAtPosition(position);
-          if (doneItems.contains(element.id + "~" + element.title.replace(" [Erledigt]", ""))) {
+          HAElement copy = new HAElement();
+          copy.id = element.id;
+          copy.flags = element.flags;
+          copy.date = element.date;
+          copy.title = element.title.replace(" [Erledigt]", "");
+          copy.subject = element.subject;
+          copy.desc = element.desc;
+          if (doneItems.contains(copy.getSsp())) {
             unmarkItems = true;
             break;
           }
@@ -182,6 +196,9 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     }
   }
 
+  /**
+   * Copies the description of all selected items to the clipboard and displays a toast.
+   */
   private void copyCurrentItems() {
     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
@@ -196,7 +213,9 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     }
     ClipData data = ClipData.newPlainText("homework", toCopy);
     clipboard.setPrimaryClip(data);
-    Toast.makeText(this, (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert", 1000).show();
+    Toast.makeText(this,
+                   (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert",
+                   Toast.LENGTH_SHORT).show();
   }
 
   private void setNewReminder() {
@@ -208,13 +227,14 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     List<HAElement> selectedItems = getSelectedListItems();
     Set<String> doneItems = new HashSet<String>();
     SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-    
+
     if (prefs.contains(MainActivity.PREF_DONEITEMS)) {
       doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS, null));
     }
 
     for (HAElement element : selectedItems) {
-      doneItems.add(element.id + "~" + element.title);
+      element.flags = element.flags | HAElement.FLAG_DONE;
+      doneItems.add(element.getSsp());
       AutomaticReminderManager.deleteAutomaticReminder(this, element);
     }
 
@@ -233,8 +253,9 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     }
 
     for (HAElement element : selectedItems) {
+      element.flags = element.flags & (~HAElement.FLAG_DONE);
       element.title = element.title.replace(" [Erledigt]", "");
-      doneItems.remove(element.id + "~" + element.title);
+      doneItems.remove(element.getSsp());
     }
 
     SharedPreferences.Editor editor = prefs.edit();
@@ -242,6 +263,10 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     editor.commit();
   }
 
+  /**
+   * Get all items currently selected in the list view.
+   * @return the selected items
+   */
   private ArrayList<HAElement> getSelectedListItems() {
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     SparseBooleanArray selected = listView.getCheckedItemPositions();
@@ -258,6 +283,10 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     loadHomework(false);
   }
 
+  /**
+   * Use {@link HomeworkUpdater} to load the homework, setting {@code this} as listener.
+   * @param forceDownload if true, no cached results will be used
+   */
   private void loadHomework(boolean forceDownload) {
     TextView emptyView = (TextView) findViewById(R.id.emptyView);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
@@ -289,9 +318,10 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     boolean filter = prefs.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
     String chosenSubjects = prefs.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
-    
+
     List<HAElement> filteredData;
 
+    // Filter by subjects if the option is turned on
     if (filter) {
       List<HAElement> displayedObjects = new ArrayList<HAElement>();
       List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
@@ -307,6 +337,7 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
       filteredData = data;
     }
 
+    // Filter by date, according to EXTRA_DATE
     List<HAElement> selectedData = new ArrayList<HAElement>();
     String strDate = getIntent().getStringExtra(EXTRA_DATE);
     boolean all;
@@ -373,14 +404,14 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     }
 
     for (HAElement element : selectedData) {
-      if (doneItems.contains(element.id + "~" + element.title)) {
+      if (doneItems.contains(element.getSsp())) {
         element.title += " [Erledigt]";
       }
     }
 
-
     if (selectedData.size() == 0) {
       HAElement noHomework = new HAElement();
+      noHomework.id = 0;
       noHomework.date = "";
       noHomework.title = "Keine Hausaufgaben!";
       noHomework.subject = "";
@@ -391,14 +422,4 @@ public class HomeworkDetailActivity extends Activity implements HomeworkUpdater.
     ListView list = (ListView) findViewById(R.id.lsViewHomework);
     list.setAdapter(new HAElementArrayAdapter(this, selectedData));
   }
-
-  public static class HAElement implements java.io.Serializable {
-    private static final long serialVersionUID = 0L;
-    public int id;
-    public String date;
-    public String title;
-    public String subject;
-    public String desc;
-  }
-
 }

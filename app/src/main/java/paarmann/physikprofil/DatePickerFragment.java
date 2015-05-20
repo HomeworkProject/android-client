@@ -13,6 +13,10 @@ import android.widget.DatePicker;
 
 import java.util.Calendar;
 
+/**
+ * Dialog fragment for displaying a date picker that provides a method for callers to be notified of the chosen date.
+ * Initializes the date picker to the current date.
+ */
 public class DatePickerFragment extends DialogFragment
     implements DatePickerDialog.OnDateSetListener {
 
@@ -30,6 +34,12 @@ public class DatePickerFragment extends DialogFragment
     return new DatePickerDialog(getActivity(), this, year, month, dayOfMonth);
   }
 
+  /**
+   * Register a {@code DatePickerDialog.OnDateSetListener} to be notified when a date is chosen.
+   *
+   * @param listener the listener to be notified
+   * @return this
+   */
   public DatePickerFragment setListener(DatePickerDialog.OnDateSetListener listener) {
     this.listener = listener;
     return this;

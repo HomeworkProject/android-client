@@ -7,35 +7,26 @@ package paarmann.physikprofil;
 
 
 import android.app.Activity;
-import android.content.ClipboardManager;
-import android.content.ClipData;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class HAElementArrayAdapter extends ArrayAdapter<HomeworkDetailActivity.HAElement> {
+/**
+ * Simple {@code ArrayAdapter} that display HAElement's title, subject, description and date.
+ */
+public class HAElementArrayAdapter extends ArrayAdapter<HAElement> {
 
   public static final String TAG = "HAElementArrayAdapter";
 
-  private List<HomeworkDetailActivity.HAElement> objects;
+  private List<HAElement> objects;
   private Activity activity;
 
-  public HAElementArrayAdapter(Activity activity, List<HomeworkDetailActivity.HAElement> objects) {
+  public HAElementArrayAdapter(Activity activity, List<HAElement> objects) {
     super(activity, R.layout.homework_list_item, objects);
     this.activity = activity;
     this.objects = objects;

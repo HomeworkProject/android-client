@@ -24,13 +24,15 @@ import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Set;
 
+/**
+ * Activity that allows the user to manage reminders, specifically delete them.
+ */
 public class ManageRemindersActivity extends Activity {
 
   public static final String TAG = "ManageRemindersActivity";
@@ -49,8 +51,9 @@ public class ManageRemindersActivity extends Activity {
       @Override
       public void onItemCheckedStateChanged(ActionMode mode, int position, long id,
                                             boolean checked) {
-      
+
       }
+
       @Override
       public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
@@ -62,16 +65,19 @@ public class ManageRemindersActivity extends Activity {
             return false;
         }
       }
+
       @Override
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.manage_reminders_context_menu, menu);
         return true;
       }
+
       @Override
       public void onDestroyActionMode(ActionMode mode) {
 
       }
+
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         return false;
@@ -89,75 +95,29 @@ public class ManageRemindersActivity extends Activity {
   }
 
   private void loadReminders() {
-    SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-    
-    if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
-      Set<String> setReminders = prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null);
-      List<Reminder> reminders = new ArrayList<Reminder>();
+    Set<Reminder> setReminders = Reminder.loadSavedReminders(this);
 
-      for (Iterator<String> it = setReminders.iterator(); it.hasNext(); ) {
-        String strReminder = it.next();
-        Reminder reminder = new Reminder();
-
-        reminder.ssp = strReminder;
-        reminder.title = "";
-        
-        String[] strElements = reminder.ssp.split("\\\\");
-        reminder.date = strElements[0];
-        for (int i = 1; i < strElements.length; i++) {
-          if (strElements[i] != null && strElements[i].length() != 0) {
-            String[] parts = strElements[i].split("~");
-            reminder.title += parts[2];
-            if (i != strElements.length - 1) {
-              reminder.title += ", ";
-            }
-          }
-        }
-        reminders.add(reminder);
-      }
-
-      ListView list = (ListView) findViewById(R.id.lsViewReminders);
-      list.setAdapter(new ReminderArrayAdapter(this, reminders));
-    }
+    ListView list = (ListView) findViewById(R.id.lsViewReminders);
+    list.setAdapter(new ReminderArrayAdapter(this, new ArrayList<Reminder>(setReminders)));
   }
 
   private void deleteSelectedReminders() {
-    SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
-    SharedPreferences.Editor editor = prefs.edit();
-
     List<Reminder> selectedReminders = getSelectedListItems();
     AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-    Set<String> deletedReminders = new HashSet<String>();
-    Set<String> savedReminders = new HashSet<String>();
-    savedReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
-    if (prefs.contains(MainActivity.PREF_DELETEDREMINDERS)) {
-      deletedReminders.addAll(prefs.getStringSet(MainActivity.PREF_DELETEDREMINDERS, null));
-    }
-
     for (Reminder reminder : selectedReminders) {
-      Date when = new Date(Long.valueOf(reminder.date));
-      String scheme = "homework";
-      String ssp = reminder.ssp;
-      Uri uri = Uri.fromParts(scheme, ssp, "");
+      Date when = reminder.getDate();
+      Uri uri = reminder.toUri();
 
-      Intent intent = new Intent(MainActivity.ACTION_REMIND, uri, this, ReminderBroadcastReceiver.class);
+      Intent
+          intent =
+          new Intent(MainActivity.ACTION_REMIND, uri, this, ReminderBroadcastReceiver.class);
       PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
 
       alarmManager.cancel(pendingIntent);
 
-      savedReminders.remove(ssp);
-
-      // Check if it is an automatic reminder, and prevent it from being created again if it is
-      if (reminder.title.endsWith(" [Automatisch]")) {
-        deletedReminders.add(ssp);
-      }
-
+      reminder.delete(this);
     }
-
-    editor.putStringSet(MainActivity.PREF_DELETEDREMINDERS, deletedReminders);
-    editor.putStringSet(MainActivity.PREF_SETREMINDERS, savedReminders);
-    editor.commit();
 
     loadReminders();
   }
@@ -172,12 +132,6 @@ public class ManageRemindersActivity extends Activity {
       }
     }
     return selectedItems;
-  }
-
-  public static class Reminder {
-    public String ssp;
-    public String title;
-    public String date;
   }
 
 }

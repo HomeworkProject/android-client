@@ -15,17 +15,12 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CalendarView;
 import android.widget.DatePicker;
-import android.widget.TextView;
 import android.widget.TimePicker;
 
 import java.text.DateFormat;
@@ -34,8 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public class ReminderDateTimePickerFragment extends DialogFragment {
 
@@ -43,7 +36,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 
   private View layout;
 
-  public static ReminderDateTimePickerFragment newInstance(ArrayList<HomeworkDetailActivity.HAElement> selectedListItems) {
+  public static ReminderDateTimePickerFragment newInstance(ArrayList<HAElement> selectedListItems) {
     ReminderDateTimePickerFragment frag = new ReminderDateTimePickerFragment();
     Bundle args = new Bundle();
     args.putSerializable("selectedListItems", selectedListItems);
@@ -66,54 +59,60 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
 
     dateButton.setText("Datum wählen");
     timeButton.setText("Zeit wählen");
-    
-    final ArrayList<HomeworkDetailActivity.HAElement> selectedListItems = (ArrayList<HomeworkDetailActivity.HAElement>) getArguments().getSerializable("selectedListItems");
+
+    final ArrayList<HAElement>
+        selectedListItems =
+        (ArrayList<HAElement>) getArguments().getSerializable("selectedListItems");
 
     dateButton.setOnClickListener(new View.OnClickListener() {
       @Override
-        public void onClick(View view) {
-          try {
-            Date initialDate = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
-            Calendar initDate = Calendar.getInstance();
-            initDate.setTime(initialDate);
-            int initYear = initDate.get(Calendar.YEAR);
-            int initMonth = initDate.get(Calendar.MONTH);
-            int initDay = initDate.get(Calendar.DAY_OF_MONTH);
-            DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
-              @Override
-                public void onDateSet(DatePicker view, int year, int month, int day) {
-                  Calendar date = Calendar.getInstance();
-                  date.set(year, month, day);
-                  setDate(date);
-                }
-            };
-            DatePickerDialog dialog = new DatePickerDialog(getActivity(), listener, initYear, initMonth, initDay); 
-            dialog.getDatePicker().setSpinnersShown(false);
-            dialog.getDatePicker().setCalendarViewShown(true);
-            dialog.show();
-          } catch (ParseException e) {
-            Log.wtf(TAG, "error parsing date", e);
-          }
-        }
-      });
-      timeButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          int initialHour = 14;
-          int initialMinute = 00;
-          TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+      public void onClick(View view) {
+        try {
+          Date initialDate = selectedListItems.get(0).getDate();
+          Calendar initDate = Calendar.getInstance();
+          initDate.setTime(initialDate);
+          int initYear = initDate.get(Calendar.YEAR);
+          int initMonth = initDate.get(Calendar.MONTH);
+          int initDay = initDate.get(Calendar.DAY_OF_MONTH);
+          DatePickerDialog.OnDateSetListener listener = new DatePickerDialog.OnDateSetListener() {
             @Override
-              public void onTimeSet(TimePicker view, int hour, int minute) {
-                Calendar time = Calendar.getInstance();
-                time.set(Calendar.HOUR_OF_DAY, hour);
-                time.set(Calendar.MINUTE, minute);
-                setTime(time);
-              }
-            };
-          TimePickerDialog dialog = new TimePickerDialog(getActivity(), listener, initialHour, initialMinute, true);
+            public void onDateSet(DatePicker view, int year, int month, int day) {
+              Calendar date = Calendar.getInstance();
+              date.set(year, month, day);
+              setDate(date);
+            }
+          };
+          DatePickerDialog
+              dialog =
+              new DatePickerDialog(getActivity(), listener, initYear, initMonth, initDay);
+          dialog.getDatePicker().setSpinnersShown(false);
+          dialog.getDatePicker().setCalendarViewShown(true);
           dialog.show();
+        } catch (ParseException e) {
+          Log.wtf(TAG, "error parsing date", e);
         }
-      });
+      }
+    });
+    timeButton.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        int initialHour = 14;
+        int initialMinute = 0;
+        TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
+          @Override
+          public void onTimeSet(TimePicker view, int hour, int minute) {
+            Calendar time = Calendar.getInstance();
+            time.set(Calendar.HOUR_OF_DAY, hour);
+            time.set(Calendar.MINUTE, minute);
+            setTime(time);
+          }
+        };
+        TimePickerDialog
+            dialog =
+            new TimePickerDialog(getActivity(), listener, initialHour, initialMinute, true);
+        dialog.show();
+      }
+    });
 
     Button btnDayBefore = (Button) layout.findViewById(R.id.btnDayBefore);
     if (selectedListItems.size() > 1) {
@@ -123,7 +122,7 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
         @Override
         public void onClick(View view) {
           try {
-            Date due = new SimpleDateFormat("yyyy-MM-dd").parse(selectedListItems.get(0).date);
+            Date due = selectedListItems.get(0).getDate();
             Calendar date = Calendar.getInstance();
             date.setTime(due);
             date.add(Calendar.DAY_OF_MONTH, -1);
@@ -140,59 +139,72 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
     }
 
     builder.setView(layout)
-          .setTitle(R.string.reminder_datetime_picker_title)
-	  .setPositiveButton(R.string.setReminder, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-              AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-              String strDate = dateButton.getText() + " " + timeButton.getText();
-              Date when = null;
-              try {
-                when = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(strDate);
-              } catch (ParseException e) {
-                return; //No date and/or no time set
-              }
-              String scheme = "homework";
-              String ssp = when.getTime() + "\\";			// AlarmTime\id~Date~Title~Subject~Desc\id~Date~Title~Subject~Desc\....
-              for (int i = 0; i < selectedListItems.size(); i++) {
-                HomeworkDetailActivity.HAElement element = selectedListItems.get(i);
-                      ssp += element.id + "~"
-                       + element.date + "~"
-                       + element.title + "~"
-                       + element.subject + "~"
-                       + element.desc + "\\";
-              }
-
-              Uri uri = Uri.fromParts(scheme, ssp, "");
-
-              Intent intent = new Intent(MainActivity.ACTION_REMIND, uri, getActivity(), ReminderBroadcastReceiver.class);
-              PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
-              if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
-              } else {
-                alarmManager.set(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
-              }
-              
-              SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
-              SharedPreferences.Editor editor = prefs.edit();
-              Set<String> setReminders;
-              if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
-                setReminders = new HashSet<String>();
-                setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
-              } else {
-                setReminders = new HashSet<String>();
-              }
-              setReminders.add(ssp);
-              editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
-              editor.commit();
+        .setTitle(R.string.reminder_datetime_picker_title)
+        .setPositiveButton(R.string.setReminder, new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int id) {
+            AlarmManager
+                alarmManager =
+                (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
+            String strDate = dateButton.getText() + " " + timeButton.getText();
+            Date when = null;
+            try {
+              when = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(strDate);
+            } catch (ParseException e) {
+              return; //No date and/or no time set
             }
-	  })
-	  .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int id) {
-              //do nothing, just let the dialog close
+//            String scheme = "homework";
+//            String
+//                ssp =
+//                when.getTime()
+//                + "\\";                        // AlarmTime\id~Date~Title~Subject~Desc\id~Date~Title~Subject~Desc\....
+//            for (int i = 0; i < selectedListItems.size(); i++) {
+//              HAElement element = selectedListItems.get(i);
+//              ssp += element.id + "~"
+//                     + element.date + "~"
+//                     + element.title + "~"
+//                     + element.subject + "~"
+//                     + element.desc + "\\";
+//            }
+
+            //Uri uri = Uri.fromParts(scheme, ssp, "");
+
+            Reminder reminder = new Reminder(when, selectedListItems);
+            Uri uri = reminder.toUri();
+
+            Intent
+                intent =
+                new Intent(MainActivity.ACTION_REMIND, uri, getActivity(),
+                           ReminderBroadcastReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+              alarmManager.setExact(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
+            } else {
+              alarmManager.set(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
             }
-	  });
+
+//            SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
+//            SharedPreferences.Editor editor = prefs.edit();
+//            Set<String> setReminders;
+//            if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
+//              setReminders = new HashSet<String>();
+//              setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
+//            } else {
+//              setReminders = new HashSet<String>();
+//            }
+//            setReminders.add(ssp);
+//            editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
+//            editor.commit();
+
+            reminder.save(getActivity());
+          }
+        })
+        .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int id) {
+            //do nothing, just let the dialog close
+          }
+        });
 
     return builder.create();
   }

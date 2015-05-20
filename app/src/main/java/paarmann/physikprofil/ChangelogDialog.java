@@ -11,6 +11,9 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+/**
+ * Dialog to display the changelog for the current version.
+ */
 public class ChangelogDialog extends DialogFragment {
 
   public static final String TAG = "ChangelogDialog";
