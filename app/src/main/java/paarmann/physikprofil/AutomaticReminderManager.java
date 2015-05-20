@@ -95,7 +95,7 @@ public abstract class AutomaticReminderManager {
         throw new RuntimeException("The date '" + element.date + "' could not be parsed");
       }
 
-      if (HomeworkUpdater.getDateDiff(new Date(), when, TimeUnit.MILLISECONDS) < 0) {
+      if (Utils.getDateDiff(new Date(), when, TimeUnit.MILLISECONDS) < 0) {
         continue;
       }
 

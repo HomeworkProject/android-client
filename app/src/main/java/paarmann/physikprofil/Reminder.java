@@ -204,7 +204,7 @@ public class Reminder implements Serializable {
     HashMap<Integer, Reminder> deletedReminders = loadDeletedRemindersInternal(context);
     HashMap<Integer, Reminder> leftReminders = new HashMap<Integer, Reminder>();
     for (Map.Entry<Integer, Reminder> r : deletedReminders.entrySet()) {
-      if (HomeworkUpdater.getDateDiff(r.getValue().getDate(), new Date(), TimeUnit.MINUTES) > 0) {
+      if (Utils.getDateDiff(r.getValue().getDate(), new Date(), TimeUnit.MINUTES) > 0) {
         leftReminders.put(r.getKey(), r.getValue());
       }
     }

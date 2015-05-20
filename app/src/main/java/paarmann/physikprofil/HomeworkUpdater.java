@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.ConnectException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -71,7 +70,7 @@ public class HomeworkUpdater {
     Date now = new Date();
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
     Date lastUpdated = new Date(prefs.getLong(MainActivity.PREF_LASTUPDATED, 0));
-    long diffMinutes = getDateDiff(lastUpdated, now, TimeUnit.MINUTES);
+    long diffMinutes = Utils.getDateDiff(lastUpdated, now, TimeUnit.MINUTES);
 
     if (diffMinutes >= 90 || forceDownload) {
       //Last updated longer than 90 minutes ago
@@ -97,19 +96,6 @@ public class HomeworkUpdater {
     Log.i(TAG, "Loading homework from file");
     FileTask task = new FileTask();
     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
-  }
-
-  /**
-   * Get a diff between two dates
-   *
-   * @param date1    the oldest date
-   * @param date2    the newest date
-   * @param timeUnit the unit in which you want the diff
-   * @return the diff value, in the provided unit
-   */
-  public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
-    long diffInMillies = date2.getTime() - date1.getTime();
-    return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
   }
 
   /**
