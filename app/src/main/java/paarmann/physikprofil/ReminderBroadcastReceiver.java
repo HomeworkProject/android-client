@@ -13,6 +13,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
@@ -74,8 +75,12 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
     reminder.delete(context);
 
-    Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-    vib.vibrate(1000);
+    AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    if (audioManager.getRingerMode() == AudioManager.RINGER_MODE_NORMAL
+      || audioManager.getRingerMode() == AudioManager.RINGER_MODE_VIBRATE) {
+      Vibrator vib = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+      vib.vibrate(1000);
+    }
   }
 
 }
