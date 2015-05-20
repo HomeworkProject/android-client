@@ -30,6 +30,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Activity that allows the user to manage reminders, specifically delete them.
+ */
 public class ManageRemindersActivity extends Activity {
 
   public static final String TAG = "ManageRemindersActivity";

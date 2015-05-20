@@ -4,6 +4,11 @@
  */
 package paarmann.physikprofil;
 
+/**
+ * Wrapper around {@code android.util.Log} that formats messages, especially stack-traces, nicer.
+ * Output format is more useful for grepping through logcat output than standard logging output.
+ * The methods otherwise behave the same way as in {@link android.util.Log}, see there for further documentation.
+ */
 public final class Log {
 
   /*

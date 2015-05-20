@@ -1,13 +1,11 @@
 /*
+ * Credit for the original version goes to jackos2500 (https://gist.github.com/jackos2500/9997104)
+ * License for modifications:
  * Copyright (c) 2015  Sebastian Paarmann
  * Licensed under the MIT license, see the LICENSE file
  */
 
 package paarmann.physikprofil;
-
-/*
-  Credit for this goes to jackos2500 (https://gist.github.com/jackos2500/9997104)
-*/
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -17,6 +15,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.NumberPicker;
 
+/**
+ * A {@code DialogPreference} for picking a number between a specified maximum and minimum value.
+ */
 public class NumberPickerPreference extends DialogPreference {
 
   private int min, max;

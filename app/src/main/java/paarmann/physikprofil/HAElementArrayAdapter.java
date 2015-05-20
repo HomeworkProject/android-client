@@ -16,6 +16,9 @@ import android.widget.TextView;
 
 import java.util.List;
 
+/**
+ * Simple {@code ArrayAdapter} that display HAElement's title, subject, description and date.
+ */
 public class HAElementArrayAdapter extends ArrayAdapter<HAElement> {
 
   public static final String TAG = "HAElementArrayAdapter";

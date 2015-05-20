@@ -22,6 +22,9 @@ import android.preference.PreferenceFragment;
 
 import java.util.Calendar;
 
+/**
+ * Activity to display the application settings.
+ */
 public class SettingsActivity extends Activity {
 
   public static final String TAG = "SettingsActivity";

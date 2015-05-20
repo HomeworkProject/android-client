@@ -35,12 +35,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
+/**
+ * Displays a list of homework elements and provides an interface for various actions on them.
+ * Users can set reminders, mark homework as done/not done and copy them to the clipboard.
+ * Data is provided by {@link HomeworkUpdater}.
+ */
 public class HomeworkDetailActivity extends Activity
     implements HomeworkUpdater.OnHomeworkLoadedListener {
 
   public static final String TAG = "HomeworkDetailActivity";
 
+  /** Extra for specifying the date. Can be {@code 'all'} or a date in yyyy-mm-DD  */
   public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
 
   private DialogFragment reminderDialog;
@@ -54,7 +59,11 @@ public class HomeworkDetailActivity extends Activity
     final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
     listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
+      // All items currently selected
       private List<Integer> checkedItems = new ArrayList<Integer>();
+
+      // If true, selected items should be marked as done when the done button is pressed.
+      // If false, instead mark them as not done if they aren't already.
       private boolean markItemsDone = true;
 
       @Override
@@ -115,6 +124,8 @@ public class HomeworkDetailActivity extends Activity
             prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
         boolean unmarkItems = false;
         for (int position : checkedItems) {
+          // Check if item is already marked as done, see also markItemsDone. (Done items are not yet
+          // using the new HAElement system)
           HAElement element = (HAElement) listView.getItemAtPosition(position);
           HAElement copy = new HAElement();
           copy.id = element.id;
@@ -185,6 +196,9 @@ public class HomeworkDetailActivity extends Activity
     }
   }
 
+  /**
+   * Copies the description of all selected items to the clipboard and displays a toast.
+   */
   private void copyCurrentItems() {
     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
@@ -201,7 +215,7 @@ public class HomeworkDetailActivity extends Activity
     clipboard.setPrimaryClip(data);
     Toast.makeText(this,
                    (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert",
-                   1000).show();
+                   Toast.LENGTH_SHORT).show();
   }
 
   private void setNewReminder() {
@@ -249,6 +263,10 @@ public class HomeworkDetailActivity extends Activity
     editor.commit();
   }
 
+  /**
+   * Get all items currently selected in the list view.
+   * @return the selected items
+   */
   private ArrayList<HAElement> getSelectedListItems() {
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     SparseBooleanArray selected = listView.getCheckedItemPositions();
@@ -265,6 +283,10 @@ public class HomeworkDetailActivity extends Activity
     loadHomework(false);
   }
 
+  /**
+   * Use {@link HomeworkUpdater} to load the homework, setting {@code this} as listener.
+   * @param forceDownload if true, no cached results will be used
+   */
   private void loadHomework(boolean forceDownload) {
     TextView emptyView = (TextView) findViewById(R.id.emptyView);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
@@ -299,6 +321,7 @@ public class HomeworkDetailActivity extends Activity
 
     List<HAElement> filteredData;
 
+    // Filter by subjects if the option is turned on
     if (filter) {
       List<HAElement> displayedObjects = new ArrayList<HAElement>();
       List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
@@ -314,6 +337,7 @@ public class HomeworkDetailActivity extends Activity
       filteredData = data;
     }
 
+    // Filter by date, according to EXTRA_DATE
     List<HAElement> selectedData = new ArrayList<HAElement>();
     String strDate = getIntent().getStringExtra(EXTRA_DATE);
     boolean all;
@@ -398,7 +422,4 @@ public class HomeworkDetailActivity extends Activity
     ListView list = (ListView) findViewById(R.id.lsViewHomework);
     list.setAdapter(new HAElementArrayAdapter(this, selectedData));
   }
-
-
-
 }

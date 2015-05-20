@@ -16,6 +16,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Simple {@code ArrayAdapter} for a list of Reminders. Mostly for use by {@link ManageRemindersActivity}.
+ */
 public class ReminderArrayAdapter extends ArrayAdapter<Reminder> {
 
   public static final String TAG = "ReminderArrayAdapter";

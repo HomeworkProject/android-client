@@ -22,6 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * {@code BroadcastReceiver} that shows a notification for the received Reminder, plays the users
+ * notification sound and vibrates the device.
+ */
 public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
   public static final String TAG = "ReminderBroadcastReceiver";

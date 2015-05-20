@@ -30,14 +30,21 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
+/**
+ * Class used to get the current homework.
+ * Capable of using a cached result and of downloading the most current data.
+ */
 public class HomeworkUpdater {
 
   public static final String TAG = "HomeworkUpdater";
 
+  // Used for caching results
   public static String HOMEWORK_FILE = "homework.ser";
 
+  /**
+   * The data is returned asynchronously to an OnHomeworkLoadedListener.
+   */
   public interface OnHomeworkLoadedListener {
-
     public void setData(List<HAElement> data);
   }
 
@@ -56,6 +63,10 @@ public class HomeworkUpdater {
     getData(false);
   }
 
+  /**
+   * Loads the data and returns it to the currently registered listener.
+   * @param forceDownload if true, no cached results will be used
+   */
   public void getData(boolean forceDownload) {
     Date now = new Date();
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
@@ -70,13 +81,19 @@ public class HomeworkUpdater {
     }
   }
 
-  public void downloadHomework() {
+  /**
+   * Create a new {@code AsyncTask} for downloading the homework and returning it.
+   */
+  private void downloadHomework() {
     Log.i(TAG, "Downloading homework");
     DownloadTask task = new DownloadTask();
     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, (Void) null);
   }
 
-  public void loadHomeworkFromFile() {
+  /**
+   * Create a new {@code AsyncTask} for loading the cached homework and returning it.
+   */
+  private void loadHomeworkFromFile() {
     Log.i(TAG, "Loading homework from file");
     FileTask task = new FileTask();
     task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, false);
@@ -95,6 +112,11 @@ public class HomeworkUpdater {
     return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
   }
 
+  /**
+   * Saves the specified data to {@code HOMEWORK_FILE} via serialization.
+   * @param data the homework data to be saved
+   * @return true if saving succeeded, false otherwise
+   */
   private boolean saveHomeworkToFile(List<HAElement> data) {
     ArrayList<HAElement> homework = new ArrayList<HAElement>();
     homework.addAll(data);
@@ -111,8 +133,13 @@ public class HomeworkUpdater {
     return true;
   }
 
+  /**
+   * {@code AsyncTask} for loading cached results from {@code HOMEWORK_FILE}
+   */
   private class FileTask extends AsyncTask<Boolean, Void, List<HAElement>> {
 
+    // If cached data is used as fallback after a failed download.
+    // A warning is added to the results if this is true.
     private boolean triedDownload;
 
     @Override
@@ -139,7 +166,9 @@ public class HomeworkUpdater {
     @Override
     protected void onPostExecute(List<HAElement> result) {
       if (result != null) {
+        // Loading worked
         if (triedDownload) {
+          // Add warning about failed download
           HAElement warning = new HAElement();
           warning.id = 0;
           warning.flags = HAElement.FLAG_WARN;
@@ -155,9 +184,11 @@ public class HomeworkUpdater {
           listener.setData(result);
         }
       } else {
+        // Loading failed
         if (!triedDownload) {
           downloadHomework();
         } else {
+          // No results could be loaded via both caching and downloading. Return an error.
           result = new ArrayList<HAElement>();
           HAElement error = new HAElement();
           error.id = 0;
@@ -176,10 +207,12 @@ public class HomeworkUpdater {
     }
   }
 
+  /**
+   * {@code AsyncTask} for downloading the current homework.
+   */
   private class DownloadTask extends AsyncTask<Void, Void, List<HAElement>> {
 
     private HAElement errorElement = new HAElement();
-    List<HAElement> errorList = new ArrayList<HAElement>();
     boolean error = false;
 
     @Override
@@ -203,11 +236,13 @@ public class HomeworkUpdater {
     protected void onPostExecute(List<HAElement> result) {
       if (error) {
         Log.i(TAG, "Could not download homework, instead loading from file.");
+        // Try loading cached results instead, indicating a download failed
         FileTask task = new FileTask();
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, true);
         return;
       }
       AutomaticReminderManager.setReminders(context, result);
+      // Save results for later reuse
       saveHomeworkToFile(result);
       if (listener != null) {
         listener.setData(result);
@@ -220,7 +255,12 @@ public class HomeworkUpdater {
       editor.commit();
     }
 
-    private List<HAElement> downloadHA() throws IOException, ConnectException {
+    /**
+     * Download current homework data from server.
+     * @return the downloaded data
+     * @throws IOException if downloading fails or there is only a mobile network available and the chose to not use it
+     */
+    private List<HAElement> downloadHA() throws IOException {
       SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
       boolean useMobile = settings.getBoolean(MainActivity.PREF_MOBILEDATA, true);
       boolean mobileActive = false;

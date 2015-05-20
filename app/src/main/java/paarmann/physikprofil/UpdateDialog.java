@@ -12,6 +12,11 @@ import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
+/**
+ * Simple {@code DialogFragment} that notifies the user about a new update and asks whether or not
+ * to update now. Made for use with {@link MainActivity}, calls its {@code update} method if the user
+ * chooses to update now.
+ */
 public class UpdateDialog extends DialogFragment {
 
   public static final String TAG = "UpdateDialog";
