@@ -21,6 +21,8 @@ import java.util.Calendar;
 
 public class TimePreference extends DialogPreference {
 
+  public static final String TAG = "TimePreference";
+
   private TimePicker _timeView;
 
   private Calendar _value;
@@ -66,8 +68,14 @@ public class TimePreference extends DialogPreference {
   protected void onBindDialogView(View view) {
     super.onBindDialogView(view);
 
-    _timeView.setCurrentHour(_value.get(Calendar.HOUR_OF_DAY));
-    _timeView.setCurrentMinute(_value.get(Calendar.MINUTE));
+    if (_value == null) {
+      Calendar now = Calendar.getInstance();
+      _timeView.setCurrentHour(now.get(Calendar.HOUR_OF_DAY));
+      _timeView.setCurrentMinute(now.get(Calendar.MINUTE));
+    } else {
+      _timeView.setCurrentHour(_value.get(Calendar.HOUR_OF_DAY));
+      _timeView.setCurrentMinute(_value.get(Calendar.MINUTE));
+    }
   }
 
 

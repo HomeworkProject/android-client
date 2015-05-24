@@ -16,7 +16,7 @@ import java.util.List;
 public class AutomaticUpdateService extends IntentService
     implements HomeworkUpdater.OnHomeworkLoadedListener {
 
-  public static final String TAG = "AutoamticUpdateService";
+  public static final String TAG = "AutomaticUpdateService";
 
   private boolean done;
 
