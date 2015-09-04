@@ -62,7 +62,7 @@ public abstract class AutomaticReminderManager {
     String chosenSubjects = settings.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
     List<String> displayedSubjects = Arrays.asList(chosenSubjects.split("\n"));
 
-    doneItems = prefs.getStringSet(MainActivity.PREF_DONEITEMS, null);
+    doneItems = prefs.getStringSet(MainActivity.PREF_DONEITEMS2, null);
     if (doneItems == null) {
       doneItems = new HashSet<String>();
     }
@@ -74,8 +74,7 @@ public abstract class AutomaticReminderManager {
         continue;
       }
 
-      //TODO mode doneItems to new system
-      if (doneItems.contains(element.id + "~" + element.title)) {
+      if (doneItems.contains(Integer.toString(element.id))) {
         continue;
       }
 

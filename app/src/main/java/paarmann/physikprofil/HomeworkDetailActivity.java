@@ -121,20 +121,13 @@ public class HomeworkDetailActivity extends Activity
         SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
         Set<String>
             doneItems =
-            prefs.getStringSet(MainActivity.PREF_DONEITEMS, new HashSet<String>());
+            prefs.getStringSet(MainActivity.PREF_DONEITEMS2, new HashSet<String>());
         boolean unmarkItems = false;
         for (int position : checkedItems) {
           // Check if item is already marked as done, see also markItemsDone. (Done items are not yet
           // using the new HAElement system)
           HAElement element = (HAElement) listView.getItemAtPosition(position);
-          HAElement copy = new HAElement();
-          copy.id = element.id;
-          copy.flags = element.flags;
-          copy.date = element.date;
-          copy.title = element.title.replace(" [Erledigt]", "");
-          copy.subject = element.subject;
-          copy.desc = element.desc;
-          if (doneItems.contains(copy.getSsp())) {
+          if (doneItems.contains(Integer.toString(element.id))) {
             unmarkItems = true;
             break;
           }
@@ -228,18 +221,18 @@ public class HomeworkDetailActivity extends Activity
     Set<String> doneItems = new HashSet<String>();
     SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
 
-    if (prefs.contains(MainActivity.PREF_DONEITEMS)) {
-      doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS, null));
+    if (prefs.contains(MainActivity.PREF_DONEITEMS2)) {
+      doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS2, null));
     }
 
     for (HAElement element : selectedItems) {
       element.flags = element.flags | HAElement.FLAG_DONE;
-      doneItems.add(element.getSsp());
+      doneItems.add(Integer.toString(element.id));
       AutomaticReminderManager.deleteAutomaticReminder(this, element);
     }
 
     SharedPreferences.Editor editor = prefs.edit();
-    editor.putStringSet(MainActivity.PREF_DONEITEMS, doneItems);
+    editor.putStringSet(MainActivity.PREF_DONEITEMS2, doneItems);
     editor.commit();
   }
 
@@ -248,18 +241,18 @@ public class HomeworkDetailActivity extends Activity
     Set<String> doneItems = new HashSet<String>();
     SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
 
-    if (prefs.contains(MainActivity.PREF_DONEITEMS)) {
-      doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS, null));
+    if (prefs.contains(MainActivity.PREF_DONEITEMS2)) {
+      doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS2, null));
     }
 
     for (HAElement element : selectedItems) {
       element.flags = element.flags & (~HAElement.FLAG_DONE);
       element.title = element.title.replace(" [Erledigt]", "");
-      doneItems.remove(element.getSsp());
+      doneItems.remove(Integer.toString(element.id));
     }
 
     SharedPreferences.Editor editor = prefs.edit();
-    editor.putStringSet(MainActivity.PREF_DONEITEMS, doneItems);
+    editor.putStringSet(MainActivity.PREF_DONEITEMS2, doneItems);
     editor.commit();
   }
 
@@ -398,13 +391,13 @@ public class HomeworkDetailActivity extends Activity
     }
 
     SharedPreferences preferences = getSharedPreferences(MainActivity.PREF_NAME, 0);
-    Set<String> doneItems = preferences.getStringSet(MainActivity.PREF_DONEITEMS, null);
+    Set<String> doneItems = preferences.getStringSet(MainActivity.PREF_DONEITEMS2, null);
     if (doneItems == null) {
       doneItems = new HashSet<String>();
     }
 
     for (HAElement element : selectedData) {
-      if (doneItems.contains(element.getSsp())) {
+      if (doneItems.contains(Integer.toString(element.id))) {
         element.title += " [Erledigt]";
       }
     }
