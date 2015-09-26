@@ -125,4 +125,45 @@ public class HAElement implements java.io.Serializable {
     elem.desc = props.next();
     return elem;
   }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+
+    HAElement haElement = (HAElement) o;
+
+    if (id != haElement.id) {
+      return false;
+    }
+    if (flags != haElement.flags) {
+      return false;
+    }
+    if (!date.equals(haElement.date)) {
+      return false;
+    }
+    if (!title.equals(haElement.title)) {
+      return false;
+    }
+    if (!subject.equals(haElement.subject)) {
+      return false;
+    }
+    return desc.equals(haElement.desc);
+
+  }
+
+  @Override
+  public int hashCode() {
+    int result = id;
+    result = 31 * result + flags;
+    result = 31 * result + date.hashCode();
+    result = 31 * result + title.hashCode();
+    result = 31 * result + subject.hashCode();
+    result = 31 * result + desc.hashCode();
+    return result;
+  }
 }
