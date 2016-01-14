@@ -145,11 +145,21 @@ public class SettingsActivity extends Activity {
       } else if (key.equals(MainActivity.PREF_AUTOREMINDERS)) {
         Preference reminderPref = findPreference(key);
         boolean autoReminders = preferences.getBoolean(key, false);
+
+        Preference reminderDay = findPreference(MainActivity.PREF_REMINDERDAY);
+        Preference reminderTime = findPreference(MainActivity.PREF_REMINDERTIME);
+
         if (autoReminders) {
           reminderPref
               .setSummary(getResources().getString(R.string.pref_autoreminders_summary_true));
+
+          reminderDay.setEnabled(true);
+          reminderTime.setEnabled(true);
         } else {
           reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary));
+
+          reminderDay.setEnabled(false);
+          reminderTime.setEnabled(false);
         }
       } else if (key.equals(MainActivity.PREF_MOBILEDATA)) {
         Preference dataPref = findPreference(key);
