@@ -51,6 +51,9 @@
     <string name="pref_autoreminders">Automatische Erinnerungen</string>
     <string name="pref_autoreminders_summary">Es werden nicht automatisch Erinnerungen erstellt.</string>
     <string name="pref_autoreminders_summary_true">Es wird für alle Hausaufgaben eine automatische Erinnerung erstellt.</string>
+    <string name="pref_instantautoreminders">Sofort erinnern</string>
+    <string name="pref_instantautoreminders_summary">Automatische Erinnerungen werden zum angegeben Zeitpunkt angezeigt.</string>
+    <string name="pref_instantautoreminders_summary_true">Es gibt eine Erinnerung sobald neue Hausaufgaben gefunden werden.</string>
     <string name="pref_reminderday">Tag für automatische Erinnerungen</string>
     <string name="pref_reminderday_summary">Auf wie viele Tage im Vorraus automatische Erinerrungen gesetzt werden.</string>
     <string name="pref_remindertime">Uhrzeit für automatische Erinnerungen</string>

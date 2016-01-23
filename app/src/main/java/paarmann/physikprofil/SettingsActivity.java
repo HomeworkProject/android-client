@@ -148,18 +148,49 @@ public class SettingsActivity extends Activity {
 
         Preference reminderDay = findPreference(MainActivity.PREF_REMINDERDAY);
         Preference reminderTime = findPreference(MainActivity.PREF_REMINDERTIME);
+        Preference instantReminders = findPreference(MainActivity.PREF_AUTOREMINDERSINSTANT);
 
         if (autoReminders) {
           reminderPref
               .setSummary(getResources().getString(R.string.pref_autoreminders_summary_true));
 
-          reminderDay.setEnabled(true);
-          reminderTime.setEnabled(true);
+          if (preferences.getBoolean(MainActivity.PREF_AUTOREMINDERSINSTANT, false)) {
+            reminderDay.setEnabled(false);
+            reminderTime.setEnabled(false);
+          } else {
+            reminderDay.setEnabled(true);
+            reminderTime.setEnabled(true);
+          }
+          instantReminders.setEnabled(true);
         } else {
           reminderPref.setSummary(getResources().getString(R.string.pref_autoreminders_summary));
 
           reminderDay.setEnabled(false);
           reminderTime.setEnabled(false);
+          instantReminders.setEnabled(false);
+        }
+      } else if (key.equals(MainActivity.PREF_AUTOREMINDERSINSTANT)){
+        Preference instantRemindersPref = findPreference(key);
+        boolean instantReminders = preferences.getBoolean(key, false);
+
+        Preference reminderDay = findPreference(MainActivity.PREF_REMINDERDAY);
+        Preference reminderTime = findPreference(MainActivity.PREF_REMINDERTIME);
+
+        if (instantReminders) {
+          instantRemindersPref.setSummary(R.string.pref_instantautoreminders_summary_true);
+
+          reminderDay.setEnabled(false);
+          reminderTime.setEnabled(false);
+        } else {
+          instantRemindersPref.setSummary(R.string.pref_instantautoreminders_summary);
+
+          if (preferences.getBoolean(MainActivity.PREF_AUTOREMINDERS, false)) {
+            reminderDay.setEnabled(true);
+            reminderTime.setEnabled(true);
+          } else {
+            reminderDay.setEnabled(false);
+            reminderTime.setEnabled(false);
+          }
         }
       } else if (key.equals(MainActivity.PREF_MOBILEDATA)) {
         Preference dataPref = findPreference(key);
@@ -190,6 +221,7 @@ public class SettingsActivity extends Activity {
       updateSummary(preferences, MainActivity.PREF_FILTERSUBJECTS);
       updateSummary(preferences, MainActivity.PREF_AUTOUPDATES);
       updateSummary(preferences, MainActivity.PREF_AUTOREMINDERS);
+      updateSummary(preferences, MainActivity.PREF_AUTOREMINDERSINSTANT);
       updateSummary(preferences, MainActivity.PREF_MOBILEDATA);
     }
 

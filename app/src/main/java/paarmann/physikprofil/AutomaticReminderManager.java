@@ -24,29 +24,25 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Helper class to manage automatic reminders.
- * <p>
- * This class provides several static helper methods for dealing with automatic reminders.
+ * Helper class to manage automatic reminders. <p> This class provides several static helper methods
+ * for dealing with automatic reminders.
  */
 public abstract class AutomaticReminderManager {
 
   public static final String TAG = "AutomaticReminderManager";
 
   /**
-   * Updates the automatic reminders for the specified homework.
-   * <p>
-   * This sets a new automatic reminder for every homework element passed, following these rules:
-   * <ul>
-   *  <li>If a reminder for a homework element already exists, no new one is created
-   *  <li>If filtering by subject is activated and the subject should not be displayed, no reminder is set
-   *  <li>No reminder is created if the homework element was marked as done
-   *  <li>If an automatic reminder would be in the past, it is not created
-   *  <li>If a reminder for a homework element was already deleted once, no new one is created
-   * </ul>
+   * Updates the automatic reminders for the specified homework. <p> This sets a new automatic
+   * reminder for every homework element passed, following these rules: <ul> <li>If a reminder for a
+   * homework element already exists, no new one is created <li>If filtering by subject is activated
+   * and the subject should not be displayed, no reminder is set <li>No reminder is created if the
+   * homework element was marked as done <li>If an automatic reminder would be in the past, it is
+   * not created <li>If a reminder for a homework element was already deleted once, no new one is
+   * created </ul>
    *
-   * @throws RuntimeException if the date of one of the homework elements can't be parsed
-   * @param context the context to use for shared preferences and file handling
+   * @param context  the context to use for shared preferences and file handling
    * @param homework the homework elements for which automatic reminders should be created
+   * @throws RuntimeException if the date of one of the homework elements can't be parsed
    */
   public static void setReminders(Context context, List<HAElement> homework) {
     SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
@@ -80,16 +76,23 @@ public abstract class AutomaticReminderManager {
 
       Date when = null;
       try {
-        when = element.getDate();
-        Calendar reminderTime = Calendar.getInstance();
-        reminderTime
-            .setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(when);
-        cal.add(Calendar.DAY_OF_MONTH, -settings.getInt(MainActivity.PREF_REMINDERDAY, 1));
-        cal.set(Calendar.HOUR_OF_DAY, reminderTime.get(Calendar.HOUR_OF_DAY));
-        cal.set(Calendar.MINUTE, reminderTime.get(Calendar.MINUTE));
-        when = cal.getTime();
+        if (settings.getBoolean(MainActivity.PREF_AUTOREMINDERSINSTANT, false)) {
+          Calendar cal = Calendar.getInstance();
+          cal.add(Calendar.SECOND, 1);
+          when = cal.getTime();
+          // TODO: Consider not showing notif if app is open and that's why new homework was detected
+        } else {
+          when = element.getDate();
+          Calendar reminderTime = Calendar.getInstance();
+          reminderTime
+              .setTimeInMillis(settings.getLong(MainActivity.PREF_REMINDERTIME, 1420290000000L));
+          Calendar cal = Calendar.getInstance();
+          cal.setTime(when);
+          cal.add(Calendar.DAY_OF_MONTH, -settings.getInt(MainActivity.PREF_REMINDERDAY, 1));
+          cal.set(Calendar.HOUR_OF_DAY, reminderTime.get(Calendar.HOUR_OF_DAY));
+          cal.set(Calendar.MINUTE, reminderTime.get(Calendar.MINUTE));
+          when = cal.getTime();
+        }
       } catch (ParseException e) {
         throw new RuntimeException("The date '" + element.date + "' could not be parsed");
       }
@@ -148,9 +151,9 @@ public abstract class AutomaticReminderManager {
   /**
    * Deletes the automatic reminder for the specified homework element, if it exists.
    *
-   * @throws RuntimeException if the date of the homework element can't be parsed
    * @param context the context to use for shared preferences and file handling
    * @param element the homework element whose automatic reminder should be deleted
+   * @throws RuntimeException if the date of the homework element can't be parsed
    */
   public static void deleteAutomaticReminder(Context context,
                                              HAElement element) {

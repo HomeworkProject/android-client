@@ -42,6 +42,12 @@
       android:summary="@string/pref_autoreminders_summary"
       android:defaultValue="false" />
 
+    <CheckBoxPreference
+      android:key="paarmann.physikprofil.InstantAutomaticReminders"
+      android:title="@string/pref_instantautoreminders"
+      android:summary="@string/pref_instantautoreminders_summary"
+      android:defaultValue="false" />
+
     <paarmann.physikprofil.NumberPickerPreference
       android:key="paarmann.physikprofil.ReminderDay"
       android:title="@string/pref_reminderday"
@@ -54,7 +60,7 @@
       android:key="paarmann.physikprofil.ReminderTime"
       android:title="@string/pref_remindertime"
       android:summary="@string/pref_remindertime_summary"
-      android:defaultValue="1420290000000" />
+      android:defaultValue="1420290000000" /> <!-- 14:00 -->
 
   </PreferenceCategory>
 

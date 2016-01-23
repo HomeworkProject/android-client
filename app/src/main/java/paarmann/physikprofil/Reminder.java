@@ -75,6 +75,7 @@ public class Reminder implements Serializable {
 
     if ((flags & FLAG_AUTO) == FLAG_AUTO) {
       HashMap<Integer, Reminder> deletedReminders = loadDeletedRemindersInternal(context);
+      deletedReminders.put(getId(), this);
       try {
         FileOutputStream fos = context.openFileOutput(DELETED_FILE, Context.MODE_PRIVATE);
         ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -137,8 +138,8 @@ public class Reminder implements Serializable {
   }
 
   public boolean wasDeleted(Context context) {
-    Set<Reminder> deletedReminders = loadDeletedReminders(context);
-    return deletedReminders.contains(this);
+    HashMap<Integer, Reminder> deletedReminders = loadDeletedRemindersInternal(context);
+    return deletedReminders.containsKey(getId());
   }
 
   public static Set<Reminder> loadSavedReminders(Context context) {
@@ -204,7 +205,9 @@ public class Reminder implements Serializable {
     HashMap<Integer, Reminder> deletedReminders = loadDeletedRemindersInternal(context);
     HashMap<Integer, Reminder> leftReminders = new HashMap<Integer, Reminder>();
     for (Map.Entry<Integer, Reminder> r : deletedReminders.entrySet()) {
-      if (Utils.getDateDiff(r.getValue().getDate(), new Date(), TimeUnit.MINUTES) > 0) {
+      // This should hopefully be enough time to not cause automatic (specifically instant) reminders
+      // to repeat themselves.
+      if (Utils.getDateDiff(r.getValue().getDate(), new Date(), TimeUnit.DAYS) <= 21) {
         leftReminders.put(r.getKey(), r.getValue());
       }
     }
