@@ -13,7 +13,7 @@ android {
         }
     }
     compileSdkVersion 19
-    buildToolsVersion "20.0.0"
+    buildToolsVersion "23.0.3"
     defaultConfig {
         applicationId "paarmann.physikprofil"
         minSdkVersion 15
@@ -44,6 +44,7 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.3.2'
 
     testCompile 'junit:junit:4.12'
+    compile 'com.google.android.gms:play-services-appindexing:8.1.0'
 }
 
 // Ask for keystore & key password
