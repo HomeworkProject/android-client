@@ -78,9 +78,12 @@ public abstract class AutomaticReminderManager {
       try {
         if (settings.getBoolean(MainActivity.PREF_AUTOREMINDERSINSTANT, false)) {
           Calendar cal = Calendar.getInstance();
-          cal.add(Calendar.SECOND, 1);
+          cal.add(Calendar.SECOND, 30);
           when = cal.getTime();
-          // TODO: Consider not showing notif if app is open and that's why new homework was detected
+
+          if (!(context instanceof AutomaticUpdateService)) {
+            continue;
+          }
         } else {
           when = element.getDate();
           Calendar reminderTime = Calendar.getInstance();
@@ -123,6 +126,7 @@ public abstract class AutomaticReminderManager {
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, 0);
 
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
           alarmManager.setExact(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
         } else {
