@@ -81,6 +81,10 @@ public abstract class AutomaticReminderManager {
           cal.add(Calendar.SECOND, 30);
           when = cal.getTime();
 
+          if (Utils.getDateDiff(new Date(), when, TimeUnit.MILLISECONDS) < 0) {
+            continue;
+          }
+
           if (!(context instanceof AutomaticUpdateService)) {
             continue;
           }
