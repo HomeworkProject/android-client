@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Build;
+import android.preference.PreferenceManager;
 
 import java.util.Calendar;
 import java.util.Set;
@@ -27,7 +28,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
   @Override
   public void onReceive(Context context, Intent intent) {
     AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    SharedPreferences prefs = context.getSharedPreferences(MainActivity.PREF_NAME, 0);
+    SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
 
     Log.i(TAG, "Setting reminder alarms again...");
 
@@ -48,8 +49,7 @@ public class BootCompleteBroadcastReceiver extends BroadcastReceiver {
       }
     }
 
-    // Re-register alarms for automatic updates
-    if (prefs.getBoolean(MainActivity.PREF_AUTOUPDATES, false)) {
+    if (settings.getBoolean(MainActivity.PREF_AUTOUPDATES, false)) {
       Log.i(TAG, "Setting automatic update alarms again...");
 
       Uri uriAfterSchool = Uri.fromParts("homeworkUpdate", "afterSchool", "");
