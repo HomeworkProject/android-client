@@ -18,8 +18,8 @@ android {
         applicationId "paarmann.physikprofil"
         minSdkVersion 15
         targetSdkVersion 19
-        versionCode 8
-        versionName "1.7"
+        versionCode 9
+        versionName "1.8"
         signingConfig signingConfigs.key
     }
     buildTypes {

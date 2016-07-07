@@ -61,6 +61,6 @@
     <string name="pref_mobile_data">Mobile Daten benutzen</string>
     <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
     <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>
-    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-E1b zu E2b geändert\n-Automatische Erinnerungen werden nicht wieder erstellt, wenn sie gelöscht wurden\n-Einstellungen zum Kontrollieren des Datums und der Uhrzeit von automatischen Erinnerungen\n-Automatische Erinnerungen werden gelöscht, wenn Hausaufgaben als Erledigt markiert werden\n-Einstellung um zu kontrolliern ob Hausaufgaben zu heute angezeigt werden.</string>
+    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-E2b zu Q1b geändert\n-\'Sofort erinnern\' hinzugefügt\n-Mehrere Bugs behoben</string>
 
 </resources>
