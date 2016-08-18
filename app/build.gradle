@@ -13,14 +13,22 @@ android {
         }
     }
     compileSdkVersion 19
-    buildToolsVersion "23.0.3"
+    buildToolsVersion "24.0.1"
     defaultConfig {
         applicationId "paarmann.physikprofil"
         minSdkVersion 15
-        targetSdkVersion 19
+        targetSdkVersion 23
         versionCode 9
         versionName "1.8"
         signingConfig signingConfigs.key
+
+        jackOptions {
+          enabled true
+        }
+    }
+    compileOptions {
+      sourceCompatibility JavaVersion.VERSION_1_8
+      targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {
@@ -42,9 +50,9 @@ dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'org.apache.commons:commons-io:1.3.2'
     compile 'org.apache.commons:commons-lang3:3.3.2'
-
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
+    // compile files('libs/hwserver_cdk.jar')
 }
 
 // Ask for keystore & key password
