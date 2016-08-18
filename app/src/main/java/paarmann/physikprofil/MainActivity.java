@@ -232,6 +232,11 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
     dialog.show(getFragmentManager(), "datePicker");
   }
 
+  public void onBtnOpenLoginScreenClick(View view) {
+    Intent login = new Intent(this, LoginActivity.class);
+    startActivity(login);
+  }
+
   @Override
   public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
     Intent details = new Intent(this, HomeworkDetailActivity.class);

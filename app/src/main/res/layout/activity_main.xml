@@ -66,6 +66,14 @@
                                 android:id="@+id/btnAfterTomorrow"
                                 android:layout_gravity="center_horizontal"
                                 android:onClick="onBtnAfterTomorrowClick"/>
+
+                        <Button
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Login"
+                            android:id="@+id/btnOpenLoginScreen"
+                            android:layout_gravity="center_horizontal"
+                            android:onClick="onBtnOpenLoginScreenClick"/>
                     </LinearLayout>
                 </LinearLayout>
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="paarmann.physikprofil">
+<manifest package="paarmann.physikprofil"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -12,10 +12,10 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,45 +25,44 @@
         <activity
             android:name=".HomeworkDetailActivity"
             android:label="@string/title_activity_homework_detail"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="paarmann.physikprofil.MainActivity" />
         </activity>
         <activity
-          android:name=".ManageRemindersActivity"
-          android:label="@string/title_activity_manage_reminders"
-          android:parentActivityName=".MainActivity" >
-          <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="paarmann.physikprofil.MainActivity" />
+            android:name=".ManageRemindersActivity"
+            android:label="@string/title_activity_manage_reminders"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="paarmann.physikprofil.MainActivity" />
         </activity>
         <activity
-          android:name=".SettingsActivity"
-          android:label="@string/title_activity_settings"
-          android:parentActivityName=".MainActivity" >
-          <meta-data
-            android:name="android.support.PARENT_ACTIVITY"
-            android:value="paarmann.physikprofil.MainActivity" />
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="paarmann.physikprofil.MainActivity" />
         </activity>
 
-        <receiver
-            android:name=".ReminderBroadcastReceiver" >
-          <intent-filter>
-            <action android:name="paarmann.physikprofil.action.REMIND" />
-          </intent-filter>
+        <receiver android:name=".ReminderBroadcastReceiver">
+            <intent-filter>
+                <action android:name="paarmann.physikprofil.action.REMIND" />
+            </intent-filter>
         </receiver>
-        <receiver
-          android:name=".BootCompleteBroadcastReceiver" >
-          <intent-filter>
-            <action android:name="android.intent.action.BOOT_COMPLETED" />
-          </intent-filter>
+        <receiver android:name=".BootCompleteBroadcastReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
         </receiver>
 
         <service
-          android:enabled="true" android:name=".AutomaticUpdateService" />
+            android:name=".AutomaticUpdateService"
+            android:enabled="true" />
 
+        <activity android:name=".LoginActivity"></activity>
     </application>
-
 
 </manifest>
