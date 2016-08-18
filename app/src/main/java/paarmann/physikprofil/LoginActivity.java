@@ -79,9 +79,14 @@ public class LoginActivity extends Activity {
             if ((Boolean) ihwFuture1.get()) {
               hwmgr.login(group, user, auth).registerListener(future -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) future;
-                IHWUser user1 = userFuture.get();
 
-                Log.d(TAG, "Logged in as " + user1.name() + " with group " + user1.group());
+                if (userFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
+                  IHWUser user1 = userFuture.get();
+
+                  Log.d(TAG, "Logged in as " + user1.name() + " with group " + user1.group());
+                } else {
+                  Log.d(TAG, "Failed to login with error code " + userFuture.errorCode());
+                }
               });
             } else {
               Log.e(TAG, "Server not compatible!");

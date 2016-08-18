@@ -53,6 +53,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.google.android.gms:play-services-appindexing:8.1.0'
     // compile files('libs/hwserver_cdk.jar')
+    compile project(':homework_server_cdk')
 }
 
 // Ask for keystore & key password

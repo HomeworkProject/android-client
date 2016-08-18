@@ -1,0 +1,3 @@
+[submodule "homework_server_cdk"]
+	path = homework_server_cdk
+	url = git@github.com:MarkL4YG/Homework_Server_CDK.git

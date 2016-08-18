@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="hwserver_cdk">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/app/libs/hwserver_cdk.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
