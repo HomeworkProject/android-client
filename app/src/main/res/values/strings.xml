@@ -62,5 +62,8 @@
     <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
     <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>
     <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-E2b zu Q1b geändert\n-\'Sofort erinnern\' hinzugefügt\n-Mehrere Bugs behoben</string>
+    <string name="toast_successfull_login">Erfolgreich eingeloggt</string>
+    <string name="school">Schule:</string>
+    <string name="login">Login</string>
 
 </resources>

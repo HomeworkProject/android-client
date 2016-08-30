@@ -6,12 +6,14 @@
 package paarmann.physikprofil;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import de.mlessmann.api.data.IHWFuture;
 import de.mlessmann.api.data.IHWFutureListener;
@@ -19,13 +21,19 @@ import de.mlessmann.api.data.IHWProvider;
 import de.mlessmann.api.data.IHWUser;
 import de.mlessmann.api.main.HWMgr;
 import de.mlessmann.exceptions.StillConnectedException;
+import de.mlessmann.internals.data.HWProvider;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class LoginActivity extends Activity {
+import paarmann.physikprofil.network.LoginManager;
+import paarmann.physikprofil.network.LoginResultListener;
+
+public class LoginActivity extends Activity implements LoginResultListener {
 
   public static final String TAG = "LoginActivity";
 
@@ -36,10 +44,23 @@ public class LoginActivity extends Activity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_login);
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
 
     hwmgr = new HWMgr();
 
     loadServerList();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+
+    hwmgr.release();
+    hwmgr = null;
   }
 
   private void loadServerList() {
@@ -69,35 +90,56 @@ public class LoginActivity extends Activity {
     Spinner spinner = (Spinner) findViewById(R.id.spinner_school);
     IHWProvider provider = providers.get(spinner.getSelectedItemPosition());
 
-    try {
-      hwmgr.connect(provider).registerListener(ihwFuture -> {
-        if (ihwFuture.isPresent()) {
-          Log.e(TAG, "Could not connect to chosen provider.",
-              (Exception) ihwFuture.get()); // TODO: Error handling
-        } else {
-          hwmgr.isCompatible().registerListener(ihwFuture1 -> {
-            if ((Boolean) ihwFuture1.get()) {
-              hwmgr.login(group, user, auth).registerListener(future -> {
-                IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) future;
+    // TODO: DEBUG
+//    try {
+//      provider = new HWProvider(new JSONObject("\t{\n"
+//                                               + "\t\t\t\"name\": \"TestServer\",\n"
+//                                               + "\t\t\t\"address\": \"192.168.178.29\",\n"
+//                                               + "\t\t\t\"port\": 11900,\n"
+//                                               + "\t\t\t\"country\": \"DE\",\n"
+//                                               + "\t\t\t\"postal\": \"25486\",\n"
+//                                               + "\t\t\t\"optional\": {\n"
+//                                               + "\t\t\t\t\"tcp_plaintext_enabled\": true,\n"
+//                                               + "\t\t\t\t\"tcp_encrypted_enabled\": false\n"
+//                                               + "\t\t\t}\n"
+//                                               + "\t\t},\n"));
+//    } catch (JSONException e) {
+//      Log.wtf(TAG, "WTF");
+//    }
 
-                if (userFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
-                  IHWUser user1 = userFuture.get();
+    LoginManager.setCredentials(this, provider, group, user, auth);
+    Log.d(TAG, "Logging in to " + provider.getAddress());
+    LoginManager.login(this, hwmgr, this);
+  }
 
-                  Log.d(TAG, "Logged in as " + user1.name() + " with group " + user1.group());
-                } else {
-                  Log.d(TAG, "Failed to login with error code " + userFuture.errorCode());
-                }
-              });
-            } else {
-              Log.e(TAG, "Server not compatible!");
-            }
-          });
-        }
-      });
-    } catch (StillConnectedException e) {
-      Log.e(TAG, "Failed to connect because still connected to another server.");
+  public void onLoginFailed(Error error) {
+    String errorText;
+    Log.i(TAG, "Error logging in: " + error);
+
+    switch (error) {
+      case CONNECTION_FAILED:
+        errorText = "Verbindung zum Server fehlgeschlagen.";
+        break;
+      case SERVER_INCOMPATIBLE:
+        errorText = "Server hat eine inkompatible Version.";
+        break;
+      case INVALID_CREDENTIALS:
+        errorText = "Ungültige Login-Informationen";
+        break;
+      default:
+        errorText = "Unbekannter Fehler beim einloggen.";
+        break;
     }
 
+    runOnUiThread(() -> {
+      Toast.makeText(this, errorText, Toast.LENGTH_LONG).show();
+    });
+  }
+
+  public void onLoginSuccessful() {
+    runOnUiThread(() -> {
+      Toast.makeText(this, "Login erfolgreich", Toast.LENGTH_SHORT).show();
+    });
   }
 
   private class GetProvidersTask extends AsyncTask<String, Void, List<IHWProvider>> {

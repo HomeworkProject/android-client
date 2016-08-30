@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="homework_server_cdk.homework_server_cdk-1.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/homework_server_cdk/build/libs/homework_server_cdk-1.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
