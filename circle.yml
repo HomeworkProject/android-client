@@ -1,3 +1,9 @@
+# clone cdk too
+checkout:
+  post:
+    - git submodule sync
+    - git submodule update --init
+
 # fix gradlew not begin marked as executable
 dependencies:
   override:
