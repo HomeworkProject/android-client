@@ -25,6 +25,10 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import de.mlessmann.api.data.IHWFuture;
+import de.mlessmann.api.data.IHWObj;
+import de.mlessmann.api.main.HWMgr;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +38,9 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import paarmann.physikprofil.network.LoginManager;
+import paarmann.physikprofil.network.LoginResultListener;
 
 /**
  * Displays a list of homework elements and provides an interface for various actions on them.
@@ -51,10 +58,14 @@ public class HomeworkDetailActivity extends Activity
   private DialogFragment reminderDialog;
   private ActionMode mActionMode;
 
+  private HWMgr hwmgr;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_homework_detail);
+
+    hwmgr = new HWMgr();
 
     final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -127,7 +138,7 @@ public class HomeworkDetailActivity extends Activity
           // Check if item is already marked as done, see also markItemsDone. (Done items are not yet
           // using the new HAElement system)
           HAElement element = (HAElement) listView.getItemAtPosition(position);
-          if (doneItems.contains(Integer.toString(element.id))) {
+          if (doneItems.contains(element.id)) {
             unmarkItems = true;
             break;
           }
@@ -227,7 +238,7 @@ public class HomeworkDetailActivity extends Activity
 
     for (HAElement element : selectedItems) {
       element.flags = element.flags | HAElement.FLAG_DONE;
-      doneItems.add(Integer.toString(element.id));
+      doneItems.add(element.id);
       AutomaticReminderManager.deleteAutomaticReminder(this, element);
     }
 
@@ -248,7 +259,7 @@ public class HomeworkDetailActivity extends Activity
     for (HAElement element : selectedItems) {
       element.flags = element.flags & (~HAElement.FLAG_DONE);
       element.title = element.title.replace(" [Erledigt]", "");
-      doneItems.remove(Integer.toString(element.id));
+      doneItems.remove(element.id);
     }
 
     SharedPreferences.Editor editor = prefs.edit();
@@ -284,12 +295,65 @@ public class HomeworkDetailActivity extends Activity
     TextView emptyView = (TextView) findViewById(R.id.emptyView);
     ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setEmptyView(emptyView);
+
+    /*
     if (forceDownload) {
       clearData();
     }
     HomeworkUpdater loader = new HomeworkUpdater(this);
     loader.setOnHomeworkLoadedListener(this);
     loader.getData(forceDownload);
+    */
+
+    if (LoginManager.loadCredentials(this)) {
+      LoginManager.login(this, hwmgr, result -> {
+        if (result == LoginResultListener.Result.LOGGED_IN) {
+          String strDate = getIntent().getStringExtra(EXTRA_DATE);
+
+          if (strDate.equals("all")) {
+
+          } else {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+              Calendar cal = Calendar.getInstance();
+              cal.setTime(dateFormat.parse(strDate));
+              hwmgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
+                  cal.get(Calendar.DAY_OF_MONTH))
+              .registerListener(future -> {
+                if (future.errorCode() == IHWFuture.ERRORCodes.OK) {
+                  List<IHWObj> homework = (List<IHWObj>) future.get();
+
+                  List<HAElement> elements = new ArrayList<HAElement>(homework.size());
+                  for (IHWObj obj : homework) {
+                    HAElement element = new HAElement();
+                    element.id = obj.id();
+                    element.date = obj.date()[0] + "-" + obj.date()[1] + "-" + obj.date()[2];
+                    element.subject = obj.subject();
+                    element.title = "No titles yet";
+                    element.desc = obj.getDescription(true);
+                    elements.add(element);
+                  }
+                  runOnUiThread(() -> {
+                    setData(elements);
+                  });
+                } else {
+                  // TODO: Error handling
+                  Log.e(TAG, "Error code: " + future.errorCode());
+                }
+              });
+            } catch (ParseException e) {
+              Log.wtf(TAG, "Invalid date format: ", e);
+            }
+          }
+        } else {
+          // TODO: Error handling
+          Log.e(TAG, "result: " + result);
+        }
+      });
+    } else {
+      // TODO: Open Login screen
+      Log.e(TAG, "No credentials");
+    }
   }
 
   private void clearData() {
@@ -397,14 +461,14 @@ public class HomeworkDetailActivity extends Activity
     }
 
     for (HAElement element : selectedData) {
-      if (doneItems.contains(Integer.toString(element.id))) {
+      if (doneItems.contains(element.id)) {
         element.title += " [Erledigt]";
       }
     }
 
     if (selectedData.size() == 0) {
       HAElement noHomework = new HAElement();
-      noHomework.id = 0;
+      noHomework.id = "0";
       noHomework.date = "";
       noHomework.title = "Keine Hausaufgaben!";
       noHomework.subject = "";

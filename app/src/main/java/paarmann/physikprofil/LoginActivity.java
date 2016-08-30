@@ -112,33 +112,30 @@ public class LoginActivity extends Activity implements LoginResultListener {
     LoginManager.login(this, hwmgr, this);
   }
 
-  public void onLoginFailed(Error error) {
-    String errorText;
-    Log.i(TAG, "Error logging in: " + error);
+  public void onLoginDone(Result result) {
+    String resultText;
+    Log.i(TAG, "Error logging in: " + result);
 
-    switch (error) {
+    switch (result) {
+      case LOGGED_IN:
+        resultText = "Erfolgreich eingeloggt.";
+        break;
       case CONNECTION_FAILED:
-        errorText = "Verbindung zum Server fehlgeschlagen.";
+        resultText = "Verbindung zum Server fehlgeschlagen.";
         break;
       case SERVER_INCOMPATIBLE:
-        errorText = "Server hat eine inkompatible Version.";
+        resultText = "Server hat eine inkompatible Version.";
         break;
       case INVALID_CREDENTIALS:
-        errorText = "Ungültige Login-Informationen";
+        resultText = "Ungültige Login-Informationen";
         break;
       default:
-        errorText = "Unbekannter Fehler beim einloggen.";
+        resultText = "Unbekannter Fehler beim einloggen.";
         break;
     }
 
     runOnUiThread(() -> {
-      Toast.makeText(this, errorText, Toast.LENGTH_LONG).show();
-    });
-  }
-
-  public void onLoginSuccessful() {
-    runOnUiThread(() -> {
-      Toast.makeText(this, "Login erfolgreich", Toast.LENGTH_SHORT).show();
+      Toast.makeText(this, resultText, Toast.LENGTH_LONG).show();
     });
   }
 

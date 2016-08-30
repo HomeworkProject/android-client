@@ -107,7 +107,7 @@ public class Reminder implements Serializable {
     }
     int id = 0;
     for (HAElement elem : homework) {
-      id += elem.id; // Not technically guaranteed to be unique, but unlikely to cause problems
+      id += elem.id.hashCode(); // Not technically guaranteed to be unique, but unlikely to cause problems
     }
 
     return id;

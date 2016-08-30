@@ -6,7 +6,8 @@
 package paarmann.physikprofil.network;
 
 public interface LoginResultListener {
-  public enum Error {
+  public enum Result {
+    LOGGED_IN,
     CONNECTION_FAILED,
     SERVER_INCOMPATIBLE,
     NO_CREDENTIALS_PRESENT,
@@ -14,6 +15,5 @@ public interface LoginResultListener {
     UNKNOWN
   }
 
-  public void onLoginSuccessful();
-  public void onLoginFailed(Error error);
+  public void onLoginDone(Result result);
 }

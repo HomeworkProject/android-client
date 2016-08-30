@@ -156,7 +156,7 @@ public class HomeworkUpdater {
         if (triedDownload) {
           // Add warning about failed download
           HAElement warning = new HAElement();
-          warning.id = 0;
+          warning.id = "0";
           warning.flags = HAElement.FLAG_WARN;
           warning.date = "";
           warning.title = "Achtung";
@@ -177,7 +177,7 @@ public class HomeworkUpdater {
           // No results could be loaded via both caching and downloading. Return an error.
           result = new ArrayList<HAElement>();
           HAElement error = new HAElement();
-          error.id = 0;
+          error.id = "0";
           error.flags = HAElement.FLAG_ERROR;
           error.date = "";
           error.title = "Fehler";

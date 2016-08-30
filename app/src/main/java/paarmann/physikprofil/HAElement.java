@@ -27,7 +27,7 @@ public class HAElement implements java.io.Serializable {
   /** Is a pseudo element for displaying an error to the user */
   public static int FLAG_ERROR = 0x4;
 
-  public int id;
+  public String id;
   public int flags;
   /** Due date of the element, must be of the form yyyy-MM-dd. */
   public String date;
@@ -119,7 +119,7 @@ public class HAElement implements java.io.Serializable {
       elem.desc = "Wir haben keine Hausaufgaben!";
       return elem;
     }
-    elem.id = id;
+    elem.id = String.valueOf(id);
     elem.date = props.next();
     elem.title = props.next();
     elem.subject = props.next();
@@ -159,7 +159,7 @@ public class HAElement implements java.io.Serializable {
 
   @Override
   public int hashCode() {
-    int result = id;
+    int result = id.hashCode();
     result = 31 * result + flags;
     result = 31 * result + date.hashCode();
     result = 31 * result + title.hashCode();

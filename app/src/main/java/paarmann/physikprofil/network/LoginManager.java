@@ -80,31 +80,31 @@ public class LoginManager {
 
   public static void login(Context ctx, HWMgr mgr, LoginResultListener listener) {
     if (!loadCredentials(ctx)) {
-      listener.onLoginFailed(LoginResultListener.Error.NO_CREDENTIALS_PRESENT);
+      listener.onLoginDone(LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
       return;
     }
 
     try {
       mgr.connect(provider).registerListener(connFuture -> {
         if (connFuture.isPresent()) {
-          listener.onLoginFailed(LoginResultListener.Error.CONNECTION_FAILED);
+          listener.onLoginDone(LoginResultListener.Result.CONNECTION_FAILED);
         } else {
           mgr.isCompatible().registerListener(compatibleFuture -> {
             IHWFuture<Boolean> compFuture = (IHWFuture<Boolean>) compatibleFuture;
             if (!compFuture.get()) {
-              listener.onLoginFailed(LoginResultListener.Error.SERVER_INCOMPATIBLE);
+              listener.onLoginDone(LoginResultListener.Result.SERVER_INCOMPATIBLE);
             }
             else {
               mgr.login(group, user, auth).registerListener(loginFuture -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
                 if (userFuture.errorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
                   if (userFuture.errorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
-                    listener.onLoginFailed(LoginResultListener.Error.INVALID_CREDENTIALS);
+                    listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
                   } else {
-                    listener.onLoginFailed(LoginResultListener.Error.UNKNOWN);
+                    listener.onLoginDone(LoginResultListener.Result.UNKNOWN);
                   }
                 } else {
-                  listener.onLoginSuccessful();
+                  listener.onLoginDone(LoginResultListener.Result.LOGGED_IN);
                 }
               });
             }

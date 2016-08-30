@@ -70,7 +70,7 @@ public abstract class AutomaticReminderManager {
         continue;
       }
 
-      if (doneItems.contains(Integer.toString(element.id))) {
+      if (doneItems.contains(element.id)) {
         continue;
       }
 
