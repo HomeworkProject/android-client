@@ -138,7 +138,7 @@ public class HAElement implements java.io.Serializable {
 
     HAElement haElement = (HAElement) o;
 
-    if (id != haElement.id) {
+    if (!id.equals(haElement.id)) {
       return false;
     }
     if (flags != haElement.flags) {
