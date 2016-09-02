@@ -5,6 +5,7 @@
 
 package paarmann.physikprofil.network;
 
+import de.mlessmann.api.data.IHWCarrier;
 import de.mlessmann.api.data.IHWFuture;
 import de.mlessmann.api.data.IHWObj;
 import de.mlessmann.api.main.HWMgr;
@@ -22,6 +23,10 @@ public class HomeworkManager {
 
   public interface GetHWListener {
     public void onHomeworkReceived(List<HAElement> homework);
+  }
+
+  public interface AddHWListener {
+    public void onHomeworkAdded(int result);
   }
 
   public static final String TAG = "HomeworkManager";
@@ -46,6 +51,24 @@ public class HomeworkManager {
         calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
         calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
       OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
+    });
+  }
+
+  public static void addHomework(HWMgr mgr, HAElement element, AddHWListener listener) {
+    IHWCarrier.Builder builder = IHWCarrier.Builder.builder();
+    IHWCarrier.JSONBuilder jsonBuilder = new IHWCarrier.JSONBuilder();
+
+    String[] d = element.date.split("-");
+    jsonBuilder.date(Integer.parseInt(d[0]),
+        Integer.parseInt(d[1]),
+        Integer.parseInt(d[2]));
+    jsonBuilder.subject(element.subject);
+    jsonBuilder.description(element.desc); // TODO: Titles
+
+    IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
+
+    mgr.addHW(carrier).registerListener(future -> {
+      OnAddHWDone((IHWFuture<Boolean>) future, listener);
     });
   }
 
@@ -81,6 +104,10 @@ public class HomeworkManager {
     }
 
     listener.onHomeworkReceived(elements);
+  }
+
+  private static void OnAddHWDone(IHWFuture<Boolean> future, AddHWListener listener) {
+    listener.onHomeworkAdded(future.errorCode());
   }
 
 }

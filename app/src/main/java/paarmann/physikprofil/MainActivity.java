@@ -241,6 +241,11 @@ public class MainActivity extends Activity implements DatePickerDialog.OnDateSet
     startActivity(login);
   }
 
+  public void onBtnOpenAddHomeworkScreenClick(View view) {
+    Intent addHW = new Intent(this, AddHomeworkActivity.class);
+    startActivity(addHW);
+  }
+
   @Override
   public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
     Intent details = new Intent(this, HomeworkDetailActivity.class);

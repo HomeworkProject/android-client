@@ -65,5 +65,7 @@
     <string name="toast_successfull_login">Erfolgreich eingeloggt</string>
     <string name="school">Schule:</string>
     <string name="login">Login</string>
+    <string name="title_activity_add_homework">Hausaufgabe hinzufügen</string>
+    <string name="title_activity_login">Login</string>
 
 </resources>

@@ -387,6 +387,7 @@ public class HomeworkDetailActivity extends Activity
       filteredData = data;
     }
 
+    // TODO: Not necessary anymore, already getting the data according to EXTRA_DATE
     // Filter by date, according to EXTRA_DATE
     List<HAElement> selectedData = new ArrayList<HAElement>();
     String strDate = getIntent().getStringExtra(EXTRA_DATE);
