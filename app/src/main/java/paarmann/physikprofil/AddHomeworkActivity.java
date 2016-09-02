@@ -33,11 +33,13 @@ public class AddHomeworkActivity extends Activity {
 
   public void onBtnAddHomeworkClick(View view) {
     String strDate = ((EditText)findViewById(R.id.txtDate)).getText().toString(); // TODO: Make proper date selector
+    String title = ((EditText)findViewById(R.id.txtTitle)).getText().toString();
     String subject = ((EditText)findViewById(R.id.txtSubject)).getText().toString();
     String desc = ((EditText)findViewById(R.id.txtDescription)).getText().toString();
 
     final HAElement element = new HAElement();
     element.date = strDate;
+    element.title = title;
     element.subject = subject;
     element.desc = desc;
 

@@ -67,8 +67,8 @@ public class HomeworkManager {
         Integer.parseInt(d[1]),
         Integer.parseInt(d[2]));
     jsonBuilder.subject(element.subject);
-    jsonBuilder.description(element.desc);
     jsonBuilder.title(element.title);
+    jsonBuilder.description(element.desc);
 
     IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
 
@@ -111,10 +111,10 @@ public class HomeworkManager {
     for (IHWObj obj : hwObjs) {
       // TODO
       HAElement elem = new HAElement();
-      elem.id = obj.id();
-      int[] d = obj.date();
+      elem.id = obj.getId();
+      int[] d = obj.getDate();
       elem.date = d[0] + "-" + d[1] + "-" + d[2];
-      elem.subject = obj.subject();
+      elem.subject = obj.getSubject();
       elem.title = obj.getTitle();
       elem.desc = obj.getDescription();
       elements.add(elem);
