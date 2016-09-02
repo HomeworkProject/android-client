@@ -39,6 +39,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import paarmann.physikprofil.network.HomeworkManager;
 import paarmann.physikprofil.network.LoginManager;
 import paarmann.physikprofil.network.LoginResultListener;
 
@@ -311,35 +312,27 @@ public class HomeworkDetailActivity extends Activity
           String strDate = getIntent().getStringExtra(EXTRA_DATE);
 
           if (strDate.equals("all")) {
+            Calendar cal = Calendar.getInstance();
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            if (!prefs.getBoolean(MainActivity.PREF_HOMEWORKTODAY, false)) {
+              cal.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            Date startDate = cal.getTime();
+            cal.add(Calendar.DAY_OF_MONTH, 64); // Server limits to 64 days
+            Date endDate = cal.getTime();
 
+            HomeworkManager.getHomework(hwmgr, startDate, endDate, hw -> {
+              runOnUiThread(() -> {
+                setData(hw);
+              });
+            });
           } else {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             try {
-              Calendar cal = Calendar.getInstance();
-              cal.setTime(dateFormat.parse(strDate));
-              hwmgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
-                  cal.get(Calendar.DAY_OF_MONTH))
-              .registerListener(future -> {
-                if (future.errorCode() == IHWFuture.ERRORCodes.OK) {
-                  List<IHWObj> homework = (List<IHWObj>) future.get();
-
-                  List<HAElement> elements = new ArrayList<HAElement>(homework.size());
-                  for (IHWObj obj : homework) {
-                    HAElement element = new HAElement();
-                    element.id = obj.id();
-                    element.date = obj.date()[0] + "-" + obj.date()[1] + "-" + obj.date()[2];
-                    element.subject = obj.subject();
-                    element.title = "No titles yet";
-                    element.desc = obj.getDescription(true);
-                    elements.add(element);
-                  }
-                  runOnUiThread(() -> {
-                    setData(elements);
-                  });
-                } else {
-                  // TODO: Error handling
-                  Log.e(TAG, "Error code: " + future.errorCode());
-                }
+              HomeworkManager.getHomework(hwmgr, dateFormat.parse(strDate), hw -> {
+                runOnUiThread(() -> {
+                  setData(hw);
+                });
               });
             } catch (ParseException e) {
               Log.wtf(TAG, "Invalid date format: ", e);
