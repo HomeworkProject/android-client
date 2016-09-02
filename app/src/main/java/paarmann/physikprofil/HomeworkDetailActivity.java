@@ -103,6 +103,7 @@ public class HomeworkDetailActivity extends Activity
             return true;
           case R.id.action_delete:
             deleteCurrentItems();
+            checkedItems.clear();
             mode.finish();
             return true;
           case R.id.action_done:
@@ -162,6 +163,7 @@ public class HomeworkDetailActivity extends Activity
 
         // Only allow deleting one item at a time for now
         item = menu.findItem(R.id.action_delete);
+        Log.d(TAG, "Checkeditems size: " + checkedItems.size());
         if (checkedItems.size() > 1) {
           item.setVisible(false);
         } else if (checkedItems.size() == 1){
@@ -421,6 +423,10 @@ public class HomeworkDetailActivity extends Activity
       emptyView.setText("Keine Hausaufgaben!");
     }
 
+    ListView list = (ListView) findViewById(R.id.lsViewHomework);
+    list.clearChoices();
+    list.requestLayout();
+
     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
     boolean filter = prefs.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
     String chosenSubjects = prefs.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
@@ -526,7 +532,6 @@ public class HomeworkDetailActivity extends Activity
       selectedData.add(noHomework);
     }
 
-    ListView list = (ListView) findViewById(R.id.lsViewHomework);
     list.setAdapter(new HAElementArrayAdapter(this, selectedData));
   }
 }
