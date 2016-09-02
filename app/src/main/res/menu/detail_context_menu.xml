@@ -1,16 +1,24 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".HomeworkDetailActivity" >
-  <item android:id="@+id/action_done"
-    android:title="@string/action_done"
-    android:icon="@drawable/ic_action_edit"
-    android:showAsAction="always" />
-	<item android:id="@+id/action_copy"
-		android:title="@string/action_copy"
-    android:icon="@drawable/ic_action_copy"
-    android:showAsAction="always" />
-	<item android:id="@+id/action_remind"
-		android:title="@string/action_remind"
-    android:icon="@drawable/ic_action_add_alarm"
-    android:showAsAction="always" />
+    tools:context=".HomeworkDetailActivity">
+    <item
+        android:id="@+id/action_done"
+        android:icon="@drawable/ic_action_edit"
+        android:showAsAction="always"
+        android:title="@string/action_done" />
+    <item
+        android:id="@+id/action_copy"
+        android:icon="@drawable/ic_action_copy"
+        android:showAsAction="always"
+        android:title="@string/action_copy" />
+    <item
+        android:id="@+id/action_remind"
+        android:icon="@drawable/ic_action_add_alarm"
+        android:showAsAction="always"
+        android:title="@string/action_remind" />
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_action_discard"
+        android:showAsAction="always"
+        android:title="@string/action_delete" />
 </menu>

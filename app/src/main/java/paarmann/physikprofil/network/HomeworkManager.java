@@ -29,6 +29,10 @@ public class HomeworkManager {
     public void onHomeworkAdded(int result);
   }
 
+  public interface DeleteHWListener {
+    public void onHomeworkDeleted(int result);
+  }
+
   public static final String TAG = "HomeworkManager";
 
   public static void getHomework(HWMgr mgr, Date date, GetHWListener listener) {
@@ -63,12 +67,25 @@ public class HomeworkManager {
         Integer.parseInt(d[1]),
         Integer.parseInt(d[2]));
     jsonBuilder.subject(element.subject);
-    jsonBuilder.description(element.desc); // TODO: Titles
+    jsonBuilder.description(element.desc);
+    jsonBuilder.title(element.title);
 
     IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
 
     mgr.addHW(carrier).registerListener(future -> {
       OnAddHWDone((IHWFuture<Boolean>) future, listener);
+    });
+  }
+
+  public static void deleteHomework(HWMgr mgr, HAElement element, DeleteHWListener listener) {
+    String[] sd = element.date.split("-");
+    int[] d = new int[]{
+        Integer.parseInt(sd[0]),
+        Integer.parseInt(sd[1]),
+        Integer.parseInt(sd[2]),
+    };
+    mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
+      OnDeleteHWDone((IHWFuture<Boolean>)future, listener);
     });
   }
 
@@ -98,8 +115,8 @@ public class HomeworkManager {
       int[] d = obj.date();
       elem.date = d[0] + "-" + d[1] + "-" + d[2];
       elem.subject = obj.subject();
-      elem.title = "No titles yet"; // TODO: Possibly titles as optionals
-      elem.desc = obj.getDescription(true);
+      elem.title = obj.getTitle();
+      elem.desc = obj.getDescription();
       elements.add(elem);
     }
 
@@ -108,6 +125,10 @@ public class HomeworkManager {
 
   private static void OnAddHWDone(IHWFuture<Boolean> future, AddHWListener listener) {
     listener.onHomeworkAdded(future.errorCode());
+  }
+
+  private static void OnDeleteHWDone(IHWFuture<Boolean> future, DeleteHWListener listener) {
+    listener.onHomeworkDeleted(future.errorCode());
   }
 
 }

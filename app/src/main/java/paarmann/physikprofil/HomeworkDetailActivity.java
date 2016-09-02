@@ -101,6 +101,10 @@ public class HomeworkDetailActivity extends Activity
             setNewReminder();
             mode.finish();
             return true;
+          case R.id.action_delete:
+            deleteCurrentItems();
+            mode.finish();
+            return true;
           case R.id.action_done:
             if (markItemsDone) {
               markCurrentItemsAsDone();
@@ -154,6 +158,14 @@ public class HomeworkDetailActivity extends Activity
           item.setIcon(R.drawable.ic_action_edit);
           item.setTitle(R.string.action_done);
           markItemsDone = true;
+        }
+
+        // Only allow deleting one item at a time for now
+        item = menu.findItem(R.id.action_delete);
+        if (checkedItems.size() > 1) {
+          item.setVisible(false);
+        } else if (checkedItems.size() == 1){
+          item.setVisible(true);
         }
         return true;
       }
@@ -226,6 +238,50 @@ public class HomeworkDetailActivity extends Activity
   private void setNewReminder() {
     reminderDialog = ReminderDateTimePickerFragment.newInstance(getSelectedListItems());
     reminderDialog.show(getFragmentManager(), "reminderDateTimePickerFragment");
+  }
+
+  private void deleteCurrentItems() {
+    List<HAElement> selectedItems = getSelectedListItems();
+
+    if (selectedItems.size() != 1) {
+      Log.wtf(TAG, "Cannot delete more than one item at a time");
+      return;
+    }
+
+    HAElement element = selectedItems.get(0);
+
+    if (LoginManager.loadCredentials(this)) {
+      LoginManager.login(this, hwmgr, loginResult -> {
+        if (loginResult == LoginResultListener.Result.LOGGED_IN) {
+          HomeworkManager.deleteHomework(hwmgr, element, result -> {
+            if (result == IHWFuture.ERRORCodes.OK) {
+              runOnUiThread(() -> {
+                Toast.makeText(this, "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
+                loadHomework(true);
+              });
+            } else {
+              String msg;
+              if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
+                msg = "Du bist nicht berechtigt, diese Hausaufgabe zu löschen.";
+              } else {
+                msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
+              }
+              Log.e(TAG, "Error deleting homework: " + result);
+              runOnUiThread(() -> {
+                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                loadHomework(true);
+              });
+            }
+          });
+        } else {
+          // TODO
+          Log.e(TAG, "login result: " + loginResult);
+        }
+      });
+    } else {
+      // TODO
+      Log.e(TAG, "No credentials");
+    }
   }
 
   private void markCurrentItemsAsDone() {
