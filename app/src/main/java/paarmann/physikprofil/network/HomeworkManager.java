@@ -5,10 +5,11 @@
 
 package paarmann.physikprofil.network;
 
+import android.content.Context;
+
 import de.mlessmann.api.data.IHWCarrier;
 import de.mlessmann.api.data.IHWFuture;
 import de.mlessmann.api.data.IHWObj;
-import de.mlessmann.api.main.HWMgr;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,58 +36,116 @@ public class HomeworkManager {
 
   public static final String TAG = "HomeworkManager";
 
-  public static void getHomework(HWMgr mgr, Date date, GetHWListener listener) {
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    mgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
-        cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-      OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
-    });
+  public static void getHomework(Context ctx, Date date, GetHWListener listener) {
+    getHomework(ctx, date, listener, false);
   }
 
-  public static void getHomework(HWMgr mgr, Date startDate, Date endDate,
+  public static void getHomework(Context ctx, Date date, GetHWListener listener, boolean silent) {
+    LoginManager.getHWMgr(ctx, (mgr, result) -> {
+
+      // TODO: Deal with result
+
+      if (mgr == null) {
+        listener.onHomeworkReceived(new ArrayList<>());
+        return;
+      }
+
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(date);
+      mgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
+                  cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
+        OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
+      });
+    }, silent);
+  }
+
+  public static void getHomework(Context ctx, Date startDate, Date endDate,
                                  GetHWListener listener) {
-    Calendar calStart = Calendar.getInstance();
-    Calendar calEnd = Calendar.getInstance();
-    calStart.setTime(startDate);
-    calEnd.setTime(endDate);
-    mgr.getHWBetween(calStart.get(Calendar.YEAR), calStart.get(Calendar.MONTH) + 1,
-        calStart.get(Calendar.DAY_OF_MONTH),
-        calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
-        calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-      OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
-    });
+    getHomework(ctx, startDate, endDate, listener, false);
   }
 
-  public static void addHomework(HWMgr mgr, HAElement element, AddHWListener listener) {
-    IHWCarrier.Builder builder = IHWCarrier.Builder.builder();
-    IHWCarrier.JSONBuilder jsonBuilder = new IHWCarrier.JSONBuilder();
+  public static void getHomework(Context ctx, Date startDate, Date endDate,
+                                 GetHWListener listener, boolean silent) {
+    LoginManager.getHWMgr(ctx, (mgr, result) -> {
 
-    String[] d = element.date.split("-");
-    jsonBuilder.date(Integer.parseInt(d[0]),
-        Integer.parseInt(d[1]),
-        Integer.parseInt(d[2]));
-    jsonBuilder.subject(element.subject);
-    jsonBuilder.title(element.title);
-    jsonBuilder.description(element.desc);
+      // TODO: Deal with result
 
-    IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
+      if (mgr == null) {
+        listener.onHomeworkReceived(new ArrayList<>());
+        return;
+      }
 
-    mgr.addHW(carrier).registerListener(future -> {
-      OnAddHWDone((IHWFuture<Boolean>) future, listener);
-    });
+      Calendar calStart = Calendar.getInstance();
+      Calendar calEnd = Calendar.getInstance();
+      calStart.setTime(startDate);
+      calEnd.setTime(endDate);
+      mgr.getHWBetween(calStart.get(Calendar.YEAR), calStart.get(Calendar.MONTH) + 1,
+                       calStart.get(Calendar.DAY_OF_MONTH),
+                       calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
+                       calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
+        OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
+      });
+    }, silent);
   }
 
-  public static void deleteHomework(HWMgr mgr, HAElement element, DeleteHWListener listener) {
-    String[] sd = element.date.split("-");
-    int[] d = new int[]{
-        Integer.parseInt(sd[0]),
-        Integer.parseInt(sd[1]),
-        Integer.parseInt(sd[2]),
-    };
-    mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
-      OnDeleteHWDone((IHWFuture<Boolean>)future, listener);
-    });
+  public static void addHomework(Context ctx, HAElement element, AddHWListener listener) {
+    addHomework(ctx, element, listener, false);
+  }
+
+  public static void addHomework(Context ctx, HAElement element, AddHWListener listener,
+                                 boolean silent) {
+    LoginManager.getHWMgr(ctx, (mgr, result) -> {
+
+      // TODO: Deal with result
+
+      if (mgr == null) {
+        listener.onHomeworkAdded(IHWFuture.ERRORCodes.LOGINREQ);
+        return;
+      }
+
+      IHWCarrier.Builder builder = IHWCarrier.Builder.builder();
+      IHWCarrier.JSONBuilder jsonBuilder = new IHWCarrier.JSONBuilder();
+
+      String[] d = element.date.split("-");
+      jsonBuilder.date(Integer.parseInt(d[0]),
+                       Integer.parseInt(d[1]),
+                       Integer.parseInt(d[2]));
+      jsonBuilder.subject(element.subject);
+      jsonBuilder.title(element.title);
+      jsonBuilder.description(element.desc);
+
+      IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
+
+      mgr.addHW(carrier).registerListener(future -> {
+        OnAddHWDone((IHWFuture<Boolean>) future, listener);
+      });
+    }, silent);
+  }
+
+  public static void deleteHomework(Context ctx, HAElement element, DeleteHWListener listener) {
+    deleteHomework(ctx, element, listener, false);
+  }
+
+  public static void deleteHomework(Context ctx, HAElement element, DeleteHWListener listener,
+                                    boolean silent) {
+    LoginManager.getHWMgr(ctx, (mgr, result) -> {
+      // TODO: Deal with result
+
+      if (mgr == null) {
+        listener.onHomeworkDeleted(IHWFuture.ERRORCodes.LOGINREQ);
+        return;
+      }
+
+      String[] sd = element.date.split("-");
+      int[] d = new int[]{
+          Integer.parseInt(sd[0]),
+          Integer.parseInt(sd[1]),
+          Integer.parseInt(sd[2]),
+          };
+      mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
+        OnDeleteHWDone((IHWFuture<Boolean>) future, listener);
+      });
+    }, silent);
   }
 
   private static void OnGetHWDone(IHWFuture<List<IHWObj>> hwFuture, GetHWListener listener) {

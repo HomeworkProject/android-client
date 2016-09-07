@@ -6,10 +6,12 @@
 package paarmann.physikprofil.network;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import de.mlessmann.api.data.IHWFuture;
 import de.mlessmann.api.data.IHWProvider;
+import de.mlessmann.api.data.IHWSession;
 import de.mlessmann.api.data.IHWUser;
 import de.mlessmann.api.main.HWMgr;
 import de.mlessmann.exceptions.StillConnectedException;
@@ -18,16 +20,32 @@ import de.mlessmann.internals.data.HWProvider;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import paarmann.physikprofil.Log;
+import paarmann.physikprofil.LoginActivity;
 import paarmann.physikprofil.MainActivity;
 
 public class LoginManager {
+
+  public interface GetHWMgrListener {
+    public void receiveHWMgr(HWMgr mgr, LoginResultListener.Result result);
+  }
 
   public static final String TAG = "LoginManager";
 
   // TODO: Don't store credentials in shared preferences
   private static IHWProvider provider;
   private static String group, user, auth;
+
+  private static IHWSession session;
+  private static boolean loggedIn = false;
+  private static HWMgr mgr;
+  private static final List<GetHWMgrListener> listenersWaitingForMgr = new ArrayList<>();
+  private static boolean nonSilentListenerPresent = false;
+  private static boolean creatingManager = false;
+  private static boolean waitingForLoginActivity = false;
 
   public static void setCredentials(Context ctx, IHWProvider provider, String group, String user,
                                     String auth) {
@@ -74,16 +92,93 @@ public class LoginManager {
     editor.apply();
   }
 
-  public static void login(Context ctx, LoginResultListener listener) {
-    login(ctx, new HWMgr(), listener);
+  public static void userCanceledLoginActivity() {
+    synchronized (listenersWaitingForMgr) {
+      waitingForLoginActivity = false;
+
+      for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+        listenersWaitingForMgr.get(i).receiveHWMgr(null,
+          LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+        listenersWaitingForMgr.remove(i);
+      }
+
+      creatingManager = false;
+      loggedIn = false;
+      nonSilentListenerPresent = false;
+    }
   }
 
-  public static void login(Context ctx, HWMgr mgr, LoginResultListener listener) {
-    if (!loadCredentials(ctx)) {
-      listener.onLoginDone(LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener l) {
+    getHWMgr(ctx, l, false);
+  }
+
+  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener listener, boolean silent) {
+    if (loggedIn) {
+      listener.receiveHWMgr(mgr, LoginResultListener.Result.LOGGED_IN);
       return;
     }
 
+    synchronized (listenersWaitingForMgr) {
+      listenersWaitingForMgr.add(listener);
+      if (!silent) {
+        nonSilentListenerPresent = true;
+      }
+
+      if (creatingManager || waitingForLoginActivity) {
+        return;
+      }
+
+      if (mgr == null) {
+        mgr = new HWMgr();
+      }
+      creatingManager = true;
+
+      if (!loadCredentials(ctx)) {
+        if (!nonSilentListenerPresent) {
+          for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+            listenersWaitingForMgr.get(i).receiveHWMgr(null,
+                                                       LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+            listenersWaitingForMgr.remove(i);
+          }
+          return;
+        } else {
+          waitingForLoginActivity = true;
+          Intent loginIntent = new Intent(ctx, LoginActivity.class);
+          ctx.startActivity(loginIntent);
+          return;
+        }
+      } else {
+        login(ctx, result -> {
+          switch (result) {
+            case LOGGED_IN:
+              for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+                listenersWaitingForMgr.get(i)
+                    .receiveHWMgr(mgr, LoginResultListener.Result.LOGGED_IN);
+                listenersWaitingForMgr.remove(i);
+              }
+              loggedIn = true;
+              creatingManager = false;
+              nonSilentListenerPresent = false;
+              break;
+            case INVALID_CREDENTIALS:
+              // TODO
+              break;
+            default:
+              for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+                listenersWaitingForMgr.get(i).receiveHWMgr(null, result);
+                listenersWaitingForMgr.remove(i);
+              }
+              loggedIn = false;
+              creatingManager = false;
+              nonSilentListenerPresent = false;
+              break;
+          }
+        });
+      }
+    }
+  }
+
+  private static void login(Context ctx, LoginResultListener listener) {
     try {
       mgr.connect(provider).registerListener(connFuture -> {
         if (connFuture.isPresent()) {
@@ -93,8 +188,7 @@ public class LoginManager {
             IHWFuture<Boolean> compFuture = (IHWFuture<Boolean>) compatibleFuture;
             if (!compFuture.get()) {
               listener.onLoginDone(LoginResultListener.Result.SERVER_INCOMPATIBLE);
-            }
-            else {
+            } else {
               mgr.login(group, user, auth).registerListener(loginFuture -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
                 if (userFuture.errorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
@@ -112,8 +206,9 @@ public class LoginManager {
         }
       });
     } catch (StillConnectedException e) {
+      Log.i(TAG, "StillConnectedException, reconnecting");
       mgr.release();
-      login(ctx, mgr, listener);
+      login(ctx, listener);
     }
   }
 

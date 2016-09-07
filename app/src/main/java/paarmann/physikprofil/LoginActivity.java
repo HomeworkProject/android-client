@@ -6,7 +6,6 @@
 package paarmann.physikprofil;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -15,17 +14,10 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.data.IHWFutureListener;
 import de.mlessmann.api.data.IHWProvider;
-import de.mlessmann.api.data.IHWUser;
 import de.mlessmann.api.main.HWMgr;
-import de.mlessmann.exceptions.StillConnectedException;
-import de.mlessmann.internals.data.HWProvider;
 
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +29,7 @@ public class LoginActivity extends Activity implements LoginResultListener {
 
   public static final String TAG = "LoginActivity";
 
-  private HWMgr hwmgr;
+  private HWMgr providerHWMgr;
   private List<IHWProvider> providers;
 
   @Override
@@ -50,8 +42,7 @@ public class LoginActivity extends Activity implements LoginResultListener {
   protected void onStart() {
     super.onStart();
 
-    hwmgr = new HWMgr();
-
+    providerHWMgr = new HWMgr();
     loadServerList();
   }
 
@@ -59,8 +50,10 @@ public class LoginActivity extends Activity implements LoginResultListener {
   protected void onStop() {
     super.onStop();
 
-    hwmgr.release();
-    hwmgr = null;
+    LoginManager.userCanceledLoginActivity();
+
+    providerHWMgr.release();
+    providerHWMgr = null;
   }
 
   private void loadServerList() {
@@ -90,31 +83,17 @@ public class LoginActivity extends Activity implements LoginResultListener {
     Spinner spinner = (Spinner) findViewById(R.id.spinner_school);
     IHWProvider provider = providers.get(spinner.getSelectedItemPosition());
 
-    // TODO: DEBUG
-//    try {
-//      provider = new HWProvider(new JSONObject("\t{\n"
-//                                               + "\t\t\t\"name\": \"TestServer\",\n"
-//                                               + "\t\t\t\"address\": \"192.168.178.29\",\n"
-//                                               + "\t\t\t\"port\": 11900,\n"
-//                                               + "\t\t\t\"country\": \"DE\",\n"
-//                                               + "\t\t\t\"postal\": \"25486\",\n"
-//                                               + "\t\t\t\"optional\": {\n"
-//                                               + "\t\t\t\t\"tcp_plaintext_enabled\": true,\n"
-//                                               + "\t\t\t\t\"tcp_encrypted_enabled\": false\n"
-//                                               + "\t\t\t}\n"
-//                                               + "\t\t},\n"));
-//    } catch (JSONException e) {
-//      Log.wtf(TAG, "WTF");
-//    }
-
     LoginManager.setCredentials(this, provider, group, user, auth);
     Log.d(TAG, "Logging in to " + provider.getAddress());
-    LoginManager.login(this, hwmgr, this);
+
+    LoginManager.getHWMgr(this, (mgr, result) -> {
+      onLoginDone(result);
+    },  false);
   }
 
   public void onLoginDone(Result result) {
     String resultText;
-    Log.i(TAG, "Error logging in: " + result);
+    Log.i(TAG, "Attempted login: " + result);
 
     switch (result) {
       case LOGGED_IN:
@@ -146,7 +125,7 @@ public class LoginActivity extends Activity implements LoginResultListener {
       JSONArray arr;
 
       try {
-        return hwmgr.getAvailableProviders(params[0]);
+        return providerHWMgr.getAvailableProviders(params[0]);
       } catch (Exception e) {
         Log.e(TAG, "Error getting available providers", e); // TODO: Proper error handling
 

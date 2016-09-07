@@ -26,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.data.IHWObj;
 import de.mlessmann.api.main.HWMgr;
 
 import java.text.ParseException;
@@ -40,33 +39,29 @@ import java.util.List;
 import java.util.Set;
 
 import paarmann.physikprofil.network.HomeworkManager;
-import paarmann.physikprofil.network.LoginManager;
-import paarmann.physikprofil.network.LoginResultListener;
 
 /**
- * Displays a list of homework elements and provides an interface for various actions on them.
- * Users can set reminders, mark homework as done/not done and copy them to the clipboard.
- * Data is provided by {@link HomeworkUpdater}.
+ * Displays a list of homework elements and provides an interface for various actions on them. Users
+ * can set reminders, mark homework as done/not done and copy them to the clipboard. Data is
+ * provided by {@link HomeworkUpdater}.
  */
 public class HomeworkDetailActivity extends Activity
     implements HomeworkUpdater.OnHomeworkLoadedListener {
 
   public static final String TAG = "HomeworkDetailActivity";
 
-  /** Extra for specifying the date. Can be {@code 'all'} or a date in yyyy-mm-DD  */
+  /**
+   * Extra for specifying the date. Can be {@code 'all'} or a date in yyyy-mm-DD
+   */
   public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
 
   private DialogFragment reminderDialog;
   private ActionMode mActionMode;
 
-  private HWMgr hwmgr;
-
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_homework_detail);
-
-    hwmgr = new HWMgr();
 
     final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
@@ -163,10 +158,9 @@ public class HomeworkDetailActivity extends Activity
 
         // Only allow deleting one item at a time for now
         item = menu.findItem(R.id.action_delete);
-        Log.d(TAG, "Checkeditems size: " + checkedItems.size());
         if (checkedItems.size() > 1) {
           item.setVisible(false);
-        } else if (checkedItems.size() == 1){
+        } else if (checkedItems.size() == 1) {
           item.setVisible(true);
         }
         return true;
@@ -252,38 +246,26 @@ public class HomeworkDetailActivity extends Activity
 
     HAElement element = selectedItems.get(0);
 
-    if (LoginManager.loadCredentials(this)) {
-      LoginManager.login(this, hwmgr, loginResult -> {
-        if (loginResult == LoginResultListener.Result.LOGGED_IN) {
-          HomeworkManager.deleteHomework(hwmgr, element, result -> {
-            if (result == IHWFuture.ERRORCodes.OK) {
-              runOnUiThread(() -> {
-                Toast.makeText(this, "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
-                loadHomework(true);
-              });
-            } else {
-              String msg;
-              if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
-                msg = "Du bist nicht berechtigt, diese Hausaufgabe zu löschen.";
-              } else {
-                msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
-              }
-              Log.e(TAG, "Error deleting homework: " + result);
-              runOnUiThread(() -> {
-                Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-                loadHomework(true);
-              });
-            }
-          });
+    HomeworkManager.deleteHomework(this, element, result -> {
+      if (result == IHWFuture.ERRORCodes.OK) {
+        runOnUiThread(() -> {
+          Toast.makeText(this, "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
+          loadHomework(true);
+        });
+      } else {
+        String msg;
+        if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
+          msg = "Du bist nicht berechtigt, diese Hausaufgabe zu löschen.";
         } else {
-          // TODO
-          Log.e(TAG, "login result: " + loginResult);
+          msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
         }
-      });
-    } else {
-      // TODO
-      Log.e(TAG, "No credentials");
-    }
+        Log.e(TAG, "Error deleting homework: " + result);
+        runOnUiThread(() -> {
+          Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+          loadHomework(true);
+        });
+      }
+    });
   }
 
   private void markCurrentItemsAsDone() {
@@ -328,6 +310,7 @@ public class HomeworkDetailActivity extends Activity
 
   /**
    * Get all items currently selected in the list view.
+   *
    * @return the selected items
    */
   private ArrayList<HAElement> getSelectedListItems() {
@@ -348,6 +331,7 @@ public class HomeworkDetailActivity extends Activity
 
   /**
    * Use {@link HomeworkUpdater} to load the homework, setting {@code this} as listener.
+   *
    * @param forceDownload if true, no cached results will be used
    */
   private void loadHomework(boolean forceDownload) {
@@ -364,46 +348,34 @@ public class HomeworkDetailActivity extends Activity
     loader.getData(forceDownload);
     */
 
-    if (LoginManager.loadCredentials(this)) {
-      LoginManager.login(this, hwmgr, result -> {
-        if (result == LoginResultListener.Result.LOGGED_IN) {
-          String strDate = getIntent().getStringExtra(EXTRA_DATE);
+    String strDate = getIntent().getStringExtra(EXTRA_DATE);
 
-          if (strDate.equals("all")) {
-            Calendar cal = Calendar.getInstance();
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            if (!prefs.getBoolean(MainActivity.PREF_HOMEWORKTODAY, false)) {
-              cal.add(Calendar.DAY_OF_MONTH, 1);
-            }
-            Date startDate = cal.getTime();
-            cal.add(Calendar.DAY_OF_MONTH, 64); // Server limits to 64 days
-            Date endDate = cal.getTime();
+    if (strDate.equals("all")) {
+      Calendar cal = Calendar.getInstance();
+      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      if (!prefs.getBoolean(MainActivity.PREF_HOMEWORKTODAY, false)) {
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+      }
+      Date startDate = cal.getTime();
+      cal.add(Calendar.DAY_OF_MONTH, 64); // Server limits to 64 days
+      Date endDate = cal.getTime();
 
-            HomeworkManager.getHomework(hwmgr, startDate, endDate, hw -> {
-              runOnUiThread(() -> {
-                setData(hw);
-              });
-            });
-          } else {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-              HomeworkManager.getHomework(hwmgr, dateFormat.parse(strDate), hw -> {
-                runOnUiThread(() -> {
-                  setData(hw);
-                });
-              });
-            } catch (ParseException e) {
-              Log.wtf(TAG, "Invalid date format: ", e);
-            }
-          }
-        } else {
-          // TODO: Error handling
-          Log.e(TAG, "result: " + result);
-        }
+      HomeworkManager.getHomework(this, startDate, endDate, hw -> {
+        runOnUiThread(() -> {
+          setData(hw);
+        });
       });
     } else {
-      // TODO: Open Login screen
-      Log.e(TAG, "No credentials");
+      SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+      try {
+        HomeworkManager.getHomework(this, dateFormat.parse(strDate), hw -> {
+          runOnUiThread(() -> {
+            setData(hw);
+          });
+        });
+      } catch (ParseException e) {
+        Log.wtf(TAG, "Invalid date format: ", e);
+      }
     }
   }
 
