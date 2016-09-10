@@ -10,17 +10,21 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import de.mlessmann.api.data.IHWFuture;
+import de.mlessmann.api.data.IHWFutureListener;
 import de.mlessmann.api.data.IHWProvider;
 import de.mlessmann.api.data.IHWSession;
 import de.mlessmann.api.data.IHWUser;
 import de.mlessmann.api.main.HWMgr;
 import de.mlessmann.exceptions.StillConnectedException;
 import de.mlessmann.internals.data.HWProvider;
+import de.mlessmann.internals.data.HWSession;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import paarmann.physikprofil.Log;
@@ -71,6 +75,9 @@ public class LoginManager {
     user = prefs.getString(MainActivity.PREF_CRED_USER, "");
     auth = prefs.getString(MainActivity.PREF_CRED_AUTH, "");
     try {
+      if (prefs.contains(MainActivity.PREF_CRED_TOKEN)) {
+        session = new HWSession(new JSONObject(prefs.getString(MainActivity.PREF_CRED_TOKEN, "")));
+      }
       provider = new HWProvider(new JSONObject(prefs.getString(MainActivity.PREF_PROVIDER, "")));
     } catch (JSONException e) {
       // Basically impossible, unless something else messed with the prefs
@@ -87,6 +94,9 @@ public class LoginManager {
     editor.putString(MainActivity.PREF_CRED_GROUP, group);
     editor.putString(MainActivity.PREF_CRED_USER, user);
     editor.putString(MainActivity.PREF_CRED_AUTH, auth);
+    if (session != null) {
+      editor.putString(MainActivity.PREF_CRED_TOKEN, session.getJSON().toString());
+    }
     editor.putString(MainActivity.PREF_PROVIDER, provider.getJSON().toString());
 
     editor.apply();
@@ -189,18 +199,37 @@ public class LoginManager {
             if (!compFuture.get()) {
               listener.onLoginDone(LoginResultListener.Result.SERVER_INCOMPATIBLE);
             } else {
-              mgr.login(group, user, auth).registerListener(loginFuture -> {
+
+              IHWFutureListener l = (loginFuture -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
                 if (userFuture.errorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
                   if (userFuture.errorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
                     listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
+                  } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.EXPIRED) {
+                    // Try again with credentials if session is invalid
+                    // TODO
+                    Log.d(TAG, "Server says token expired, retrying with creds");
+                    session = null;
+                    mgr.release();
+                    login(ctx, listener);
                   } else {
                     listener.onLoginDone(LoginResultListener.Result.UNKNOWN);
                   }
                 } else {
+                  session = userFuture.get().session();
+                  saveCredentials(ctx);
                   listener.onLoginDone(LoginResultListener.Result.LOGGED_IN);
                 }
               });
+
+              if (session != null && !isSessionExpired(session)) {
+                Log.d(TAG, "Connecting with session token.");
+                mgr.login(session.getToken()).registerListener(l);
+              } else {
+                Log.d(TAG, "Connecting with credentials.");
+                Log.d(TAG, "Session is: " + session);
+                mgr.login(group, user, auth).registerListener(l);
+              }
             }
           });
         }
@@ -212,4 +241,16 @@ public class LoginManager {
     }
   }
 
+
+  private static boolean isSessionExpired(IHWSession session) {
+    Calendar cal = Calendar.getInstance();
+
+    int[] d = session.expires();
+    cal.set(d[0], d[1], d[2]);
+
+    if (cal.compareTo(Calendar.getInstance()) != 1) {
+      return true;
+    }
+    return false;
+  }
 }
