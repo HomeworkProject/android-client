@@ -8,13 +8,16 @@ package paarmann.physikprofil;
 import android.app.IntentService;
 import android.content.Intent;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+
+import paarmann.physikprofil.network.HomeworkManager;
 
 /**
  * Service that updates homework data in the background.
  */
-public class AutomaticUpdateService extends IntentService
-    implements HomeworkUpdater.OnHomeworkLoadedListener {
+public class AutomaticUpdateService extends IntentService {
 
   public static final String TAG = "AutomaticUpdateService";
 
@@ -29,9 +32,14 @@ public class AutomaticUpdateService extends IntentService
     Log.i(TAG, "Starting update of homework data");
 
     done = false;
-    HomeworkUpdater updater = new HomeworkUpdater(this);
-    updater.setOnHomeworkLoadedListener(this);
-    updater.downloadHomework();
+
+    Calendar cal = Calendar.getInstance();
+    Date startDate = cal.getTime();
+    cal.add(Calendar.DAY_OF_MONTH, 64); // Server limits to 64 days
+    Date endDate = cal.getTime();
+    HomeworkManager.getHomework(this, startDate, endDate, hw -> {
+      done = true;
+    }, true);
 
     while (!done) {
       try {
@@ -44,8 +52,4 @@ public class AutomaticUpdateService extends IntentService
     Log.i(TAG, "Finished update of homework data");
   }
 
-  @Override
-  public void setData(List<HAElement> data) {
-    done = true;
-  }
 }
