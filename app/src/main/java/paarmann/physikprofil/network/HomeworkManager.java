@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import paarmann.physikprofil.AutomaticReminderManager;
 import paarmann.physikprofil.HAElement;
 import paarmann.physikprofil.Log;
 
@@ -54,7 +55,7 @@ public class HomeworkManager {
       cal.setTime(date);
       mgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
                   cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-        OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
+        OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener);
       });
     }, silent);
   }
@@ -83,7 +84,7 @@ public class HomeworkManager {
                        calStart.get(Calendar.DAY_OF_MONTH),
                        calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
                        calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-        OnGetHWDone((IHWFuture<List<IHWObj>>) future, listener);
+        OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener);
       });
     }, silent);
   }
@@ -148,7 +149,7 @@ public class HomeworkManager {
     }, silent);
   }
 
-  private static void OnGetHWDone(IHWFuture<List<IHWObj>> hwFuture, GetHWListener listener) {
+  private static void OnGetHWDone(Context ctx, IHWFuture<List<IHWObj>> hwFuture, GetHWListener listener) {
     if (hwFuture.errorCode() != IHWFuture.ERRORCodes.OK) {
       Log.e(TAG, "GetHW returned error: " + hwFuture.errorCode());
       HAElement error = new HAElement();
@@ -168,7 +169,6 @@ public class HomeworkManager {
     List<HAElement> elements = new ArrayList<>(hwObjs.size());
 
     for (IHWObj obj : hwObjs) {
-      // TODO
       HAElement elem = new HAElement();
       elem.id = obj.getId();
       int[] d = obj.getDate();
@@ -178,6 +178,8 @@ public class HomeworkManager {
       elem.desc = obj.getDescription();
       elements.add(elem);
     }
+
+    AutomaticReminderManager.setReminders(ctx, elements);
 
     listener.onHomeworkReceived(elements);
   }
