@@ -57,6 +57,8 @@ public class LoginManager {
     LoginManager.group = group;
     LoginManager.user = user;
     LoginManager.auth = auth;
+    session = null;
+    loggedIn = false;
 
     saveCredentials(ctx);
   }
@@ -94,7 +96,9 @@ public class LoginManager {
     editor.putString(MainActivity.PREF_CRED_GROUP, group);
     editor.putString(MainActivity.PREF_CRED_USER, user);
     editor.putString(MainActivity.PREF_CRED_AUTH, auth);
-    if (session != null) {
+    if (session == null) {
+      editor.remove(MainActivity.PREF_CRED_TOKEN);
+    } else {
       editor.putString(MainActivity.PREF_CRED_TOKEN, session.getJSON().toString());
     }
     editor.putString(MainActivity.PREF_PROVIDER, provider.getJSON().toString());
@@ -171,7 +175,15 @@ public class LoginManager {
               nonSilentListenerPresent = false;
               break;
             case INVALID_CREDENTIALS:
-              // TODO
+              // TODO: Possibly open LoginActivity if not silent
+              for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+                listenersWaitingForMgr.get(i).receiveHWMgr(null,
+                  LoginResultListener.Result.INVALID_CREDENTIALS);
+                listenersWaitingForMgr.remove(i);
+              }
+              loggedIn = false;
+              creatingManager = false;
+              nonSilentListenerPresent = false;
               break;
             default:
               for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
@@ -203,7 +215,11 @@ public class LoginManager {
               IHWFutureListener l = (loginFuture -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
                 if (userFuture.errorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
+                  Log.d(TAG, "Error code: " + userFuture.errorCode());
                   if (userFuture.errorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
+                    listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
+                  } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.NOTFOUNDERR) {
+                    // TODO: Consider giving group not found a special Result
                     listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
                   } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.EXPIRED) {
                     // Try again with credentials if session is invalid
