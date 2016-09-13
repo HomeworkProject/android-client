@@ -3,6 +3,9 @@ checkout:
   post:
     - git submodule sync
     - git submodule update --init
+    - cd ./homework_server_cdk/
+    - git submodule update --init
+    - cd ../
 
 # fix gradlew not begin marked as executable
 dependencies:
