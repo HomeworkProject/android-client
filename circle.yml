@@ -5,7 +5,7 @@ checkout:
     - git submodule update --init
     - git submodule update --init:
         pwd:
-	    homework_server_cdk
+            homework_server_cdk
 
 # fix gradlew not begin marked as executable
 dependencies:
