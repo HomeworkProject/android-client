@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import paarmann.physikprofil.ui.MainActivity;
+
 /**
  * Helper class to manage automatic reminders. <p> This class provides several static helper methods
  * for dealing with automatic reminders.

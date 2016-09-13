@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2015  Sebastian Paarmann
+ * Copyright (c) 2016  Sebastian Paarmann
  * Licensed under the MIT license, see the LICENSE file
  */
 
-package paarmann.physikprofil;
+package paarmann.physikprofil.ui;
 
 
 import android.app.AlertDialog;
@@ -11,6 +11,9 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+
+import paarmann.physikprofil.Log;
+import paarmann.physikprofil.R;
 
 /**
  * Simple {@code DialogFragment} that notifies the user about a new update and asks whether or not
@@ -40,7 +43,7 @@ public class UpdateDialog extends DialogFragment {
     builder.setMessage(message).setPositiveButton("Ja!", new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        ((MainActivity) getActivity()).update();
+        ((MainFragment)((MainActivity) getActivity()).fragment).update();
       }
     }).setNegativeButton("Nicht jetzt", new DialogInterface.OnClickListener() {
       @Override

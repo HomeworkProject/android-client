@@ -1,123 +1,37 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    tools:context=".MainActivity"
-    android:orientation="vertical">
+<android.support.v4.widget.DrawerLayout android:id="@+id/drawer_layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
-    <TabHost
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:id="@+id/tabHost" android:layout_weight="0.1">
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:orientation="vertical">
-
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"></TabWidget>
-
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent">
-
-                <LinearLayout
-                    android:id="@+id/tabHA"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="vertical"
-                    android:weightSum="1">
-
-
-                    <LinearLayout
-                            android:orientation="vertical"
-                            android:layout_width="match_parent"
-                            android:layout_height="fill_parent">
-                        <Button
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="10dp"
-                                android:text="@string/allHomework"
-                                android:id="@+id/btnAllHomework"
-                                android:layout_gravity="center_horizontal"
-                            android:onClick="onBtnAllHomeworkClick" />
-                        <Button
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/pickDate"
-                                android:id="@+id/btnPickDate"
-                                android:layout_gravity="center_horizontal"
-                                android:onClick="onBtnPickDateClick"/>
-                        <Button
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/tomorrow"
-                                android:id="@+id/btnTomorrow"
-                                android:layout_gravity="center_horizontal"
-                                android:onClick="onBtnTomorrowClick"/>
-                        <Button
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="@string/afterTomorrow"
-                                android:id="@+id/btnAfterTomorrow"
-                                android:layout_gravity="center_horizontal"
-                                android:onClick="onBtnAfterTomorrowClick"/>
-
-                        <Button
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Login"
-                            android:id="@+id/btnOpenLoginScreen"
-                            android:layout_gravity="center_horizontal"
-                            android:onClick="onBtnOpenLoginScreenClick"/>
-
-                        <Button
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Hausaufgabe hinzufügen"
-                            android:id="@+id/btnOpenAddHomeworkScreen"
-                            android:layout_gravity="center_horizontal"
-                            android:onClick="onBtnOpenAddHomeworkScreenClick"/>
-                    </LinearLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/tabDates"
-                    android:layout_width="fill_parent"
-                    android:layout_height="fill_parent"
-                    android:orientation="horizontal">
-
-                    <TextView android:layout_width="wrap_content"
-                              android:layout_height="wrap_content"
-                              android:text="@string/dates_unavailable"/>
-
-                </LinearLayout>
-            </FrameLayout>
-        </LinearLayout>
-    </TabHost>
+    <!-- The main view -->
     <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
             android:layout_width="match_parent"
-            android:layout_height="fill_parent"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.75" android:visibility="visible">
-        <ProgressBar
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/progressBar2" android:layout_weight="0.5"
-                android:visibility="visible"/>
-        <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:text="@string/updating"
-                android:id="@+id/txtUpdating" android:layout_weight="0.4"
-                android:visibility="visible"/>
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="@style/ToolbarTheme"
+            android:background="@color/actionBarColor" />
+
+        <FrameLayout
+            android:id="@+id/content_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 
+    <!-- The navigation drawer -->
+    <android.support.design.widget.NavigationView
+        android:id="@+id/navigation"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        app:menu="@menu/navigation_items" />
 
-</LinearLayout>
+
+</android.support.v4.widget.DrawerLayout>

@@ -3,12 +3,15 @@
  * Licensed under the MIT license, see the LICENSE file
  */
 
-package paarmann.physikprofil;
+package paarmann.physikprofil.ui;
 
-import android.app.Activity;
+import android.app.Fragment;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -22,24 +25,35 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 import java.util.List;
 
+import paarmann.physikprofil.Log;
+import paarmann.physikprofil.R;
 import paarmann.physikprofil.network.LoginManager;
 import paarmann.physikprofil.network.LoginResultListener;
 
-public class LoginActivity extends Activity implements LoginResultListener {
+public class LoginFragment extends Fragment {
 
-  public static final String TAG = "LoginActivity";
+  public static final String TAG = "LoginFragment";
 
   private HWMgr providerHWMgr;
   private List<IHWProvider> providers;
 
+  public LoginFragment() {
+
+  }
+
+  @Nullable
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_login);
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                           Bundle savedInstanceState) {
+    View root = inflater.inflate(R.layout.fragment_login, container, false);
+
+    root.findViewById(R.id.btnLogin).setOnClickListener(this::onBtnLoginClick);
+
+    return root;
   }
 
   @Override
-  protected void onStart() {
+  public void onStart() {
     super.onStart();
 
     providerHWMgr = new HWMgr();
@@ -47,7 +61,7 @@ public class LoginActivity extends Activity implements LoginResultListener {
   }
 
   @Override
-  protected void onStop() {
+  public void onStop() {
     super.onStop();
 
     LoginManager.userCanceledLoginActivity();
@@ -56,42 +70,43 @@ public class LoginActivity extends Activity implements LoginResultListener {
     providerHWMgr = null;
   }
 
+
   private void loadServerList() {
     new GetProvidersTask().execute((String) null);
   }
 
   private void populateProviderSpinner() {
-    Spinner spinner = (Spinner) findViewById(R.id.spinner_school);
+    Spinner spinner = (Spinner) getView().findViewById(R.id.spinner_school);
 
     List<String> providerNames = new ArrayList<String>();
     for (IHWProvider provider : providers) {
       providerNames.add(provider.getName());
     }
 
-    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-        android.R.layout.simple_spinner_item, providerNames);
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+      android.R.layout.simple_spinner_item, providerNames);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
     spinner.setAdapter(adapter);
   }
 
   public void onBtnLoginClick(View v) {
-    final String group = ((EditText) findViewById(R.id.txtGroup)).getText().toString();
-    final String user = ((EditText) findViewById(R.id.txtUser)).getText().toString();
-    final String auth = ((EditText) findViewById(R.id.txtAuth)).getText().toString();
+    final String group = ((EditText) getView().findViewById(R.id.txtGroup)).getText().toString();
+    final String user = ((EditText) getView().findViewById(R.id.txtUser)).getText().toString();
+    final String auth = ((EditText) getView().findViewById(R.id.txtAuth)).getText().toString();
 
-    Spinner spinner = (Spinner) findViewById(R.id.spinner_school);
+    Spinner spinner = (Spinner) getView().findViewById(R.id.spinner_school);
     IHWProvider provider = providers.get(spinner.getSelectedItemPosition());
 
-    LoginManager.setCredentials(this, provider, group, user, auth);
+    LoginManager.setCredentials(getActivity(), provider, group, user, auth);
     Log.d(TAG, "Logging in to " + provider.getAddress());
 
-    LoginManager.getHWMgr(this, (mgr, result) -> {
+    LoginManager.getHWMgr(getActivity(), (mgr, result) -> {
       onLoginDone(result);
-    },  false);
+    }, false, true);
   }
 
-  public void onLoginDone(Result result) {
+  public void onLoginDone(LoginResultListener.Result result) {
     String resultText;
     Log.i(TAG, "Attempted login: " + result);
 
@@ -113,8 +128,12 @@ public class LoginActivity extends Activity implements LoginResultListener {
         break;
     }
 
-    runOnUiThread(() -> {
-      Toast.makeText(this, resultText, Toast.LENGTH_LONG).show();
+    getActivity().runOnUiThread(() -> {
+      Toast.makeText(getActivity(), resultText, Toast.LENGTH_LONG).show();
+
+      if (result == LoginResultListener.Result.LOGGED_IN) {
+        if (getActivity() != null) ((MainActivity) getActivity()).showMainView();
+      }
     });
   }
 

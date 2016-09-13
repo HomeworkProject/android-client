@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016  Sebastian Paarmann
+  ~ Licensed under the MIT license, see the LICENSE file
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".ui.MainFragment"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="fill_parent">
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="@string/allHomework"
+        android:id="@+id/btnAllHomework"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pickDate"
+        android:id="@+id/btnPickDate"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/tomorrow"
+        android:id="@+id/btnTomorrow"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/afterTomorrow"
+        android:id="@+id/btnAfterTomorrow"
+        android:layout_gravity="center_horizontal" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:orientation="horizontal"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.75" android:visibility="visible">
+        <ProgressBar
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar2" android:layout_weight="0.5"
+            android:visibility="visible"/>
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/updating"
+            android:id="@+id/txtUpdating" android:layout_weight="0.4"
+            android:visibility="visible"/>
+    </LinearLayout>
+</LinearLayout>

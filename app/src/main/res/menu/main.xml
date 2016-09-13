@@ -1,16 +1,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity" >
+    tools:context=".ui.MainActivity" >
     <item android:id="@+id/action_update"
         android:title="@string/updateText"
         android:orderInCategory="98"
         android:showAsAction="never" />
-    <item android:id="@+id/action_manageReminders"
-      android:title="@string/manageRemindersText"
-      android:orderInCategory="99"
-      android:showAsAction="never" />
-    <item android:id="@+id/action_settings"
-      android:title="@string/action_settings"
-      android:orderInCategory="100"
-      android:showAsAction="never" />
 </menu>

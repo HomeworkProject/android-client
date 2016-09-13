@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2015  Sebastian Paarmann
+ * Copyright (c) 2016  Sebastian Paarmann
  * Licensed under the MIT license, see the LICENSE file
  */
 
-package paarmann.physikprofil;
+package paarmann.physikprofil.ui;
 
 import android.app.AlarmManager;
 import android.app.AlertDialog;
@@ -29,6 +29,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+
+import paarmann.physikprofil.HAElement;
+import paarmann.physikprofil.Log;
+import paarmann.physikprofil.R;
+import paarmann.physikprofil.Reminder;
+import paarmann.physikprofil.ReminderBroadcastReceiver;
 
 public class ReminderDateTimePickerFragment extends DialogFragment {
 

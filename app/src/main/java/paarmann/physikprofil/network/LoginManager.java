@@ -24,12 +24,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import paarmann.physikprofil.Log;
-import paarmann.physikprofil.LoginActivity;
-import paarmann.physikprofil.MainActivity;
+import paarmann.physikprofil.ui.MainActivity;
 
 public class LoginManager {
 
@@ -59,6 +57,27 @@ public class LoginManager {
     LoginManager.auth = auth;
     session = null;
     loggedIn = false;
+
+    saveCredentials(ctx);
+  }
+
+  public static void removeCredentials(Context ctx) {
+    provider = null;
+    group = null;
+    user = null;
+    auth = null;
+    session = null;
+    loggedIn = false;
+
+    if (listenersWaitingForMgr != null && listenersWaitingForMgr.size() > 0) {
+      for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+        listenersWaitingForMgr.get(i).receiveHWMgr(null,
+          LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+        listenersWaitingForMgr.remove(i);
+      }
+    }
+    creatingManager = false;
+    waitingForLoginActivity = false;
 
     saveCredentials(ctx);
   }
@@ -93,15 +112,35 @@ public class LoginManager {
     SharedPreferences prefs = ctx.getSharedPreferences(MainActivity.PREF_NAME, 0);
     SharedPreferences.Editor editor = prefs.edit();
 
-    editor.putString(MainActivity.PREF_CRED_GROUP, group);
-    editor.putString(MainActivity.PREF_CRED_USER, user);
-    editor.putString(MainActivity.PREF_CRED_AUTH, auth);
+    if (group == null) {
+      editor.remove(MainActivity.PREF_CRED_GROUP);
+    } else {
+      editor.putString(MainActivity.PREF_CRED_GROUP, group);
+    }
+
+    if (user == null) {
+      editor.remove(MainActivity.PREF_CRED_USER);
+    } else {
+      editor.putString(MainActivity.PREF_CRED_USER, user);
+    }
+
+    if (auth == null) {
+      editor.remove(MainActivity.PREF_CRED_AUTH);
+    } else {
+      editor.putString(MainActivity.PREF_CRED_AUTH, auth);
+    }
+
     if (session == null) {
       editor.remove(MainActivity.PREF_CRED_TOKEN);
     } else {
       editor.putString(MainActivity.PREF_CRED_TOKEN, session.getJSON().toString());
     }
-    editor.putString(MainActivity.PREF_PROVIDER, provider.getJSON().toString());
+
+    if (provider == null) {
+      editor.remove(MainActivity.PREF_PROVIDER);
+    } else {
+      editor.putString(MainActivity.PREF_PROVIDER, provider.getJSON().toString());
+    }
 
     editor.apply();
   }
@@ -123,10 +162,14 @@ public class LoginManager {
   }
 
   public synchronized static void getHWMgr(Context ctx, GetHWMgrListener l) {
-    getHWMgr(ctx, l, false);
+    getHWMgr(ctx, l, false, false);
   }
 
-  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener listener, boolean silent) {
+  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener l, boolean silent) {
+    getHWMgr(ctx, l, silent, false);
+  }
+
+  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener listener, boolean silent, boolean loginActivity) {
     if (loggedIn) {
       listener.receiveHWMgr(mgr, LoginResultListener.Result.LOGGED_IN);
       return;
@@ -138,14 +181,14 @@ public class LoginManager {
         nonSilentListenerPresent = true;
       }
 
-      if (creatingManager || waitingForLoginActivity) {
+      if ((creatingManager || waitingForLoginActivity) && !loginActivity) {
         return;
       }
 
+      creatingManager = true;
       if (mgr == null) {
         mgr = new HWMgr();
       }
-      creatingManager = true;
 
       if (!loadCredentials(ctx)) {
         if (!nonSilentListenerPresent) {
@@ -154,12 +197,21 @@ public class LoginManager {
                                                        LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
             listenersWaitingForMgr.remove(i);
           }
+          creatingManager = false;
           return;
         } else {
           waitingForLoginActivity = true;
-          Intent loginIntent = new Intent(ctx, LoginActivity.class);
-          ctx.startActivity(loginIntent);
-          return;
+          try {
+            ((MainActivity) ctx).showLoginView();
+          } catch (ClassCastException e) {
+            waitingForLoginActivity = false;
+            for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
+              listenersWaitingForMgr.get(i).receiveHWMgr(null, LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+              listenersWaitingForMgr.remove(i);
+            }
+            creatingManager = false;
+            return;
+          }
         }
       } else {
         login(ctx, result -> {
@@ -175,7 +227,6 @@ public class LoginManager {
               nonSilentListenerPresent = false;
               break;
             case INVALID_CREDENTIALS:
-              // TODO: Possibly open LoginActivity if not silent
               for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
                 listenersWaitingForMgr.get(i).receiveHWMgr(null,
                   LoginResultListener.Result.INVALID_CREDENTIALS);

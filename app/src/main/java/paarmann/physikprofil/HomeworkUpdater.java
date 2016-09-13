@@ -29,6 +29,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import paarmann.physikprofil.ui.MainActivity;
+
 /**
  * Class used to get the current homework.
  * Capable of using a cached result and of downloading the most current data.

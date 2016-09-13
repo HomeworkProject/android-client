@@ -1,32 +1,33 @@
 /*
- * Copyright (c) 2015  Sebastian Paarmann
+ * Copyright (c) 2016  Sebastian Paarmann
  * Licensed under the MIT license, see the LICENSE file
  */
 
-package paarmann.physikprofil;
+package paarmann.physikprofil.ui;
 
-import android.app.Activity;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.main.HWMgr;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -38,32 +39,38 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import paarmann.physikprofil.AutomaticReminderManager;
+import paarmann.physikprofil.HAElement;
+import paarmann.physikprofil.HAElementArrayAdapter;
+import paarmann.physikprofil.Log;
+import paarmann.physikprofil.R;
 import paarmann.physikprofil.network.HomeworkManager;
+import paarmann.physikprofil.network.LoginResultListener;
 
-/**
- * Displays a list of homework elements and provides an interface for various actions on them. Users
- * can set reminders, mark homework as done/not done and copy them to the clipboard. Data is
- * provided by {@link HomeworkUpdater}.
- */
-public class HomeworkDetailActivity extends Activity
-    implements HomeworkUpdater.OnHomeworkLoadedListener {
+public class HomeworkDetailFragment extends Fragment {
 
-  public static final String TAG = "HomeworkDetailActivity";
+  public static final String TAG = "HomeworkDetailFragment";
 
-  /**
-   * Extra for specifying the date. Can be {@code 'all'} or a date in yyyy-mm-DD
-   */
-  public static String EXTRA_DATE = "paarmann.physikprofil.extra_date";
+  public static final String EXTRA_DATE = "paarmann.physikprofil.extra.date";
+
+  private String strDate;
+
+  public HomeworkDetailFragment() {
+  }
 
   private DialogFragment reminderDialog;
-  private ActionMode mActionMode;
+  private ActionMode actionMode;
 
+  @Nullable
   @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_homework_detail);
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    Bundle savedInstanceState) {
 
-    final ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+    View root = inflater.inflate(R.layout.fragment_homework_detail, container, false);
+
+    strDate = getArguments().getString(EXTRA_DATE);
+
+    final ListView listView = (ListView) root.findViewById(R.id.lsViewHomework);
     listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
     listView.setMultiChoiceModeListener(new ListView.MultiChoiceModeListener() {
       // All items currently selected
@@ -107,7 +114,7 @@ public class HomeworkDetailActivity extends Activity
             } else {
               markCurrentItemsAsNotDone();
             }
-            loadHomework();
+            loadHomework(root);
             mode.finish();
             return true;
           default:
@@ -119,18 +126,18 @@ public class HomeworkDetailActivity extends Activity
       public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.detail_context_menu, menu);
-        mActionMode = mode;
+        actionMode = mode;
         return true;
       }
 
       @Override
       public void onDestroyActionMode(ActionMode mode) {
-        mActionMode = null;
+        actionMode = null;
       }
 
       @Override
       public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-        SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
+        SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
         Set<String>
             doneItems =
             prefs.getStringSet(MainActivity.PREF_DONEITEMS2, new HashSet<String>());
@@ -166,14 +173,16 @@ public class HomeworkDetailActivity extends Activity
         return true;
       }
     });
-    listView.setOnItemLongClickListener(new OnItemLongClickListener() {
+    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
       public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         listView.setItemChecked(position, true);
         return true;
       }
     });
 
-    loadHomework();
+    loadHomework(root);
+
+    return root;
   }
 
   @Override
@@ -181,28 +190,24 @@ public class HomeworkDetailActivity extends Activity
     if (reminderDialog != null) {
       reminderDialog.dismiss();
     }
-    if (mActionMode != null) {
-      mActionMode.finish();
+    if (actionMode != null) {
+      actionMode.finish();
     }
+
     super.onSaveInstanceState(outState);
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.homework_detail, menu);
-    return true;
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    // TODO ?
+    inflater.inflate(R.menu.homework_detail, menu);
   }
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
-    switch (id) {
+    switch (item.getItemId()) {
       case R.id.action_refresh:
-        loadHomework(true);
+        loadHomework(getView(), true);
         return true;
       default:
         return super.onOptionsItemSelected(item);
@@ -213,8 +218,9 @@ public class HomeworkDetailActivity extends Activity
    * Copies the description of all selected items to the clipboard and displays a toast.
    */
   private void copyCurrentItems() {
-    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+    ClipboardManager clipboard = (ClipboardManager) getActivity()
+      .getSystemService(Context.CLIPBOARD_SERVICE);
+    ListView listView = (ListView) getView().findViewById(R.id.lsViewHomework);
     SparseBooleanArray items = listView.getCheckedItemPositions();
     String toCopy = "";
     for (int i = 0; i < items.size(); i++) {
@@ -226,7 +232,7 @@ public class HomeworkDetailActivity extends Activity
     }
     ClipData data = ClipData.newPlainText("homework", toCopy);
     clipboard.setPrimaryClip(data);
-    Toast.makeText(this,
+    Toast.makeText(getActivity(),
                    (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert",
                    Toast.LENGTH_SHORT).show();
   }
@@ -246,11 +252,11 @@ public class HomeworkDetailActivity extends Activity
 
     HAElement element = selectedItems.get(0);
 
-    HomeworkManager.deleteHomework(this, element, result -> {
+    HomeworkManager.deleteHomework(getActivity(), element, result -> {
       if (result == IHWFuture.ERRORCodes.OK) {
-        runOnUiThread(() -> {
-          Toast.makeText(this, "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
-          loadHomework(true);
+        getActivity().runOnUiThread(() -> {
+          Toast.makeText(getActivity(), "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
+          loadHomework(getView(), true);
         });
       } else {
         String msg;
@@ -260,9 +266,9 @@ public class HomeworkDetailActivity extends Activity
           msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
         }
         Log.e(TAG, "Error deleting homework: " + result);
-        runOnUiThread(() -> {
-          Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
-          loadHomework(true);
+        getActivity().runOnUiThread(() -> {
+          Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+          loadHomework(getView(), true);
         });
       }
     });
@@ -271,7 +277,7 @@ public class HomeworkDetailActivity extends Activity
   private void markCurrentItemsAsDone() {
     List<HAElement> selectedItems = getSelectedListItems();
     Set<String> doneItems = new HashSet<String>();
-    SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
+    SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
 
     if (prefs.contains(MainActivity.PREF_DONEITEMS2)) {
       doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS2, null));
@@ -280,7 +286,7 @@ public class HomeworkDetailActivity extends Activity
     for (HAElement element : selectedItems) {
       element.flags = element.flags | HAElement.FLAG_DONE;
       doneItems.add(element.id);
-      AutomaticReminderManager.deleteAutomaticReminder(this, element);
+      AutomaticReminderManager.deleteAutomaticReminder(getActivity(), element);
     }
 
     SharedPreferences.Editor editor = prefs.edit();
@@ -291,7 +297,7 @@ public class HomeworkDetailActivity extends Activity
   private void markCurrentItemsAsNotDone() {
     List<HAElement> selectedItems = getSelectedListItems();
     Set<String> doneItems = new HashSet<String>();
-    SharedPreferences prefs = getSharedPreferences(MainActivity.PREF_NAME, 0);
+    SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
 
     if (prefs.contains(MainActivity.PREF_DONEITEMS2)) {
       doneItems.addAll(prefs.getStringSet(MainActivity.PREF_DONEITEMS2, null));
@@ -314,7 +320,7 @@ public class HomeworkDetailActivity extends Activity
    * @return the selected items
    */
   private ArrayList<HAElement> getSelectedListItems() {
-    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+    ListView listView = (ListView) getView().findViewById(R.id.lsViewHomework);
     SparseBooleanArray selected = listView.getCheckedItemPositions();
     ArrayList<HAElement> selectedItems = new ArrayList<HAElement>();
     for (int i = 0; i < selected.size(); i++) {
@@ -325,18 +331,14 @@ public class HomeworkDetailActivity extends Activity
     return selectedItems;
   }
 
-  private void loadHomework() {
-    loadHomework(false);
+
+  private void loadHomework(View root) {
+    loadHomework(root, false);
   }
 
-  /**
-   * Use {@link HomeworkUpdater} to load the homework, setting {@code this} as listener.
-   *
-   * @param forceDownload if true, no cached results will be used
-   */
-  private void loadHomework(boolean forceDownload) {
-    TextView emptyView = (TextView) findViewById(R.id.emptyView);
-    ListView listView = (ListView) findViewById(R.id.lsViewHomework);
+  private void loadHomework(View root, boolean forceDownload) {
+    TextView emptyView = (TextView) root.findViewById(R.id.emptyView);
+    ListView listView = (ListView) root.findViewById(R.id.lsViewHomework);
     listView.setEmptyView(emptyView);
 
     /*
@@ -348,11 +350,22 @@ public class HomeworkDetailActivity extends Activity
     loader.getData(forceDownload);
     */
 
-    String strDate = getIntent().getStringExtra(EXTRA_DATE);
+    HomeworkManager.GetHWListener myListener = (hw, loginResult) -> {
+      if (getActivity() != null) getActivity().runOnUiThread(() -> {
+        if (loginResult == LoginResultListener.Result.NO_CREDENTIALS_PRESENT
+            || loginResult == LoginResultListener.Result.INVALID_CREDENTIALS) {
+          Toast.makeText(getActivity(), "Ungültige Zugangsdaten", Toast.LENGTH_LONG).show();
+
+          ((MainActivity) getActivity()).showLoginView();
+        } else {
+          setData(hw);
+        }
+      });
+    };
 
     if (strDate.equals("all")) {
       Calendar cal = Calendar.getInstance();
-      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+      SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
       if (!prefs.getBoolean(MainActivity.PREF_HOMEWORKTODAY, false)) {
         cal.add(Calendar.DAY_OF_MONTH, 1);
       }
@@ -360,19 +373,11 @@ public class HomeworkDetailActivity extends Activity
       cal.add(Calendar.DAY_OF_MONTH, 64); // Server limits to 64 days
       Date endDate = cal.getTime();
 
-      HomeworkManager.getHomework(this, startDate, endDate, hw -> {
-        runOnUiThread(() -> {
-          setData(hw);
-        });
-      });
+      HomeworkManager.getHomework(getActivity(), startDate, endDate, myListener);
     } else {
       SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
       try {
-        HomeworkManager.getHomework(this, dateFormat.parse(strDate), hw -> {
-          runOnUiThread(() -> {
-            setData(hw);
-          });
-        });
+        HomeworkManager.getHomework(getActivity(), dateFormat.parse(strDate), myListener);
       } catch (ParseException e) {
         Log.wtf(TAG, "Invalid date format: ", e);
       }
@@ -380,26 +385,25 @@ public class HomeworkDetailActivity extends Activity
   }
 
   private void clearData() {
-    TextView emptyView = (TextView) findViewById(R.id.emptyView);
+    TextView emptyView = (TextView) getView().findViewById(R.id.emptyView);
     emptyView.setText(getResources().getString(R.string.emptyText));
 
-    ListView lsView = (ListView) findViewById(R.id.lsViewHomework);
+    ListView lsView = (ListView) getView().findViewById(R.id.lsViewHomework);
     lsView.setEmptyView(emptyView);
-    lsView.setAdapter(new HAElementArrayAdapter(this, new ArrayList<HAElement>()));
+    lsView.setAdapter(new HAElementArrayAdapter(getActivity(), new ArrayList<HAElement>()));
   }
 
-  @Override
   public void setData(List<HAElement> data) {
     if (data.isEmpty()) {
-      TextView emptyView = (TextView) findViewById(R.id.emptyView);
+      TextView emptyView = (TextView) getView().findViewById(R.id.emptyView);
       emptyView.setText("Keine Hausaufgaben!");
     }
 
-    ListView list = (ListView) findViewById(R.id.lsViewHomework);
+    ListView list = (ListView) getView().findViewById(R.id.lsViewHomework);
     list.clearChoices();
     list.requestLayout();
 
-    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
     boolean filter = prefs.getBoolean(MainActivity.PREF_FILTERSUBJECTS, false);
     String chosenSubjects = prefs.getString(MainActivity.PREF_CHOSENSUBJECTS, "");
 
@@ -421,89 +425,28 @@ public class HomeworkDetailActivity extends Activity
       filteredData = data;
     }
 
-    // TODO: Not necessary anymore, already getting the data according to EXTRA_DATE
-    // Filter by date, according to EXTRA_DATE
-    List<HAElement> selectedData = new ArrayList<HAElement>();
-    String strDate = getIntent().getStringExtra(EXTRA_DATE);
-    boolean all;
-    Date date = new Date();
-
-    SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
-
-    if (strDate.equals("all")) {
-      Calendar cal = Calendar.getInstance();
-      if (!prefs.getBoolean(MainActivity.PREF_HOMEWORKTODAY, false)) {
-        cal.add(Calendar.DAY_OF_MONTH, 1);
-      }
-      date = cal.getTime();
-      all = true;
-    } else {
-      try {
-        date = dateFormatter.parse(strDate);
-      } catch (ParseException e) {
-        Log.wtf(TAG, "Invalid date format: ", e);
-      }
-      all = false;
-    }
-    Calendar cal = Calendar.getInstance();
-    cal.setTime(date);
-    cal.set(Calendar.HOUR_OF_DAY, 00);
-    cal.set(Calendar.MINUTE, 00);
-    cal.set(Calendar.SECOND, 00);
-    cal.set(Calendar.MILLISECOND, 00);
-
-    date = cal.getTime();
-
-    for (int i = 0; i < filteredData.size(); i++) {
-      if (filteredData.get(i).date.equals("")) {
-        selectedData.add(filteredData.get(i));
-        continue;
-      }
-      Date elemDate = new Date();
-      try {
-        elemDate = dateFormatter.parse(filteredData.get(i).date);
-      } catch (ParseException e) {
-        Log.e(TAG, "Failed parsing homework date: ", e);
-        continue;
-      }
-
-      if (all) {
-        if (elemDate.getTime() >= date.getTime()) {
-          selectedData.add(filteredData.get(i));
-        }
-      } else {
-        Calendar elemCal = Calendar.getInstance();
-        elemCal.setTime(elemDate);
-        if (elemCal.get(Calendar.MONTH) == cal.get(Calendar.MONTH) &&
-            elemCal.get(Calendar.DAY_OF_MONTH) == cal.get(Calendar.DAY_OF_MONTH)) {
-          selectedData.add(filteredData.get(i));
-        }
-      }
-
-    }
-
-    SharedPreferences preferences = getSharedPreferences(MainActivity.PREF_NAME, 0);
+    SharedPreferences preferences = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
     Set<String> doneItems = preferences.getStringSet(MainActivity.PREF_DONEITEMS2, null);
     if (doneItems == null) {
       doneItems = new HashSet<String>();
     }
 
-    for (HAElement element : selectedData) {
+    for (HAElement element : filteredData) {
       if (doneItems.contains(element.id)) {
         element.title += " [Erledigt]";
       }
     }
 
-    if (selectedData.size() == 0) {
+    if (filteredData.size() == 0) {
       HAElement noHomework = new HAElement();
       noHomework.id = "0";
       noHomework.date = "";
       noHomework.title = "Keine Hausaufgaben!";
       noHomework.subject = "";
       noHomework.desc = "Wir haben keine Hausaufgaben!";
-      selectedData.add(noHomework);
+      filteredData.add(noHomework);
     }
 
-    list.setAdapter(new HAElementArrayAdapter(this, selectedData));
+    list.setAdapter(new HAElementArrayAdapter(getActivity(), filteredData));
   }
 }

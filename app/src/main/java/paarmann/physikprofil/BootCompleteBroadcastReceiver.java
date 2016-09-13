@@ -18,6 +18,8 @@ import android.preference.PreferenceManager;
 import java.util.Calendar;
 import java.util.Set;
 
+import paarmann.physikprofil.ui.MainActivity;
+
 /**
  * Broadcast receiver for re-registering all alarms in the system after a reboot.
  */

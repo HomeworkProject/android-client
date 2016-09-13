@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016  Sebastian Paarmann
+  ~ Licensed under the MIT license, see the LICENSE file
+  -->
+
+<resources>
+
+    <style name="AppTheme" parent="AppTheme.Base">
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
+
+    <style name="ToolbarTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:actionMenuTextColor">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="android:homeAsUpIndicator">@drawable/ic_drawer</item>
+    </style>
+
+</resources>

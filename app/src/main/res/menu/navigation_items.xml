@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016  Sebastian Paarmann
+  ~ Licensed under the MIT license, see the LICENSE file
+  -->
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/nav_section_top"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/ic_launcher"
+            android:title="Hausaufgaben" />
+        <item
+            android:id="@+id/nav_add_homework"
+            android:title="Hausaufgaben hinzufügen" />
+        <item
+            android:id="@+id/nav_reminders"
+            android:icon="@drawable/ic_action_add_alarm"
+            android:title="Erinnerungen" />
+    </group>
+
+    <group
+        android:id="@+id/nav_section_bottom"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_logout"
+            android:title="Logout" />
+
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_action_settings"
+            android:title="Settings" />
+    </group>
+
+</menu>

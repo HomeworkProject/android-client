@@ -68,5 +68,7 @@
     <string name="title_activity_add_homework">Hausaufgabe hinzufügen</string>
     <string name="title_activity_login">Login</string>
     <string name="action_delete">Löschen</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
 </resources>

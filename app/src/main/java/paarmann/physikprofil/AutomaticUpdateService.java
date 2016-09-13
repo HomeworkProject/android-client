@@ -37,7 +37,7 @@ public class AutomaticUpdateService extends IntentService {
     Date startDate = cal.getTime();
     cal.add(Calendar.DAY_OF_MONTH, 64); // Server limits to 64 days
     Date endDate = cal.getTime();
-    HomeworkManager.getHomework(this, startDate, endDate, hw -> {
+    HomeworkManager.getHomework(this, startDate, endDate, (hw, loginResult) -> {
       done = true;
     }, true);
 

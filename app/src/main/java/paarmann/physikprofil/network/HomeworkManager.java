@@ -24,7 +24,8 @@ import paarmann.physikprofil.Log;
 public class HomeworkManager {
 
   public interface GetHWListener {
-    public void onHomeworkReceived(List<HAElement> homework);
+    public void onHomeworkReceived(List<HAElement> homework,
+                                   LoginResultListener.Result loginResult);
   }
 
   public interface AddHWListener {
@@ -44,19 +45,16 @@ public class HomeworkManager {
   public static void getHomework(Context ctx, Date date, GetHWListener listener, boolean silent) {
     LoginManager.getHWMgr(ctx, (mgr, result) -> {
 
-      // TODO: Deal with result
-
-      if (mgr == null) {
-        listener.onHomeworkReceived(new ArrayList<>());
-        return;
+      if (result == LoginResultListener.Result.LOGGED_IN) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        mgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
+          OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener, result);
+        });
+      } else {
+        OnGetHWDone(ctx, null, listener, result);
       }
-
-      Calendar cal = Calendar.getInstance();
-      cal.setTime(date);
-      mgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
-                  cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-        OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener);
-      });
     }, silent);
   }
 
@@ -69,23 +67,20 @@ public class HomeworkManager {
                                  GetHWListener listener, boolean silent) {
     LoginManager.getHWMgr(ctx, (mgr, result) -> {
 
-      // TODO: Deal with result
-
-      if (mgr == null) {
-        listener.onHomeworkReceived(new ArrayList<>());
-        return;
+      if (result == LoginResultListener.Result.LOGGED_IN) {
+        Calendar calStart = Calendar.getInstance();
+        Calendar calEnd = Calendar.getInstance();
+        calStart.setTime(startDate);
+        calEnd.setTime(endDate);
+        mgr.getHWBetween(calStart.get(Calendar.YEAR), calStart.get(Calendar.MONTH) + 1,
+                         calStart.get(Calendar.DAY_OF_MONTH),
+                         calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
+                         calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
+          OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener, result);
+        });
+      } else {
+        OnGetHWDone(ctx, null, listener, result);
       }
-
-      Calendar calStart = Calendar.getInstance();
-      Calendar calEnd = Calendar.getInstance();
-      calStart.setTime(startDate);
-      calEnd.setTime(endDate);
-      mgr.getHWBetween(calStart.get(Calendar.YEAR), calStart.get(Calendar.MONTH) + 1,
-                       calStart.get(Calendar.DAY_OF_MONTH),
-                       calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
-                       calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-        OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener);
-      });
     }, silent);
   }
 
@@ -149,19 +144,26 @@ public class HomeworkManager {
     }, silent);
   }
 
-  private static void OnGetHWDone(Context ctx, IHWFuture<List<IHWObj>> hwFuture, GetHWListener listener) {
-    if (hwFuture.errorCode() != IHWFuture.ERRORCodes.OK) {
+  private static void OnGetHWDone(Context ctx, IHWFuture<List<IHWObj>> hwFuture,
+                                  GetHWListener listener, LoginResultListener.Result loginResult) {
+    HAElement error = new HAElement();
+    error.id = "0";
+    error.flags = HAElement.FLAG_ERROR;
+    error.date = "";
+    error.title = "Fehler";
+    error.desc = "Beim herunterladen der Hausaufgaben ist ein Fehler aufgetreten.";
+    List<HAElement> list = new ArrayList<>(1);
+
+    if (hwFuture == null) {
+      Log.e(TAG, "GetHW could not login.");
+      error.subject = "Nicht eingeloggt";
+    } else if (hwFuture.errorCode() != IHWFuture.ERRORCodes.OK) {
       Log.e(TAG, "GetHW returned error: " + hwFuture.errorCode());
-      HAElement error = new HAElement();
-      error.id = "0";
-      error.flags = HAElement.FLAG_ERROR;
-      error.date = "";
-      error.title = "Fehler";
       error.subject = String.valueOf(hwFuture.errorCode()); // TODO
-      error.desc = "Beim herunterladen der Hausaufgaben ist ein Fehler aufgetreten.";
-      List<HAElement> list = new ArrayList<>(1);
+    }
+    if (hwFuture == null || hwFuture.errorCode() != IHWFuture.ERRORCodes.OK) {
       list.add(error);
-      listener.onHomeworkReceived(list);
+      listener.onHomeworkReceived(list, loginResult);
       return;
     }
 
@@ -181,7 +183,7 @@ public class HomeworkManager {
 
     AutomaticReminderManager.setReminders(ctx, elements);
 
-    listener.onHomeworkReceived(elements);
+    listener.onHomeworkReceived(elements, loginResult);
   }
 
   private static void OnAddHWDone(IHWFuture<Boolean> future, AddHWListener listener) {

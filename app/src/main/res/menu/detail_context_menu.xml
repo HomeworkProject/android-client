@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".HomeworkDetailActivity">
+    tools:context=".ui.HomeworkDetailActivity">
     <item
         android:id="@+id/action_done"
         android:icon="@drawable/ic_action_edit"

@@ -12,16 +12,15 @@ import android.app.TaskStackBuilder;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Vibrator;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import paarmann.physikprofil.ui.HomeworkDetailFragment;
+import paarmann.physikprofil.ui.MainActivity;
 
 /**
  * {@code BroadcastReceiver} that shows a notification for the received Reminder, plays the users
@@ -37,11 +36,12 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
     Reminder reminder = Reminder.fromUri(context, data);
 
-    Intent clickIntent = new Intent(context, HomeworkDetailActivity.class);
-    clickIntent.putExtra(HomeworkDetailActivity.EXTRA_DATE, "all");
+    Intent clickIntent = new Intent(context, MainActivity.class);
+    clickIntent.putExtra(HomeworkDetailFragment.EXTRA_DATE, "all");
+    clickIntent.putExtra(MainActivity.EXTRA_OPEN_VIEW, MainActivity.Views.HOMEWORK_DETAIL.name());
 
     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-    stackBuilder.addParentStack(HomeworkDetailActivity.class);
+    stackBuilder.addParentStack(MainActivity.class);
     stackBuilder.addNextIntent(clickIntent);
 
     PendingIntent

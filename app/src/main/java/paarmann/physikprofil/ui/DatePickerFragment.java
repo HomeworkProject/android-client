@@ -1,9 +1,9 @@
 /*
- * Copyright (c) 2015  Sebastian Paarmann
+ * Copyright (c) 2016  Sebastian Paarmann
  * Licensed under the MIT license, see the LICENSE file
  */
 
-package paarmann.physikprofil;
+package paarmann.physikprofil.ui;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

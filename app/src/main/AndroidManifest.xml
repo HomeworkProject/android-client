@@ -14,7 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,28 +23,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".HomeworkDetailActivity"
-            android:label="@string/title_activity_homework_detail"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="paarmann.physikprofil.MainActivity" />
-        </activity>
-        <activity
-            android:name=".ManageRemindersActivity"
-            android:label="@string/title_activity_manage_reminders"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="paarmann.physikprofil.MainActivity" />
-        </activity>
-        <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".ui.MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="paarmann.physikprofil.MainActivity" />
+                android:value=".ui.MainActivity" />
         </activity>
 
         <receiver android:name=".ReminderBroadcastReceiver">
@@ -62,23 +46,6 @@
             android:name=".AutomaticUpdateService"
             android:enabled="true" />
 
-        <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="paarmann.physikprofil.MainActivity" />
-        </activity>
-
-        <activity
-            android:name=".AddHomeworkActivity"
-            android:label="@string/title_activity_add_homework"
-            android:parentActivityName=".MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="paarmann.physikprofil.MainActivity" />
-        </activity>
     </application>
 
 </manifest>
