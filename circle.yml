@@ -2,14 +2,11 @@
 checkout:
   post:
     - git submodule sync
-    - git submodule update --init
-    - git submodule update --init:
-        pwd:
-            homework_server_cdk
+    - git submodule update --init --recursive
 
 # fix gradlew not begin marked as executable
 dependencies:
   override:
-    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,android-24,build-tools-24.0.1
+    - echo y | android update sdk --no-ui --all --filter tool,extra-android-m2repository,extra-android-support,android-24,build-tools-24.0.1
     - chmod +x ./gradlew
     - ./gradlew dependencies
