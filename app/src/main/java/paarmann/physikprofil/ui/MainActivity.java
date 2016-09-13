@@ -171,6 +171,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+
+    if (!LoginManager.loadCredentials(this)) {
+      showView(Views.LOGIN);
+    }
   }
 
   @Override
