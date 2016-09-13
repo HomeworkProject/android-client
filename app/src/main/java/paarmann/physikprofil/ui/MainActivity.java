@@ -10,6 +10,7 @@ import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -122,24 +123,24 @@ public class MainActivity extends AppCompatActivity {
     navigationView.setNavigationItemSelectedListener(item -> {
       switch (item.getItemId()) {
         case R.id.nav_home:
-          showMainView();
+          showView(Views.MAIN);
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_add_homework:
-          showAddHomeworkView();
+          showView(Views.ADD_HOMEWORK);
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_reminders:
-          showRemindersView();
+          showView(Views.MANAGE_REMINDERS);
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_logout:
           LoginManager.removeCredentials(this);
-          showLoginView();
+          showView(Views.LOGIN);
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_settings:
-          showSettingsView();
+          showView(Views.SETTINGS);
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         default:
@@ -158,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
       }
     };
     drawerLayout.addDrawerListener(drawerToggle);
+
+    getFragmentManager().addOnBackStackChangedListener(this::onBackStackChanged);
 
     if (getIntent().hasExtra(EXTRA_OPEN_VIEW)) {
       showView(Views.valueOf(getIntent().getStringExtra(EXTRA_OPEN_VIEW)));
@@ -225,6 +228,23 @@ public class MainActivity extends AppCompatActivity {
     }
   }
 
+  private void onBackStackChanged() {
+    Fragment frag = getFragmentManager().findFragmentById(R.id.content_frame);
+
+    if (frag instanceof MainFragment)
+      currentView = Views.MAIN;
+    else if (frag instanceof HomeworkDetailFragment)
+      currentView = Views.HOMEWORK_DETAIL;
+    else if (frag instanceof AddHomeworkFragment)
+      currentView = Views.ADD_HOMEWORK;
+    else if (frag instanceof ManagerRemindersFragment)
+      currentView = Views.MANAGE_REMINDERS;
+    else if (frag instanceof LoginFragment)
+      currentView = Views.LOGIN;
+    else if (frag instanceof SettingsFragment)
+      currentView = Views.SETTINGS;
+  }
+
   private void showView(Fragment frag, Views view) {
     if (getCurrentFocus() != null) {
       InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
@@ -232,10 +252,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     fragment = frag;
-    currentView = view;
     FragmentManager manager = getFragmentManager();
-    manager.beginTransaction().replace(R.id.content_frame, fragment).commit();
+    FragmentTransaction transaction = manager.beginTransaction().replace(R.id.content_frame, fragment);
+    if ((currentView == Views.MAIN
+        || view == Views.ADD_HOMEWORK
+        || view == Views.MANAGE_REMINDERS
+        || view == Views.SETTINGS)
+        && view != Views.MAIN
+        && currentView != view) {
+     transaction.addToBackStack(null);
+    }
+    transaction.commit();
 
+    currentView = view;
     invalidateOptionsMenu();
   }
 
