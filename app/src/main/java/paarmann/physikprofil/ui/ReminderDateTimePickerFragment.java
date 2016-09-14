@@ -16,12 +16,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TimePicker;
+import android.widget.Toast;
+
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -152,28 +156,17 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
             AlarmManager
                 alarmManager =
                 (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
-            String strDate = dateButton.getText() + " " + timeButton.getText();
             Date when = null;
             try {
-              when = new SimpleDateFormat("dd.MM.yyyy HH:mm").parse(strDate);
-            } catch (ParseException e) {
+              Calendar cal = Calendar.getInstance();
+              cal.setTime(getDate().getTime());
+              cal.set(Calendar.HOUR_OF_DAY, getTime().get(Calendar.HOUR_OF_DAY));
+              cal.set(Calendar.MINUTE, getTime().get(Calendar.MINUTE));
+              cal.set(Calendar.SECOND, 0);
+              when = cal.getTime();
+            } catch (NullPointerException e) {
               return; //No date and/or no time set
             }
-//            String scheme = "homework";
-//            String
-//                ssp =
-//                when.getTime()
-//                + "\\";                        // AlarmTime\id~Date~Title~Subject~Desc\id~Date~Title~Subject~Desc\....
-//            for (int i = 0; i < selectedListItems.size(); i++) {
-//              HAElement element = selectedListItems.get(i);
-//              ssp += element.id + "~"
-//                     + element.date + "~"
-//                     + element.title + "~"
-//                     + element.subject + "~"
-//                     + element.desc + "\\";
-//            }
-
-            //Uri uri = Uri.fromParts(scheme, ssp, "");
 
             Reminder reminder = new Reminder(when, selectedListItems);
             Uri uri = reminder.toUri();
@@ -183,26 +176,15 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
                 new Intent(MainActivity.ACTION_REMIND, uri, getActivity(),
                            ReminderBroadcastReceiver.class);
             PendingIntent pendingIntent = PendingIntent.getBroadcast(getActivity(), 0, intent, 0);
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
               alarmManager.setExact(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
             } else {
               alarmManager.set(AlarmManager.RTC_WAKEUP, when.getTime(), pendingIntent);
             }
 
-//            SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREF_NAME, 0);
-//            SharedPreferences.Editor editor = prefs.edit();
-//            Set<String> setReminders;
-//            if (prefs.contains(MainActivity.PREF_SETREMINDERS)) {
-//              setReminders = new HashSet<String>();
-//              setReminders.addAll(prefs.getStringSet(MainActivity.PREF_SETREMINDERS, null));
-//            } else {
-//              setReminders = new HashSet<String>();
-//            }
-//            setReminders.add(ssp);
-//            editor.putStringSet(MainActivity.PREF_SETREMINDERS, setReminders);
-//            editor.commit();
-
             reminder.save(getActivity());
+
+            Toast.makeText(getActivity(), "Erinnerung erstellt", Toast.LENGTH_SHORT).show();
           }
         })
         .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -215,16 +197,28 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
     return builder.create();
   }
 
+  private Calendar _date;
+  private Calendar getDate() {
+    return _date;
+  }
   private void setDate(Calendar date) {
     Button dateButton = (Button) layout.findViewById(R.id.dateButton);
     String strDate = DateFormat.getDateInstance().format(date.getTime());
     dateButton.setText(strDate);
+
+    _date = date;
   }
 
+  private Calendar _time;
+  private Calendar getTime() {
+    return _time;
+  }
   private void setTime(Calendar time) {
     Button timeButton = (Button) layout.findViewById(R.id.timeButton);
     String strTime = new SimpleDateFormat("HH:mm").format(time.getTime());
     timeButton.setText(strTime);
+
+    _time = time;
   }
 
 }
