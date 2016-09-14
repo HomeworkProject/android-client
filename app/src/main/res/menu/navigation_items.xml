@@ -24,7 +24,7 @@
 
     <group
         android:id="@+id/nav_section_bottom"
-        android:checkableBehavior="none">
+        android:checkableBehavior="single">
         <item
             android:id="@+id/nav_logout"
             android:title="Logout" />

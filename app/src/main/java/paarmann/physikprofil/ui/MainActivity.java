@@ -270,6 +270,27 @@ public class MainActivity extends AppCompatActivity {
 
     currentView = view;
     invalidateOptionsMenu();
+
+    switch (view) {
+      case MAIN:
+        navigationView.setCheckedItem(R.id.nav_home);
+        break;
+      case HOMEWORK_DETAIL:
+        navigationView.setCheckedItem(R.id.nav_home);
+        break;
+      case ADD_HOMEWORK:
+        navigationView.setCheckedItem(R.id.nav_add_homework);
+        break;
+      case MANAGE_REMINDERS:
+        navigationView.setCheckedItem(R.id.nav_reminders);
+        break;
+      case LOGIN:
+        navigationView.setCheckedItem(R.id.nav_logout);
+        break;
+      case SETTINGS:
+        navigationView.setCheckedItem(R.id.nav_settings);
+        break;
+    }
   }
 
   private void showView(Views view) {
