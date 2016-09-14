@@ -127,12 +127,17 @@ public class HomeworkDetailFragment extends Fragment {
         MenuInflater inflater = mode.getMenuInflater();
         inflater.inflate(R.menu.detail_context_menu, menu);
         actionMode = mode;
+
+        getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
+
         return true;
       }
 
       @Override
       public void onDestroyActionMode(ActionMode mode) {
         actionMode = null;
+
+        getActivity().findViewById(R.id.toolbar).setVisibility(View.VISIBLE);
       }
 
       @Override
@@ -340,15 +345,6 @@ public class HomeworkDetailFragment extends Fragment {
     TextView emptyView = (TextView) root.findViewById(R.id.emptyView);
     ListView listView = (ListView) root.findViewById(R.id.lsViewHomework);
     listView.setEmptyView(emptyView);
-
-    /*
-    if (forceDownload) {
-      clearData();
-    }
-    HomeworkUpdater loader = new HomeworkUpdater(this);
-    loader.setOnHomeworkLoadedListener(this);
-    loader.getData(forceDownload);
-    */
 
     HomeworkManager.GetHWListener myListener = (hw, loginResult) -> {
       if (getActivity() != null) getActivity().runOnUiThread(() -> {
