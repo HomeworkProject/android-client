@@ -11,7 +11,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_launcher"
+            android:icon="@mipmap/ic_launcher"
             android:title="Hausaufgaben" />
         <item
             android:id="@+id/nav_add_homework"

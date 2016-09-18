@@ -61,7 +61,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
     Notification.Builder builder =
         new Notification.Builder(context)
-            .setSmallIcon(R.drawable.ic_launcher)
+            .setSmallIcon(R.mipmap.ic_launcher)
             .setContentTitle("Hausaufgaben")
             .setContentText(notificationText)
             .setAutoCancel(true)
