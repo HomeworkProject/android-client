@@ -39,6 +39,8 @@ import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TabHost;
 
+import com.bugsnag.android.Bugsnag;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.BufferedInputStream;
@@ -107,6 +109,8 @@ public class MainActivity extends AppCompatActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+    Bugsnag.init(this);
+
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
