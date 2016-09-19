@@ -95,8 +95,6 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
           DatePickerDialog
               dialog =
               new DatePickerDialog(getActivity(), listener, initYear, initMonth, initDay);
-          dialog.getDatePicker().setSpinnersShown(false);
-          dialog.getDatePicker().setCalendarViewShown(true);
           dialog.show();
         } catch (ParseException e) {
           Log.wtf(TAG, "error parsing date", e);

@@ -5,17 +5,22 @@
 
 package paarmann.physikprofil.ui;
 
+import android.app.DatePickerDialog;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.main.HWMgr;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import paarmann.physikprofil.HAElement;
 import paarmann.physikprofil.R;
@@ -25,6 +30,8 @@ public class AddHomeworkFragment extends Fragment {
 
   public static final String TAG = "AddHomeworkFragment";
 
+  private Calendar selectedDate = null;
+
   @Nullable
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -32,19 +39,50 @@ public class AddHomeworkFragment extends Fragment {
     View root = inflater.inflate(R.layout.fragment_add_homework, container, false);
 
     root.findViewById(R.id.btnAddHomework).setOnClickListener(this::onBtnAddHomeworkClick);
+    root.findViewById(R.id.btnChooseDate).setOnClickListener(this::onBtnChooseDateClick);
 
     return root;
   }
 
+  public void onBtnChooseDateClick(View view) {
+    Calendar initialDate;
+    if (selectedDate != null) {
+      initialDate = selectedDate;
+    } else {
+      initialDate = Calendar.getInstance();
+      selectedDate = initialDate;
+      initialDate.add(Calendar.DAY_OF_MONTH, 1);
+    }
+
+    int initialYear = initialDate.get(Calendar.YEAR);
+    int initialMonth = initialDate.get(Calendar.MONTH);
+    int initialDay = initialDate.get(Calendar.DAY_OF_MONTH);
+
+    DatePickerDialog dialog = new DatePickerDialog(getActivity(), (v, y, m, d) -> {
+      setDate(y, m, d);
+    }, initialYear, initialMonth, initialDay);
+
+    dialog.show();
+  }
+
+  private void setDate(int y, int m, int d) {
+    selectedDate.set(y, m, d);
+
+    Button btnChooseDate = (Button) getView().findViewById(R.id.btnChooseDate);
+    btnChooseDate.setText(DateFormat.getDateInstance().format(selectedDate.getTime()));
+  }
 
   public void onBtnAddHomeworkClick(View view) {
-    String
-        strDate =
-        ((EditText) getView().findViewById(R.id.txtDate)).getText()
-            .toString(); // TODO: Make proper date selector
     String title = ((EditText) getView().findViewById(R.id.txtTitle)).getText().toString();
     String subject = ((EditText) getView().findViewById(R.id.txtSubject)).getText().toString();
     String desc = ((EditText) getView().findViewById(R.id.txtDescription)).getText().toString();
+
+    if (selectedDate == null) {
+      Toast.makeText(getActivity(), "Es muss ein Datum ausgewählt werden.", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    String strDate = new SimpleDateFormat("yyyy-MM-dd").format(selectedDate.getTime());
 
     final HAElement element = new HAElement();
     element.date = strDate;
