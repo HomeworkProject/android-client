@@ -11,15 +11,19 @@
 
 		<Button
 			android:id="@+id/dateButton"
-			android:layout_width="wrap_content"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-			style="?android:attr/spinnerStyle" />
+			android:layout_weight="1"
+			android:hint="Datum wählen"
+			style="@style/SpinnerButtonStyle" />
 
 		<Button
 			android:id="@+id/timeButton"
-			android:layout_width="wrap_content"
+			android:layout_width="0dp"
 			android:layout_height="wrap_content"
-		    style="?android:attr/spinnerStyle" />
+			android:layout_weight="1"
+			android:hint="Zeit wählen"
+		    style="@style/SpinnerButtonStyle" />
 
 	</LinearLayout>
 

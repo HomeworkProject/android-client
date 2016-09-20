@@ -67,9 +67,6 @@ public class ReminderDateTimePickerFragment extends DialogFragment {
     final Button dateButton = (Button) layout.findViewById(R.id.dateButton);
     final Button timeButton = (Button) layout.findViewById(R.id.timeButton);
 
-    dateButton.setText("Datum wählen");
-    timeButton.setText("Zeit wählen");
-
     final ArrayList<HAElement>
         selectedListItems =
         (ArrayList<HAElement>) getArguments().getSerializable("selectedListItems");

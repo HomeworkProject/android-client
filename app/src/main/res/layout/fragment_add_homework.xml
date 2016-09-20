@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         style="@style/SpinnerButtonStyle"
         android:textAlignment="viewStart"
+        android:hint="Datum"
         android:gravity="start" />
 
     <EditText
@@ -42,7 +43,6 @@
         android:id="@+id/btnAddHomework"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:onClick="onBtnAddHomeworkClick"
         android:text="Hausaufgabe hinzufügen" />
 
 
