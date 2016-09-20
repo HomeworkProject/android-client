@@ -66,7 +66,7 @@ public class AddHomeworkFragment extends Fragment {
   }
 
   private void setDate(int y, int m, int d) {
-    selectedDate.set(y, m, d);
+    selectedDate.set(y, m, d, 0, 0, 0);
 
     Button btnChooseDate = (Button) getView().findViewById(R.id.btnChooseDate);
     btnChooseDate.setText(DateFormat.getDateInstance().format(selectedDate.getTime()));
@@ -79,6 +79,16 @@ public class AddHomeworkFragment extends Fragment {
 
     if (selectedDate == null) {
       Toast.makeText(getActivity(), "Es muss ein Datum ausgewählt werden.", Toast.LENGTH_SHORT).show();
+      return;
+    }
+
+    Calendar today = Calendar.getInstance();
+    today.set(Calendar.HOUR_OF_DAY, 0);
+    today.set(Calendar.MINUTE, 0);
+    today.set(Calendar.SECOND, 0);
+
+    if (selectedDate.before(today)) {
+      Toast.makeText(getActivity(), "Das Datum darf nicht vor heute liegen!", Toast.LENGTH_SHORT).show();
       return;
     }
 
