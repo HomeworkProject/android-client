@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
     drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
     navigationView = (NavigationView) findViewById(R.id.navigation);
     drawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-    //drawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.actionBarColor));
 
     navigationView.setNavigationItemSelectedListener(item -> {
       switch (item.getItemId()) {
@@ -251,6 +250,10 @@ public class MainActivity extends AppCompatActivity {
       currentView = Views.LOGIN;
     else if (frag instanceof SettingsFragment)
       currentView = Views.SETTINGS;
+    else
+      Log.w(TAG, "Fragment displayed not recognized!");
+
+    updateNavDrawerSelection(currentView);
   }
 
   private void showView(Fragment frag, Views view) {
@@ -261,20 +264,26 @@ public class MainActivity extends AppCompatActivity {
 
     fragment = frag;
     FragmentManager manager = getFragmentManager();
-    FragmentTransaction transaction = manager.beginTransaction().replace(R.id.content_frame, fragment);
+    FragmentTransaction
+        transaction =
+        manager.beginTransaction().replace(R.id.content_frame, fragment);
     if ((currentView == Views.MAIN
-        || view == Views.ADD_HOMEWORK
-        || view == Views.MANAGE_REMINDERS
-        || view == Views.SETTINGS)
+         || view == Views.ADD_HOMEWORK
+         || view == Views.MANAGE_REMINDERS
+         || view == Views.SETTINGS)
         && view != Views.MAIN
         && currentView != view) {
-     transaction.addToBackStack(null);
+      transaction.addToBackStack(null);
     }
     transaction.commit();
 
     currentView = view;
     invalidateOptionsMenu();
 
+    updateNavDrawerSelection(view);
+  }
+
+  private void updateNavDrawerSelection(Views view) {
     switch (view) {
       case MAIN:
         navigationView.setCheckedItem(R.id.nav_home);
