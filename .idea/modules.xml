@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/PhysikProfil.iml" filepath="$PROJECT_DIR$/PhysikProfil.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/homework_server_cdk/homework_server_cdk.iml" filepath="$PROJECT_DIR$/homework_server_cdk/homework_server_cdk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/homework_server_cdk/submodules/javacommon/javacommon.iml" filepath="$PROJECT_DIR$/homework_server_cdk/submodules/javacommon/javacommon.iml" />
     </modules>
   </component>
 </project>
