@@ -24,6 +24,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,6 +47,8 @@ import paarmann.physikprofil.Log;
 import paarmann.physikprofil.R;
 import paarmann.physikprofil.network.HomeworkManager;
 import paarmann.physikprofil.network.LoginResultListener;
+
+import static android.view.View.GONE;
 
 public class HomeworkDetailFragment extends Fragment {
 
@@ -128,7 +131,7 @@ public class HomeworkDetailFragment extends Fragment {
         inflater.inflate(R.menu.detail_context_menu, menu);
         actionMode = mode;
 
-        getActivity().findViewById(R.id.toolbar).setVisibility(View.GONE);
+        getActivity().findViewById(R.id.toolbar).setVisibility(GONE);
 
         return true;
       }
@@ -342,9 +345,11 @@ public class HomeworkDetailFragment extends Fragment {
   }
 
   private void loadHomework(View root, boolean forceDownload) {
-    TextView emptyView = (TextView) root.findViewById(R.id.emptyView);
+    ProgressBar loadingIcon = (ProgressBar) root.findViewById(R.id.loadingIcon);
     ListView listView = (ListView) root.findViewById(R.id.lsViewHomework);
-    listView.setEmptyView(emptyView);
+
+    listView.setVisibility(View.GONE);
+    loadingIcon.setVisibility(View.VISIBLE);
 
     HomeworkManager.GetHWListener myListener = (hw, loginResult) -> {
       if (getActivity() != null) getActivity().runOnUiThread(() -> {
@@ -380,21 +385,7 @@ public class HomeworkDetailFragment extends Fragment {
     }
   }
 
-  private void clearData() {
-    TextView emptyView = (TextView) getView().findViewById(R.id.emptyView);
-    emptyView.setText(getResources().getString(R.string.emptyText));
-
-    ListView lsView = (ListView) getView().findViewById(R.id.lsViewHomework);
-    lsView.setEmptyView(emptyView);
-    lsView.setAdapter(new HAElementArrayAdapter(getActivity(), new ArrayList<HAElement>()));
-  }
-
   public void setData(List<HAElement> data) {
-    if (data.isEmpty()) {
-      TextView emptyView = (TextView) getView().findViewById(R.id.emptyView);
-      emptyView.setText("Keine Hausaufgaben!");
-    }
-
     ListView list = (ListView) getView().findViewById(R.id.lsViewHomework);
     list.clearChoices();
     list.requestLayout();
@@ -444,5 +435,9 @@ public class HomeworkDetailFragment extends Fragment {
     }
 
     list.setAdapter(new HAElementArrayAdapter(getActivity(), filteredData));
+
+    ProgressBar loadingIcon = (ProgressBar) getView().findViewById(R.id.loadingIcon);
+    loadingIcon.setVisibility(GONE);
+    list.setVisibility(View.VISIBLE);
   }
 }
