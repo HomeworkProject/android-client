@@ -48,15 +48,15 @@
       android:summary="@string/pref_instantautoreminders_summary"
       android:defaultValue="false" />
 
-    <paarmann.physikprofil.NumberPickerPreference
+    <de.s_paarmann.homeworkapp.NumberPickerPreference
       android:key="paarmann.physikprofil.ReminderDay"
       android:title="@string/pref_reminderday"
       android:summary="@string/pref_reminderday_summary"
-      custom:maxValue="14"
-      custom:minValue="1"
       android:defaultValue="1" />
+<!--custom:maxValue="14"
+      custom:minValue="1"-->
 
-     <paarmann.physikprofil.TimePreference
+     <de.s_paarmann.homeworkapp.TimePreference
       android:key="paarmann.physikprofil.ReminderTime"
       android:title="@string/pref_remindertime"
       android:summary="@string/pref_remindertime_summary"
