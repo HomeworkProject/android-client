@@ -109,6 +109,8 @@ public class AddHomeworkFragment extends Fragment {
         if (getActivity() != null) getActivity().runOnUiThread(() -> {
           Toast.makeText(getActivity(), "Hausaufgabe hinzugefügt.", Toast.LENGTH_SHORT).show();
           dialog.dismiss();
+
+          ((MainActivity) getActivity()).showMainView();
         });
       } else {
         String msg;
