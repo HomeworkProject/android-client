@@ -7,6 +7,7 @@ package paarmann.physikprofil.ui;
 
 import android.app.DatePickerDialog;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -100,10 +101,14 @@ public class AddHomeworkFragment extends Fragment {
     element.subject = subject;
     element.desc = desc;
 
+    final ProgressDialog dialog = ProgressDialog.show(getActivity(), "",
+      "Hausaufgabe wird hinzugefügt.", true, false);
+
     HomeworkManager.addHomework(getActivity(), element, result -> {
       if (result == IHWFuture.ERRORCodes.OK) {
         if (getActivity() != null) getActivity().runOnUiThread(() -> {
           Toast.makeText(getActivity(), "Hausaufgabe hinzugefügt.", Toast.LENGTH_SHORT).show();
+          dialog.dismiss();
         });
       } else {
         String msg;
@@ -114,6 +119,7 @@ public class AddHomeworkFragment extends Fragment {
         }
         if (getActivity() != null) getActivity().runOnUiThread(() -> {
           Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+          dialog.dismiss();
         });
       }
     });
