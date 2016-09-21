@@ -26,6 +26,8 @@ public class HAElement implements java.io.Serializable {
   public static int FLAG_WARN = 0x2;
   /** Is a pseudo element for displaying an error to the user */
   public static int FLAG_ERROR = 0x4;
+  /** Is a pseudo element for displaying an information to the user */
+  public static int FLAG_INFO = 0x8;
 
   public String id;
   public int flags;

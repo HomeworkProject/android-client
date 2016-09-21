@@ -149,35 +149,56 @@ public class HomeworkDetailFragment extends Fragment {
         Set<String>
             doneItems =
             prefs.getStringSet(MainActivity.PREF_DONEITEMS2, new HashSet<String>());
+
+        MenuItem doneMenuItem = menu.findItem(R.id.action_done);
+        MenuItem addReminderMenuItem = menu.findItem(R.id.action_remind);
+        MenuItem deleteMenuItem = menu.findItem(R.id.action_delete);
+
+        // Check if item is already marked as done, see also markItemsDone. (Done items are not yet
+        // using the new HAElement system)
         boolean unmarkItems = false;
         for (int position : checkedItems) {
-          // Check if item is already marked as done, see also markItemsDone. (Done items are not yet
-          // using the new HAElement system)
-          HAElement element = (HAElement) listView.getItemAtPosition(position);
+         HAElement element = (HAElement) listView.getItemAtPosition(position);
           if (doneItems.contains(element.id)) {
             unmarkItems = true;
             break;
           }
         }
 
-        MenuItem item = menu.findItem(R.id.action_done);
-        if (unmarkItems) {
-          item.setIcon(R.drawable.ic_action_cancel);
-          item.setTitle("Als nicht erledigt markieren");
-          markItemsDone = false;
-        } else {
-          item.setIcon(R.drawable.ic_action_edit);
-          item.setTitle(R.string.action_done);
-          markItemsDone = true;
+        // Only allow deleting one item at a time for now
+        boolean allowDeleting = checkedItems.size() == 1;
+
+        // Disallow setting reminders, deleting and marking as done for warnings and errors
+        boolean allowActions = true;
+        for (int position : checkedItems) {
+          HAElement element = (HAElement) listView.getItemAtPosition(position);
+          Log.d(TAG, element.title + ": " + element.flags);
+          if ((element.flags & (HAElement.FLAG_ERROR
+                                | HAElement.FLAG_WARN
+                                | HAElement.FLAG_INFO)) != 0) {
+            allowActions = false;
+            break;
+          }
         }
 
-        // Only allow deleting one item at a time for now
-        item = menu.findItem(R.id.action_delete);
-        if (checkedItems.size() > 1) {
-          item.setVisible(false);
-        } else if (checkedItems.size() == 1) {
-          item.setVisible(true);
+        if (!allowActions) {
+          doneMenuItem.setVisible(false);
+          deleteMenuItem.setVisible(false);
+          addReminderMenuItem.setVisible(false);
+        } else {
+          if (unmarkItems) {
+            doneMenuItem.setIcon(R.drawable.ic_action_cancel);
+            doneMenuItem.setTitle("Als nicht erledigt markieren");
+            markItemsDone = false;
+          } else {
+            doneMenuItem.setIcon(R.drawable.ic_action_edit);
+            doneMenuItem.setTitle(R.string.action_done);
+            markItemsDone = true;
+          }
+
+          deleteMenuItem.setVisible(allowDeleting);
         }
+
         return true;
       }
     });
@@ -427,6 +448,7 @@ public class HomeworkDetailFragment extends Fragment {
     if (filteredData.size() == 0) {
       HAElement noHomework = new HAElement();
       noHomework.id = "0";
+      noHomework.flags = HAElement.FLAG_INFO;
       noHomework.date = "";
       noHomework.title = "Keine Hausaufgaben!";
       noHomework.subject = "";
