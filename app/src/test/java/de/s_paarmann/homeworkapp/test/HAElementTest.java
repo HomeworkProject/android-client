@@ -6,11 +6,11 @@
 /**
  * Created by basti on 26.09.15.
  */
-package s_paarmann.physikprofil.test;
+package de.s_paarmann.homeworkapp.test;
 
 import org.junit.Test;
 
-import s_paarmann.physikprofil.HAElement;
+import de.s_paarmann.homeworkapp.HAElement;
 
 import static org.junit.Assert.*;
 

@@ -3,7 +3,7 @@
  * Licensed under the MIT license, see the LICENSE file
  */
 
-package s_paarmann.physikprofil;
+package de.s_paarmann.homeworkapp;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
