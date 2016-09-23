@@ -5,9 +5,9 @@
   -->
 
 <resources>
-    <color name="primary">#039BE5</color>
-    <color name="primary_dark">#0288D1</color>
-    <color name="accent">#00E676</color>
+    <color name="primary">#00B742</color>
+    <color name="primary_dark">#00D864</color>
+    <color name="accent">#F4511E</color>
 
     <color name="actionBarColor">@color/primary</color>
 </resources>
