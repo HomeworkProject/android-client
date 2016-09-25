@@ -25,7 +25,7 @@
     <string name="dates_unavailable">Termine werden in einem zukünftigen Update hinzugefügt</string>
     <string name="updating">Update wird heruntergeladen...</string>
     <string name="noUpdateDialogText">Die neueste Version ist bereits installiert.</string>
-    <string name="noAutoUpdatesDialogText">Diese Option macht vor allem Sinn, wenn auch "Automatische Aktualisierungen" aktiviert ist, ansonsten wird immer erst eine Erinnerung erstellt, wenn die Hausaufgabe in der App angesehen wurde.</string>
+    <string name="noAutoUpdatesDialogText">Diese Option ergibt vor allem Sinn, wenn auch "Automatische Aktualisierungen" aktiviert ist, ansonsten wird immer erst eine Erinnerung erstellt, wenn die Hausaufgabe in der App angesehen wurde.</string>
     <string name="setReminder">Erinnerung erstellen</string>
     <string name="noReminders">Keine Erinnerungen</string>
     <string name="reminder_datetime_picker_title">Erinnerung hinzufügen</string>
