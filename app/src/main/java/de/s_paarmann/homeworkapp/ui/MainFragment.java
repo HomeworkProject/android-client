@@ -67,8 +67,6 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     layout.findViewById(R.id.btnTomorrow).setOnClickListener(this::onBtnTomorrowClick);
     layout.findViewById(R.id.btnAfterTomorrow).setOnClickListener(this::onBtnAfterTomorrowClick);
 
-    layout.findViewById(R.id.btnTemp).setOnClickListener(this::ontbnTmpClick);
-
     return layout;
   }
 
