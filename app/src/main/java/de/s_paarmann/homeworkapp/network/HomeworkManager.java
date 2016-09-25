@@ -152,12 +152,15 @@ public class HomeworkManager {
     error.flags = HAElement.FLAG_ERROR;
     error.date = "";
     error.title = "Fehler";
-    error.desc = "Beim herunterladen der Hausaufgaben ist ein Fehler aufgetreten.";
+    error.desc = "Beim Herunterladen der Hausaufgaben ist ein Fehler aufgetreten.";
     List<HAElement> list = new ArrayList<>(1);
 
     if (hwFuture == null) {
-      Log.e(TAG, "GetHW could not login.");
-      error.subject = "Nicht eingeloggt";
+      if (loginResult == LoginResultListener.Result.CONNECTION_FAILED) {
+        error.subject = "Verbindung fehlgeschlagen.";
+      } else {
+        error.subject = "Fehler beim einloggen.";
+      }
     } else if (hwFuture.getErrorCode() != IHWFuture.ERRORCodes.OK) {
       Log.e(TAG, "GetHW returned error: " + hwFuture.getErrorCode());
       error.subject = String.valueOf(hwFuture.getErrorCode()); // TODO
