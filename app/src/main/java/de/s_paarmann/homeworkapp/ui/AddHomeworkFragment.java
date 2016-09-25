@@ -115,7 +115,7 @@ public class AddHomeworkFragment extends Fragment {
       } else {
         String msg;
         if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
-          msg = "Du bist nicht berechtigt Hausaufgaben hinzuzufügen.";
+          msg = "Unzureichende Berechtigungen um Hausaufgaben hinzuzufügen.";
         } else {
           msg = "Unbekannter Fehler beim hinzufügen der Hausaufgabe.";
         }

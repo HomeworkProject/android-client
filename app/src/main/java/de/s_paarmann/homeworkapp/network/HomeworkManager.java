@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import de.mlessmann.api.networking.CloseReason;
 import de.s_paarmann.homeworkapp.AutomaticReminderManager;
 import de.s_paarmann.homeworkapp.HAElement;
 import de.s_paarmann.homeworkapp.Log;
@@ -92,30 +93,42 @@ public class HomeworkManager {
   public static void addHomework(Context ctx, HAElement element, AddHWListener listener,
                                  boolean silent) {
     LoginManager.getHWMgr(ctx, (mgr, result) -> {
+      if (result == LoginResultListener.Result.LOGGED_IN) {
+        if (mgr == null) {
+          listener.onHomeworkAdded(IHWFuture.ERRORCodes.LOGINREQ);
+          return;
+        }
 
-      // TODO: Deal with result
+        IHWCarrier.Builder builder = IHWCarrier.Builder.builder();
+        IHWCarrier.JSONBuilder jsonBuilder = new IHWCarrier.JSONBuilder();
 
-      if (mgr == null) {
-        listener.onHomeworkAdded(IHWFuture.ERRORCodes.LOGINREQ);
-        return;
+        String[] d = element.date.split("-");
+        jsonBuilder.date(Integer.parseInt(d[0]),
+                         Integer.parseInt(d[1]),
+                         Integer.parseInt(d[2]));
+        jsonBuilder.subject(element.subject);
+        jsonBuilder.title(element.title);
+        jsonBuilder.description(element.desc);
+
+        IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
+
+        mgr.addHW(carrier).registerListener(future -> {
+          if (future.getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
+            CloseReason closeReason = (CloseReason) future.getError();
+            if (closeReason != CloseReason.KILL) {
+              mgr.addHW(carrier).registerListener(f -> {
+                OnAddHWDone((IHWFuture<Boolean>) f, listener);
+              });
+            } else {
+              OnAddHWDone((IHWFuture<Boolean>) future, listener);
+            }
+          } else {
+            OnAddHWDone((IHWFuture<Boolean>) future, listener);
+          }
+        });
+      } else {
+        OnAddHWDone(null, listener);
       }
-
-      IHWCarrier.Builder builder = IHWCarrier.Builder.builder();
-      IHWCarrier.JSONBuilder jsonBuilder = new IHWCarrier.JSONBuilder();
-
-      String[] d = element.date.split("-");
-      jsonBuilder.date(Integer.parseInt(d[0]),
-                       Integer.parseInt(d[1]),
-                       Integer.parseInt(d[2]));
-      jsonBuilder.subject(element.subject);
-      jsonBuilder.title(element.title);
-      jsonBuilder.description(element.desc);
-
-      IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
-
-      mgr.addHW(carrier).registerListener(future -> {
-        OnAddHWDone((IHWFuture<Boolean>) future, listener);
-      });
     }, silent);
   }
 
@@ -126,22 +139,34 @@ public class HomeworkManager {
   public static void deleteHomework(Context ctx, HAElement element, DeleteHWListener listener,
                                     boolean silent) {
     LoginManager.getHWMgr(ctx, (mgr, result) -> {
-      // TODO: Deal with result
+      if (result == LoginResultListener.Result.LOGGED_IN) {
+        if (mgr == null) {
+          listener.onHomeworkDeleted(IHWFuture.ERRORCodes.LOGINREQ);
+          return;
+        }
 
-      if (mgr == null) {
-        listener.onHomeworkDeleted(IHWFuture.ERRORCodes.LOGINREQ);
-        return;
+        String[] sd = element.date.split("-");
+        int[] d = new int[]{
+            Integer.parseInt(sd[0]),
+            Integer.parseInt(sd[1]),
+            Integer.parseInt(sd[2]),
+            };
+        mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
+          if (future.getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
+            CloseReason closeReason = (CloseReason) future.getError();
+            if (closeReason != CloseReason.KILL) {
+              mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(f -> {
+                OnDeleteHWDone((IHWFuture<Boolean>) f, listener);
+              });
+            } else {
+              OnDeleteHWDone((IHWFuture<Boolean>) future, listener);
+            }
+          }
+          OnDeleteHWDone((IHWFuture<Boolean>) future, listener);
+        });
+      } else {
+        OnDeleteHWDone(null, listener);
       }
-
-      String[] sd = element.date.split("-");
-      int[] d = new int[]{
-          Integer.parseInt(sd[0]),
-          Integer.parseInt(sd[1]),
-          Integer.parseInt(sd[2]),
-          };
-      mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
-        OnDeleteHWDone((IHWFuture<Boolean>) future, listener);
-      });
     }, silent);
   }
 
@@ -191,11 +216,11 @@ public class HomeworkManager {
   }
 
   private static void OnAddHWDone(IHWFuture<Boolean> future, AddHWListener listener) {
-    listener.onHomeworkAdded(future.getErrorCode());
+    listener.onHomeworkAdded(future == null ? IHWFuture.ERRORCodes.UNKNOWN : future.getErrorCode());
   }
 
   private static void OnDeleteHWDone(IHWFuture<Boolean> future, DeleteHWListener listener) {
-    listener.onHomeworkDeleted(future.getErrorCode());
+    listener.onHomeworkDeleted(future == null ? IHWFuture.ERRORCodes.UNKNOWN : future.getErrorCode());
   }
 
 }
