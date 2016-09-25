@@ -106,7 +106,8 @@ public class MainActivity extends AppCompatActivity {
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_logout:
-          // TODO
+          LoginManager.removeCredentials(this);
+          startActivity(new Intent(this, LoginActivity.class));
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_settings:
