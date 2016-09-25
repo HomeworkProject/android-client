@@ -13,10 +13,15 @@ import de.mlessmann.api.data.IHWFutureListener;
 import de.mlessmann.api.data.IHWProvider;
 import de.mlessmann.api.data.IHWSession;
 import de.mlessmann.api.data.IHWUser;
+import de.mlessmann.api.logging.ILogListener;
+import de.mlessmann.api.logging.LogLevel;
+import de.mlessmann.api.logging.Types;
 import de.mlessmann.api.main.HWMgr;
 import de.mlessmann.exceptions.StillConnectedException;
 import de.mlessmann.internals.data.HWProvider;
 import de.mlessmann.internals.data.HWSession;
+import de.s_paarmann.homeworkapp.Log;
+import de.s_paarmann.homeworkapp.ui.MainActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,9 +29,6 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-
-import de.s_paarmann.homeworkapp.Log;
-import de.s_paarmann.homeworkapp.ui.MainActivity;
 
 public class LoginManager {
 
@@ -47,6 +49,33 @@ public class LoginManager {
   private static boolean nonSilentListenerPresent = false;
   private static boolean creatingManager = false;
   private static boolean waitingForLoginActivity = false;
+
+  public static ILogListener LogListener = context -> {
+    String msg = context.getSender().toString() + ": " + context.getPayload().toString();
+    int level = context.getLevel();
+    boolean isException = context.getType().equals(Types.EXC) || context.getType().equals(Types.CDKEXC);
+    if (level == LogLevel.DEBUG) {
+      if (isException)
+        Log.d("CDK", msg, (Exception) context.getPayload());
+      else
+        Log.d("CDK", msg);
+    } else if (level == LogLevel.WARNING) {
+      if (isException)
+        Log.w("CDK", msg, (Exception) context.getPayload());
+      else
+        Log.w("CDK", msg);
+    } else if (level == LogLevel.SEVERE) {
+      if (isException)
+        Log.e("CDK", msg, (Exception) context.getPayload());
+      else
+        Log.e("CDK", msg);
+    } else {
+      if (isException)
+        Log.i("CDK", msg, (Exception) context.getPayload());
+      else
+        Log.i("CDK", msg);
+    }
+  };
 
   public static void setCredentials(Context ctx, IHWProvider provider, String group, String user,
                                     String auth) {
@@ -71,7 +100,7 @@ public class LoginManager {
     if (listenersWaitingForMgr != null && listenersWaitingForMgr.size() > 0) {
       for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
         listenersWaitingForMgr.get(i).receiveHWMgr(null,
-          LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+                                                   LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
         listenersWaitingForMgr.remove(i);
       }
     }
@@ -150,7 +179,7 @@ public class LoginManager {
 
       for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
         listenersWaitingForMgr.get(i).receiveHWMgr(null,
-          LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+                                                   LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
         listenersWaitingForMgr.remove(i);
       }
 
@@ -168,7 +197,8 @@ public class LoginManager {
     getHWMgr(ctx, l, silent, false);
   }
 
-  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener listener, boolean silent, boolean loginActivity) {
+  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener listener, boolean silent,
+                                           boolean loginActivity) {
     if (loggedIn) {
       listener.receiveHWMgr(mgr, LoginResultListener.Result.LOGGED_IN);
       return;
@@ -187,6 +217,7 @@ public class LoginManager {
       creatingManager = true;
       if (mgr == null) {
         mgr = new HWMgr();
+        mgr.registerLogListener(LogListener);
       }
 
       if (!loadCredentials(ctx)) {
@@ -206,7 +237,8 @@ public class LoginManager {
           } catch (ClassCastException e) {
             waitingForLoginActivity = false;
             for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
-              listenersWaitingForMgr.get(i).receiveHWMgr(null, LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+              listenersWaitingForMgr.get(i)
+                  .receiveHWMgr(null, LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
               listenersWaitingForMgr.remove(i);
             }
             creatingManager = false;
@@ -229,7 +261,7 @@ public class LoginManager {
             case INVALID_CREDENTIALS:
               for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
                 listenersWaitingForMgr.get(i).receiveHWMgr(null,
-                  LoginResultListener.Result.INVALID_CREDENTIALS);
+                                                           LoginResultListener.Result.INVALID_CREDENTIALS);
                 listenersWaitingForMgr.remove(i);
               }
               loggedIn = false;

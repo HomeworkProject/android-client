@@ -142,12 +142,10 @@ public class MainActivity extends AppCompatActivity {
 
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-    // TODO
     if (!LoginManager.loadCredentials(this)) {
-
+      Intent intent = new Intent(this, LoginActivity.class);
+      startActivity(intent);
     }
-    Intent intent = new Intent(this, LoginActivity.class);
-    startActivity(intent);
   }
 
   @Override

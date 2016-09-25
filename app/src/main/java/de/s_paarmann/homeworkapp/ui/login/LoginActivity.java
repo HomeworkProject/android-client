@@ -6,17 +6,12 @@
 package de.s_paarmann.homeworkapp.ui.login;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -27,21 +22,18 @@ import android.widget.Toast;
 import de.mlessmann.api.data.IHWFuture;
 import de.mlessmann.api.data.IHWGroupMapping;
 import de.mlessmann.api.data.IHWProvider;
-import de.mlessmann.api.data.IHWUser;
 import de.mlessmann.api.main.HWMgr;
 import de.mlessmann.exceptions.StillConnectedException;
-import de.s_paarmann.homeworkapp.AutomaticReminderManager;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.LoginManager;
 import de.s_paarmann.homeworkapp.network.LoginResultListener;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class LoginActivity extends AppCompatActivity {
+
+  public static final String TAG = "LoginActivity";
 
   private FrameLayout contentFrame;
   private LayoutInflater inflater;
@@ -84,7 +76,13 @@ public class LoginActivity extends AppCompatActivity {
   }
 
   private void loadProviders() {
-    mgr = new HWMgr();
+    if (mgr == null) {
+      mgr = new HWMgr();
+      mgr.registerLogListener(LoginManager.LogListener);
+    } else {
+      mgr.release(true);
+    }
+
     mgr.getAvailableProvidersOBJ(null).registerListener(future -> {
       IHWFuture<List<IHWProvider>> providerFuture = (IHWFuture<List<IHWProvider>>) future;
 
@@ -92,8 +90,16 @@ public class LoginActivity extends AppCompatActivity {
         providers = providerFuture.get();
         runOnUiThread(this::displayProviderSelect);
       } else {
-        // TODO
-        Toast.makeText(this, "Liste von Schulen konnte nicht geladen werden.", Toast.LENGTH_LONG).show();
+        runOnUiThread(() -> {
+          new AlertDialog.Builder(this)
+              .setTitle("Error")
+              .setMessage("Fehler beim Herunterladen der Liste von Schulen.")
+              .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
+                dialog.dismiss();
+                loadProviders();
+              }))
+              .show();
+        });
       }
     });
   }
@@ -135,9 +141,7 @@ public class LoginActivity extends AppCompatActivity {
       try {
         mgr.setProvider(selectedProvider);
       } catch (StillConnectedException e2) {
-        // TODO
-        Toast.makeText(this, "Fehler beim Verbinden zum Server.", Toast.LENGTH_LONG).show();
-        return;
+        // Impossible
       }
     }
 
@@ -145,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
       mgr.connect().registerListener(connFuture -> {
         if (connFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
           mgr.isCompatible().registerListener(compFuture -> {
-            if (((boolean)compFuture.getOrElse(Boolean.FALSE))) {
+            if (((boolean) compFuture.getOrElse(Boolean.FALSE)) ) {
               mgr.getGroups("").registerListener(getGrpFuture -> {
                 if (getGrpFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
                   groups = ((IHWFuture<IHWGroupMapping>) getGrpFuture).get();
@@ -155,27 +159,45 @@ public class LoginActivity extends AppCompatActivity {
                   });
                 } else {
                   runOnUiThread(() -> {
-                    // TODO
-                    Toast.makeText(this, "Fehler beim Laden der Klassen.", Toast.LENGTH_LONG).show();
+                    new AlertDialog.Builder(this)
+                        .setTitle("Error")
+                        .setMessage("Fehler beim Herunterladen der Liste von Klassen.")
+                        .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
+                          dialog.dismiss();
+                          loadGroups();
+                        }))
+                        .show();
                   });
                 }
               });
             } else {
               runOnUiThread(() -> {
-                // TODO
-                Toast.makeText(this, "Server hat eine inkompatible Version.", Toast.LENGTH_LONG).show();
+                new AlertDialog.Builder(this)
+                    .setTitle("Error")
+                    .setMessage("Der ausgewählte Server hat eine inkompatible Version.")
+                    .setNeutralButton("Anderen Server auswählen", ((dialog, which) -> {
+                      dialog.dismiss();
+                      loadProviders();
+                    }))
+                    .show();
               });
             }
           });
         } else {
           runOnUiThread(() -> {
-            // TODO
-            Toast.makeText(this, "Fehler beim Verbinden zum Server.", Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this)
+                .setTitle("Error")
+                .setMessage("Fehler beim Verbinden zum Server")
+                .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
+                  dialog.dismiss();
+                  loadGroups();
+                }))
+                .show();
           });
         }
       });
     } catch (StillConnectedException e) {
-      // Should be utterly impossible
+      // impossible
     }
   }
 
@@ -268,12 +290,13 @@ public class LoginActivity extends AppCompatActivity {
         } else {
           runOnUiThread(() -> {
             String msg = "";
-            if (result == LoginResultListener.Result.INVALID_CREDENTIALS)
+            if (result == LoginResultListener.Result.INVALID_CREDENTIALS) {
               msg = "Ungültige Zugangsdaten";
-            else if (result == LoginResultListener.Result.CONNECTION_FAILED)
+            } else if (result == LoginResultListener.Result.CONNECTION_FAILED) {
               msg = "Verbindung zum Server fehlgeschlagen.";
-            else
+            } else {
               msg = "Unbekannter Fehler beim einloggen.";
+            }
 
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             contentFrame.findViewById(R.id.login_loadingIcon).setVisibility(View.GONE);
