@@ -37,6 +37,9 @@
         android:id="@+id/txtDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:gravity="top|start"
+        android:minLines="3"
         android:hint="Beschreibung" />
 
     <Button
