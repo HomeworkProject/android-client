@@ -8,6 +8,7 @@ package de.s_paarmann.homeworkapp.ui;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -28,6 +29,7 @@ import com.bugsnag.android.Bugsnag;
 import de.s_paarmann.homeworkapp.Log;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.LoginManager;
+import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
   private static final String STATE_VIEW = "view";
 
   public enum Views {
-    MAIN, HOMEWORK_DETAIL, ADD_HOMEWORK, MANAGE_REMINDERS, LOGIN, SETTINGS
+    MAIN, HOMEWORK_DETAIL, ADD_HOMEWORK, MANAGE_REMINDERS, SETTINGS
   }
 
   private Views currentView;
@@ -104,8 +106,7 @@ public class MainActivity extends AppCompatActivity {
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_logout:
-          LoginManager.removeCredentials(this);
-          showView(Views.LOGIN);
+          // TODO
           drawerLayout.closeDrawer(GravityCompat.START);
           return true;
         case R.id.nav_settings:
@@ -141,9 +142,12 @@ public class MainActivity extends AppCompatActivity {
 
     PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
+    // TODO
     if (!LoginManager.loadCredentials(this)) {
-      showView(Views.LOGIN);
+
     }
+    Intent intent = new Intent(this, LoginActivity.class);
+    startActivity(intent);
   }
 
   @Override
@@ -171,7 +175,6 @@ public class MainActivity extends AppCompatActivity {
         break;
       case ADD_HOMEWORK:
       case MANAGE_REMINDERS:
-      case LOGIN:
       case SETTINGS:
         // No menu
         super.onCreateOptionsMenu(menu);
@@ -212,8 +215,6 @@ public class MainActivity extends AppCompatActivity {
       currentView = Views.ADD_HOMEWORK;
     else if (frag instanceof ManagerRemindersFragment)
       currentView = Views.MANAGE_REMINDERS;
-    else if (frag instanceof LoginFragment)
-      currentView = Views.LOGIN;
     else if (frag instanceof SettingsFragment)
       currentView = Views.SETTINGS;
     else
@@ -263,9 +264,6 @@ public class MainActivity extends AppCompatActivity {
       case MANAGE_REMINDERS:
         navigationView.setCheckedItem(R.id.nav_reminders);
         break;
-      case LOGIN:
-        navigationView.setCheckedItem(R.id.nav_logout);
-        break;
       case SETTINGS:
         navigationView.setCheckedItem(R.id.nav_settings);
         break;
@@ -285,9 +283,6 @@ public class MainActivity extends AppCompatActivity {
         break;
       case MANAGE_REMINDERS:
         showRemindersView();
-        break;
-      case LOGIN:
-        showLoginView();
         break;
       case SETTINGS:
         showSettingsView();
@@ -318,10 +313,6 @@ public class MainActivity extends AppCompatActivity {
 
   public void showRemindersView() {
     showView(new ManagerRemindersFragment(), Views.MANAGE_REMINDERS);
-  }
-
-  public void showLoginView() {
-    showView(new LoginFragment(), Views.LOGIN);
   }
 
   public void showSettingsView() {

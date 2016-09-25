@@ -378,7 +378,8 @@ public class HomeworkDetailFragment extends Fragment {
             || loginResult == LoginResultListener.Result.INVALID_CREDENTIALS) {
           Toast.makeText(getActivity(), "Ungültige Zugangsdaten", Toast.LENGTH_LONG).show();
 
-          ((MainActivity) getActivity()).showLoginView();
+          // TODO
+          //((MainActivity) getActivity()).showLoginView();
         } else {
           setData(hw);
         }

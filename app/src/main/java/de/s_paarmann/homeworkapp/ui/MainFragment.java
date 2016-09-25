@@ -41,6 +41,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import de.s_paarmann.homeworkapp.Log;
 import de.s_paarmann.homeworkapp.R;
+import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 public class MainFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
@@ -66,7 +67,14 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     layout.findViewById(R.id.btnTomorrow).setOnClickListener(this::onBtnTomorrowClick);
     layout.findViewById(R.id.btnAfterTomorrow).setOnClickListener(this::onBtnAfterTomorrowClick);
 
+    layout.findViewById(R.id.btnTemp).setOnClickListener(this::ontbnTmpClick);
+
     return layout;
+  }
+
+  public void ontbnTmpClick(View v) {
+    Intent intent = new Intent(getActivity(), LoginActivity.class);
+    startActivity(intent);
   }
 
   @Override

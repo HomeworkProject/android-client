@@ -201,7 +201,8 @@ public class LoginManager {
         } else {
           waitingForLoginActivity = true;
           try {
-            ((MainActivity) ctx).showLoginView();
+            // TODO
+            //((MainActivity) ctx).showLoginView();
           } catch (ClassCastException e) {
             waitingForLoginActivity = false;
             for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {

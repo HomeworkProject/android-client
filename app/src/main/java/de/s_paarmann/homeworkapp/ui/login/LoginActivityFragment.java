@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2016  Sebastian Paarmann
+ * Licensed under the MIT license, see the LICENSE file
+ */
+
 package de.s_paarmann.homeworkapp.ui.login;
 
 import android.support.v4.app.Fragment;
@@ -8,9 +13,6 @@ import android.view.ViewGroup;
 
 import de.s_paarmann.homeworkapp.R;
 
-/**
- * A placeholder fragment containing a simple view.
- */
 public class LoginActivityFragment extends Fragment {
 
   public LoginActivityFragment() {
@@ -19,6 +21,6 @@ public class LoginActivityFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_login2, container, false);
+    return inflater.inflate(R.layout.login_provider_select, container, false);
   }
 }
