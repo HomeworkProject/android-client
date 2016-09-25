@@ -10,6 +10,7 @@ import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -47,6 +48,7 @@ import de.s_paarmann.homeworkapp.Log;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.HomeworkManager;
 import de.s_paarmann.homeworkapp.network.LoginResultListener;
+import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import static android.view.View.GONE;
 
@@ -172,7 +174,6 @@ public class HomeworkDetailFragment extends Fragment {
         boolean allowActions = true;
         for (int position : checkedItems) {
           HAElement element = (HAElement) listView.getItemAtPosition(position);
-          Log.d(TAG, element.title + ": " + element.flags);
           if ((element.flags & (HAElement.FLAG_ERROR
                                 | HAElement.FLAG_WARN
                                 | HAElement.FLAG_INFO)) != 0) {
@@ -228,7 +229,6 @@ public class HomeworkDetailFragment extends Fragment {
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-    // TODO ?
     inflater.inflate(R.menu.homework_detail, menu);
   }
 
@@ -378,8 +378,7 @@ public class HomeworkDetailFragment extends Fragment {
             || loginResult == LoginResultListener.Result.INVALID_CREDENTIALS) {
           Toast.makeText(getActivity(), "Ungültige Zugangsdaten", Toast.LENGTH_LONG).show();
 
-          // TODO
-          //((MainActivity) getActivity()).showLoginView();
+          startActivity(new Intent(getActivity(), LoginActivity.class));
         } else {
           setData(hw);
         }

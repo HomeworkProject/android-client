@@ -67,6 +67,13 @@ public class LoginActivity extends AppCompatActivity {
   }
 
   @Override
+  protected void onStop() {
+    super.onStop();
+
+    LoginManager.userCanceledLoginActivity();
+  }
+
+  @Override
   public void onBackPressed() {
     if (backAction == null) {
       super.onBackPressed();

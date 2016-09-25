@@ -6,6 +6,7 @@
 package de.s_paarmann.homeworkapp.network;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 import de.mlessmann.api.data.IHWFuture;
@@ -22,6 +23,7 @@ import de.mlessmann.internals.data.HWProvider;
 import de.mlessmann.internals.data.HWSession;
 import de.s_paarmann.homeworkapp.Log;
 import de.s_paarmann.homeworkapp.ui.MainActivity;
+import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -232,8 +234,7 @@ public class LoginManager {
         } else {
           waitingForLoginActivity = true;
           try {
-            // TODO
-            //((MainActivity) ctx).showLoginView();
+            ctx.startActivity(new Intent(ctx, LoginActivity.class));
           } catch (ClassCastException e) {
             waitingForLoginActivity = false;
             for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
@@ -302,11 +303,8 @@ public class LoginManager {
                   if (userFuture.errorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
                     listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
                   } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.NOTFOUNDERR) {
-                    // TODO: Consider giving group not found a special Result
                     listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
                   } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.EXPIRED) {
-                    // Try again with credentials if session is invalid
-                    // TODO
                     Log.d(TAG, "Server says token expired, retrying with creds");
                     session = null;
                     mgr.release();

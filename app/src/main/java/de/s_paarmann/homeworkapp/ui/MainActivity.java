@@ -118,7 +118,6 @@ public class MainActivity extends AppCompatActivity {
       }
     });
 
-    // TODO
     drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
       R.string.drawer_open, R.string.drawer_close) {
       public void onDrawerClosed(View view) {
