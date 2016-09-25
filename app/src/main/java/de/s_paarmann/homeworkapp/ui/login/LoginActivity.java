@@ -39,6 +39,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -54,6 +55,12 @@ public class LoginActivity extends AppCompatActivity {
   private String selectedUser;
   private String password;
 
+  private interface BackAction {
+    void onBackPressed();
+  }
+
+  private BackAction backAction;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -65,6 +72,15 @@ public class LoginActivity extends AppCompatActivity {
     contentFrame = (FrameLayout) findViewById(R.id.content_login);
 
     loadProviders();
+  }
+
+  @Override
+  public void onBackPressed() {
+    if (backAction == null) {
+      super.onBackPressed();
+    } else {
+      backAction.onBackPressed();
+    }
   }
 
   private void loadProviders() {
@@ -103,6 +119,8 @@ public class LoginActivity extends AppCompatActivity {
 
       loadGroups();
     });
+
+    backAction = null;
   }
 
   private void loadGroups() {
@@ -180,6 +198,12 @@ public class LoginActivity extends AppCompatActivity {
 
       displayUserSelect();
     });
+
+    backAction = () -> {
+      contentFrame.removeView(contentFrame.findViewById(R.id.content_login_group));
+      findViewById(R.id.login_loadingIcon).setVisibility(View.VISIBLE);
+      loadProviders();
+    };
   }
 
   private void displayUserSelect() {
@@ -204,6 +228,12 @@ public class LoginActivity extends AppCompatActivity {
 
       displayPasswordForm();
     });
+
+    backAction = () -> {
+      contentFrame.removeView(contentFrame.findViewById(R.id.content_login_user));
+      findViewById(R.id.login_loadingIcon).setVisibility(View.VISIBLE);
+      loadGroups();
+    };
   }
 
   private void displayPasswordForm() {
@@ -237,13 +267,25 @@ public class LoginActivity extends AppCompatActivity {
           });
         } else {
           runOnUiThread(() -> {
-            // TODO
-            Toast.makeText(this, "Fehler beim einloggen.", Toast.LENGTH_LONG).show();
+            String msg = "";
+            if (result == LoginResultListener.Result.INVALID_CREDENTIALS)
+              msg = "Ungültige Zugangsdaten";
+            else if (result == LoginResultListener.Result.CONNECTION_FAILED)
+              msg = "Verbindung zum Server fehlgeschlagen.";
+            else
+              msg = "Unbekannter Fehler beim einloggen.";
+
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
             contentFrame.findViewById(R.id.login_loadingIcon).setVisibility(View.GONE);
             contentFrame.findViewById(R.id.content_login_password).setVisibility(View.VISIBLE);
           });
         }
       });
     });
+
+    backAction = () -> {
+      contentFrame.removeView(contentFrame.findViewById(R.id.content_login_password));
+      displayUserSelect();
+    };
   }
 }
