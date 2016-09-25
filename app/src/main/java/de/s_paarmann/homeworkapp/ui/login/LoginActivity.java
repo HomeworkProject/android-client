@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity {
     mgr.getAvailableProvidersOBJ(null).registerListener(future -> {
       IHWFuture<List<IHWProvider>> providerFuture = (IHWFuture<List<IHWProvider>>) future;
 
-      if (providerFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
+      if (providerFuture.getErrorCode() == IHWFuture.ERRORCodes.OK) {
         providers = providerFuture.get();
         runOnUiThread(this::displayProviderSelect);
       } else {
@@ -154,11 +154,11 @@ public class LoginActivity extends AppCompatActivity {
 
     try {
       mgr.connect().registerListener(connFuture -> {
-        if (connFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
+        if (connFuture.getErrorCode() == IHWFuture.ERRORCodes.OK) {
           mgr.isCompatible().registerListener(compFuture -> {
             if (((boolean) compFuture.getOrElse(Boolean.FALSE)) ) {
               mgr.getGroups("").registerListener(getGrpFuture -> {
-                if (getGrpFuture.errorCode() == IHWFuture.ERRORCodes.OK) {
+                if (getGrpFuture.getErrorCode() == IHWFuture.ERRORCodes.OK) {
                   groups = ((IHWFuture<IHWGroupMapping>) getGrpFuture).get();
 
                   runOnUiThread(() -> {

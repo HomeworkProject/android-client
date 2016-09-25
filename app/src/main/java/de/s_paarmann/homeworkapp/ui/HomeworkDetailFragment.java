@@ -41,6 +41,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.mlessmann.api.networking.CloseReason;
 import de.s_paarmann.homeworkapp.AutomaticReminderManager;
 import de.s_paarmann.homeworkapp.HAElement;
 import de.s_paarmann.homeworkapp.HAElementArrayAdapter;
@@ -366,19 +367,28 @@ public class HomeworkDetailFragment extends Fragment {
   }
 
   private void loadHomework(View root, boolean forceDownload) {
+    loadHomework(root, forceDownload, false);
+  }
+
+  private void loadHomework(View root, boolean forceDownload, boolean secondTry) {
     ProgressBar loadingIcon = (ProgressBar) root.findViewById(R.id.loadingIcon);
     ListView listView = (ListView) root.findViewById(R.id.lsViewHomework);
 
     listView.setVisibility(View.GONE);
     loadingIcon.setVisibility(View.VISIBLE);
 
-    HomeworkManager.GetHWListener myListener = (hw, loginResult) -> {
+    HomeworkManager.GetHWListener myListener = (hw, loginResult, error) -> {
       if (getActivity() != null) getActivity().runOnUiThread(() -> {
         if (loginResult == LoginResultListener.Result.NO_CREDENTIALS_PRESENT
             || loginResult == LoginResultListener.Result.INVALID_CREDENTIALS) {
           Toast.makeText(getActivity(), "Ungültige Zugangsdaten", Toast.LENGTH_LONG).show();
 
           startActivity(new Intent(getActivity(), LoginActivity.class));
+        } else if (loginResult == LoginResultListener.Result.CONNECTION_CLOSED && !secondTry) {
+          CloseReason closeReason = (CloseReason) error;
+          if (closeReason != CloseReason.KILL) {
+            loadHomework(root, forceDownload, true);
+          }
         } else {
           setData(hw);
         }

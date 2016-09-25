@@ -25,7 +25,8 @@ public class HomeworkManager {
 
   public interface GetHWListener {
     public void onHomeworkReceived(List<HAElement> homework,
-                                   LoginResultListener.Result loginResult);
+                                   LoginResultListener.Result loginResult,
+                                   Object error);
   }
 
   public interface AddHWListener {
@@ -157,13 +158,13 @@ public class HomeworkManager {
     if (hwFuture == null) {
       Log.e(TAG, "GetHW could not login.");
       error.subject = "Nicht eingeloggt";
-    } else if (hwFuture.errorCode() != IHWFuture.ERRORCodes.OK) {
-      Log.e(TAG, "GetHW returned error: " + hwFuture.errorCode());
-      error.subject = String.valueOf(hwFuture.errorCode()); // TODO
+    } else if (hwFuture.getErrorCode() != IHWFuture.ERRORCodes.OK) {
+      Log.e(TAG, "GetHW returned error: " + hwFuture.getErrorCode());
+      error.subject = String.valueOf(hwFuture.getErrorCode()); // TODO
     }
-    if (hwFuture == null || hwFuture.errorCode() != IHWFuture.ERRORCodes.OK) {
+    if (hwFuture == null || hwFuture.getErrorCode() != IHWFuture.ERRORCodes.OK) {
       list.add(error);
-      listener.onHomeworkReceived(list, loginResult);
+      listener.onHomeworkReceived(list, loginResult, hwFuture == null ? null : hwFuture.getError());
       return;
     }
 
@@ -183,15 +184,15 @@ public class HomeworkManager {
 
     AutomaticReminderManager.setReminders(ctx, elements);
 
-    listener.onHomeworkReceived(elements, loginResult);
+    listener.onHomeworkReceived(elements, loginResult, hwFuture.getError());
   }
 
   private static void OnAddHWDone(IHWFuture<Boolean> future, AddHWListener listener) {
-    listener.onHomeworkAdded(future.errorCode());
+    listener.onHomeworkAdded(future.getErrorCode());
   }
 
   private static void OnDeleteHWDone(IHWFuture<Boolean> future, DeleteHWListener listener) {
-    listener.onHomeworkDeleted(future.errorCode());
+    listener.onHomeworkDeleted(future.getErrorCode());
   }
 
 }

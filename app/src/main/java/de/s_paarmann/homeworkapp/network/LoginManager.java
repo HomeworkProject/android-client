@@ -14,10 +14,12 @@ import de.mlessmann.api.data.IHWFutureListener;
 import de.mlessmann.api.data.IHWProvider;
 import de.mlessmann.api.data.IHWSession;
 import de.mlessmann.api.data.IHWUser;
+import de.mlessmann.api.logging.IHWLogContext;
 import de.mlessmann.api.logging.ILogListener;
 import de.mlessmann.api.logging.LogLevel;
 import de.mlessmann.api.logging.Types;
 import de.mlessmann.api.main.HWMgr;
+import de.mlessmann.api.networking.CloseReason;
 import de.mlessmann.exceptions.StillConnectedException;
 import de.mlessmann.internals.data.HWProvider;
 import de.mlessmann.internals.data.HWSession;
@@ -52,30 +54,43 @@ public class LoginManager {
   private static boolean creatingManager = false;
   private static boolean waitingForLoginActivity = false;
 
-  public static ILogListener LogListener = context -> {
-    String msg = context.getSender().toString() + ": " + context.getPayload().toString();
-    int level = context.getLevel();
-    boolean isException = context.getType().equals(Types.EXC) || context.getType().equals(Types.CDKEXC);
-    if (level == LogLevel.DEBUG) {
-      if (isException)
-        Log.d("CDK", msg, (Exception) context.getPayload());
-      else
-        Log.d("CDK", msg);
-    } else if (level == LogLevel.WARNING) {
-      if (isException)
-        Log.w("CDK", msg, (Exception) context.getPayload());
-      else
-        Log.w("CDK", msg);
-    } else if (level == LogLevel.SEVERE) {
-      if (isException)
-        Log.e("CDK", msg, (Exception) context.getPayload());
-      else
-        Log.e("CDK", msg);
-    } else {
-      if (isException)
-        Log.i("CDK", msg, (Exception) context.getPayload());
-      else
-        Log.i("CDK", msg);
+  public static ILogListener LogListener = new ILogListener() {
+    @Override
+    public void onMessage(IHWLogContext context) {
+      String msg = context.getSender().toString() + ": " + context.getPayload().toString();
+      int level = context.getLevel();
+      boolean isException = context.getType().equals(Types.EXC)
+                            || context.getType().equals(Types.CDKEXC);
+      if (level == LogLevel.DEBUG) {
+        if (isException) {
+          Log.d("CDK", msg, (Exception) context.getPayload());
+        } else {
+          Log.d("CDK", msg);
+        }
+      } else if (level == LogLevel.WARNING) {
+        if (isException) {
+          Log.w("CDK", msg, (Exception) context.getPayload());
+        } else {
+          Log.w("CDK", msg);
+        }
+      } else if (level == LogLevel.SEVERE) {
+        if (isException) {
+          Log.e("CDK", msg, (Exception) context.getPayload());
+        } else {
+          Log.e("CDK", msg);
+        }
+      } else {
+        if (isException) {
+          Log.i("CDK", msg, (Exception) context.getPayload());
+        } else {
+          Log.i("CDK", msg);
+        }
+      }
+    }
+    @Override
+    public void onConnectionLost(CloseReason reason) {
+      Log.w("CDK", "Connection to server lost: " + reason.name());
+      loggedIn = false;
     }
   };
 
@@ -298,13 +313,15 @@ public class LoginManager {
 
               IHWFutureListener l = (loginFuture -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
-                if (userFuture.errorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
-                  Log.d(TAG, "Error code: " + userFuture.errorCode());
-                  if (userFuture.errorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
+                if (userFuture.getErrorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
+                  Log.d(TAG, "Error code: " + userFuture.getErrorCode());
+                  if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
                     listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
-                  } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.NOTFOUNDERR) {
+                  } else if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.NOTFOUNDERR) {
                     listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
-                  } else if (userFuture.errorCode() == IHWFuture.ERRORCodes.EXPIRED) {
+                  } else if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
+                    listener.onLoginDone(LoginResultListener.Result.CONNECTION_CLOSED);
+                  } else if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.EXPIRED) {
                     Log.d(TAG, "Server says token expired, retrying with creds");
                     session = null;
                     mgr.release();

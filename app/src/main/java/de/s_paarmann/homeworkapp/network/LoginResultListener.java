@@ -12,6 +12,7 @@ public interface LoginResultListener {
     SERVER_INCOMPATIBLE,
     NO_CREDENTIALS_PRESENT,
     INVALID_CREDENTIALS,
+    CONNECTION_CLOSED,
     UNKNOWN
   }
 
