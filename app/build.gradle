@@ -52,7 +52,6 @@ dependencies {
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support.constraint:constraint-layout:1.0.0-alpha8'
     compile 'com.bugsnag:bugsnag-android:3.+'
     testCompile 'junit:junit:4.12'
     // compile files('libs/hwserver_cdk.jar')
