@@ -15,18 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="@string/allHomework"
-        android:id="@+id/btnAllHomework"
-        android:layout_gravity="center_horizontal" />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/pickDate"
-        android:id="@+id/btnPickDate"
-        android:layout_gravity="center_horizontal" />
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:text="@string/tomorrow"
         android:id="@+id/btnTomorrow"
         android:layout_gravity="center_horizontal" />
@@ -35,6 +23,18 @@
         android:layout_height="wrap_content"
         android:text="@string/afterTomorrow"
         android:id="@+id/btnAfterTomorrow"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/allHomework"
+        android:id="@+id/btnAllHomework"
+        android:layout_gravity="center_horizontal" />
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pickDate"
+        android:id="@+id/btnPickDate"
         android:layout_gravity="center_horizontal" />
 
     <LinearLayout
