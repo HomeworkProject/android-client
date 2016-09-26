@@ -5,11 +5,13 @@
 
 package de.s_paarmann.homeworkapp.ui;
 
+import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -280,28 +282,37 @@ public class HomeworkDetailFragment extends Fragment {
       return;
     }
 
-    HAElement element = selectedItems.get(0);
+    DialogInterface.OnClickListener deleteHomework = (dialog, which) -> {
 
-    HomeworkManager.deleteHomework(getActivity(), element, result -> {
-      if (result == IHWFuture.ERRORCodes.OK) {
-        getActivity().runOnUiThread(() -> {
-          Toast.makeText(getActivity(), "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
-          loadHomework(getView(), true);
-        });
-      } else {
-        String msg;
-        if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
-          msg = "Du bist nicht berechtigt, diese Hausaufgabe zu löschen.";
+      HAElement element = selectedItems.get(0);
+
+      HomeworkManager.deleteHomework(getActivity(), element, result -> {
+        if (result == IHWFuture.ERRORCodes.OK) {
+          getActivity().runOnUiThread(() -> {
+            Toast.makeText(getActivity(), "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
+            loadHomework(getView(), true);
+          });
         } else {
-          msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
+          String msg;
+          if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
+            msg = "Du bist nicht berechtigt, diese Hausaufgabe zu löschen.";
+          } else {
+            msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
+          }
+          Log.e(TAG, "Error deleting homework: " + result);
+          getActivity().runOnUiThread(() -> {
+            Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+            loadHomework(getView(), true);
+          });
         }
-        Log.e(TAG, "Error deleting homework: " + result);
-        getActivity().runOnUiThread(() -> {
-          Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-          loadHomework(getView(), true);
-        });
-      }
-    });
+      });
+    };
+
+    new AlertDialog.Builder(getActivity())
+        .setMessage("Ausgewählte Hausaufgabe löschen?")
+        .setPositiveButton("Löschen", deleteHomework)
+        .setNegativeButton("Abbrechen", null)
+        .show();
   }
 
   private void markCurrentItemsAsDone() {
