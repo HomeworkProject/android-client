@@ -133,7 +133,13 @@ public class LoginActivity extends AppCompatActivity {
       loadGroups();
     });
 
-    backAction = null;
+    backAction = () -> {
+      if (LoginManager.loadCredentials(this)) {
+        finish();
+      } else {
+        finishAffinity();
+      }
+    };
   }
 
   private void loadGroups() {
