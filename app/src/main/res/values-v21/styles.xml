@@ -9,23 +9,6 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <!--<item name="windowActionModeOverlay">true</item>-->
-        <item name="android:actionModeStyle">@style/ActionModeTheme</item>
-        <item name="actionModeStyle">@style/ActionModeTheme</item>
-    </style>
-
-    <style name="ToolbarTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:actionMenuTextColor">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
-        <item name="android:homeAsUpIndicator">@drawable/ic_drawer</item>
-        <item name="android:actionModeStyle">@style/ActionModeTheme</item>
-        <item name="actionModeStyle">@style/ActionModeTheme</item>
-        <item name="android:actionModeBackground">@color/actionBarColor</item>
-    </style>
-
-    <style name="ActionModeTheme" parent="Widget.AppCompat.ActionMode">
-        <item name="android:actionModeBackground">@color/actionBarColor</item>
     </style>
 
     <style name="SpinnerButtonStyle" parent="@android:style/Widget.Material.Spinner.Underlined">
