@@ -24,7 +24,6 @@ import java.util.Calendar;
 
 import de.s_paarmann.homeworkapp.AutomaticReminderManager;
 import de.s_paarmann.homeworkapp.AutomaticUpdateService;
-import de.s_paarmann.homeworkapp.HomeworkUpdater;
 import de.s_paarmann.homeworkapp.R;
 
 public class SettingsFragment extends PreferenceFragment
@@ -91,7 +90,6 @@ public class SettingsFragment extends PreferenceFragment
     } else if (key.equals(MainActivity.PREF_REMINDERDAY) || key
         .equals(MainActivity.PREF_REMINDERTIME)) {
       AutomaticReminderManager.deleteAutomaticReminders(context);
-      new HomeworkUpdater(context).getData();
     }
   }
 
