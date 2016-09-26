@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Physik/Bio Profil</string>
+    <string name="app_name">Hausaufgaben</string>
     <string name="action_copy">Kopieren</string>
     <string name="action_remind">Erinnern</string>
     <string name="action_reminder_delete">Löschen</string>
