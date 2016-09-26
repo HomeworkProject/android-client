@@ -22,7 +22,7 @@
           android:key="de.s_paarmann.homeworkapp.HomeworkToday"
           android:title="@string/pref_homeworktoday"
           android:summary="@string/pref_homeworktoday_summary"
-          android:defaultValue="false" />
+          android:defaultValue="true" />
 
   </PreferenceCategory>
 
@@ -34,13 +34,13 @@
       android:key="de.s_paarmann.homeworkapp.AutomaticUpdates"
       android:title="@string/pref_autoupdates"
       android:summary="@string/pref_autoupdates_summary"
-      android:defaultValue="false" />
+      android:defaultValue="true" />
 
     <CheckBoxPreference
       android:key="de.s_paarmann.homeworkapp.AutomaticReminders"
       android:title="@string/pref_autoreminders"
       android:summary="@string/pref_autoreminders_summary"
-      android:defaultValue="false" />
+      android:defaultValue="true" />
 
     <CheckBoxPreference
       android:key="de.s_paarmann.homeworkapp.InstantAutomaticReminders"
