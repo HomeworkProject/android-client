@@ -15,6 +15,7 @@
             android:title="Hausaufgaben" />
         <item
             android:id="@+id/nav_add_homework"
+            android:icon="@drawable/ic_action_new"
             android:title="Hausaufgaben hinzufügen" />
         <item
             android:id="@+id/nav_reminders"
@@ -27,6 +28,7 @@
         android:checkableBehavior="single">
         <item
             android:id="@+id/nav_logout"
+            android:icon="@drawable/ic_action_log_out"
             android:title="Logout" />
 
         <item
