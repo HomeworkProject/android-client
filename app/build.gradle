@@ -13,13 +13,13 @@ android {
         }
     }
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "24.0.2"
     defaultConfig {
         applicationId "de.s_paarmann.homeworkapp"
         minSdkVersion 16
         targetSdkVersion 24
-        versionCode 9
-        versionName "1.8"
+        versionCode 0
+        versionName "1.0-alpha1"
         signingConfig signingConfigs.key
 
         jackOptions {

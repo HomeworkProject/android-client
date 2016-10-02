@@ -5,6 +5,7 @@
 
 package de.s_paarmann.homeworkapp.ui;
 
+import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
@@ -15,12 +16,20 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.Toast;
+
+import de.s_paarmann.homeworkapp.Log;
+import de.s_paarmann.homeworkapp.R;
+import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import org.apache.commons.io.IOUtils;
 
@@ -39,15 +48,13 @@ import java.util.Scanner;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import de.s_paarmann.homeworkapp.Log;
-import de.s_paarmann.homeworkapp.R;
-import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
-
 public class MainFragment extends Fragment implements DatePickerDialog.OnDateSetListener {
 
   public static final String TAG = "MainFragment";
 
   private SharedPreferences prefs;
+
+  private final static int PERMISSION_REQUEST_UPDATE = 1;
 
   private boolean isPaused;
   private static List<DialogFragment> dialogsToShow = new ArrayList<>();
@@ -99,11 +106,11 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
       btnAfterNextDay.setText("Hausaufgaben zu Dienstag");
     }
 
-
     if (prefs.getBoolean(MainActivity.PREF_UPDATED, false)) {
       prefs.edit().putBoolean(MainActivity.PREF_UPDATED, false).apply();
       File file = new File(
-        Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk");
+          Environment.getExternalStorageDirectory(),
+          "homeworkapp-update.apk");
       file.delete();
 
       showChangelog();
@@ -131,7 +138,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
   }
 
   public void onBtnAllHomeworkClick(View view) {
-    ((MainActivity)getActivity()).showHomeworkDetailView("all");
+    ((MainActivity) getActivity()).showHomeworkDetailView("all");
   }
 
   public void onBtnTomorrowClick(View view) {
@@ -148,7 +155,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     String date = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(
         Calendar.DAY_OF_MONTH);
 
-    ((MainActivity)getActivity()).showHomeworkDetailView(date);
+    ((MainActivity) getActivity()).showHomeworkDetailView(date);
   }
 
   public void onBtnAfterTomorrowClick(View view) {
@@ -166,7 +173,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     String date = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(
         Calendar.DAY_OF_MONTH);
 
-    ((MainActivity)getActivity()).showHomeworkDetailView(date);
+    ((MainActivity) getActivity()).showHomeworkDetailView(date);
   }
 
   public void onBtnPickDateClick(View view) {
@@ -178,24 +185,47 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
   public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
     String date = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
 
-    ((MainActivity)getActivity()).showHomeworkDetailView(date);
+    ((MainActivity) getActivity()).showHomeworkDetailView(date);
   }
 
   public void checkForUpdates(boolean userInitiated) {
     new CheckForUpdateTask()
-        .execute(getResources().getString(R.string.server_uri), String.valueOf(userInitiated));
+        .execute(getResources().getString(R.string.update_server_uri),
+            String.valueOf(userInitiated));
   }
 
   private void askForUpdate(int newVersionCode, String newVersionName) {
     DialogFragment dialog = new UpdateDialog().setVersionName(newVersionName);
-    dialog.show(getFragmentManager(), "updateDialog");
+    if (getActivity() != null) {
+      dialog.show(getFragmentManager(), "updateDialog");
+    }
   }
 
   public void update() {
-    getView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
-    getView().findViewById(R.id.txtUpdating).setVisibility(View.VISIBLE);
-    new UpdateTask()
-        .execute(getResources().getString(R.string.server_uri) + "/app/physikbioapp-latest.apk");
+    if (ActivityCompat
+            .checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(getActivity(),
+          new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_UPDATE);
+    } else {
+      getView().findViewById(R.id.progressBar2).setVisibility(View.VISIBLE);
+      getView().findViewById(R.id.txtUpdating).setVisibility(View.VISIBLE);
+      new UpdateTask()
+          .execute(
+              getResources().getString(R.string.update_server_uri) + "/app/homeworkapp-latest.apk");
+    }
+  }
+
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+    if (getActivity() == null) return;
+    if (requestCode == PERMISSION_REQUEST_UPDATE) {
+      if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+        Toast.makeText(getActivity(), "Update abgebrochen.", Toast.LENGTH_LONG).show();
+      } else {
+        update();
+      }
+    }
   }
 
   private void showChangelog() {
@@ -236,7 +266,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
         }
 
         int currVersionCode = getActivity().getPackageManager().getPackageInfo(
-          getActivity().getPackageName(), 0).versionCode;
+            getActivity().getPackageName(), 0).versionCode;
         if (versionCode > currVersionCode) {
           askForUpdate(versionCode, versionName);
         } else {
@@ -259,13 +289,10 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     }
   }
 
-  private class UpdateTask extends AsyncTask<String, Void, String> {
+  private class UpdateTask extends AsyncTask<String, Void, File> {
 
     @Override
-    protected String doInBackground(String... params) {
-      String
-          path =
-          Environment.getExternalStorageDirectory().getPath() + "/physikbioapp-update.apk";
+    protected File doInBackground(String... params) {
       try {
         URL url = new URL(params[0]);
         URLConnection connection = url.openConnection();
@@ -274,7 +301,12 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
         int fileLength = connection.getContentLength();
 
         InputStream input = new BufferedInputStream(url.openStream());
-        OutputStream output = new FileOutputStream(path);
+
+        File file = new File(
+            Environment.getExternalStorageDirectory(),
+            "homeworkapp-update.apk");
+
+        OutputStream output = new FileOutputStream(file);
 
         byte data[] = new byte[1024];
         long total = 0;
@@ -287,17 +319,30 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
         output.flush();
         output.close();
         input.close();
+
+        return file;
       } catch (Exception e) {
         Log.e(TAG, "Update failed!", e);
+        return null;
       }
-      return path;
     }
 
     @Override
-    protected void onPostExecute(String s) {
+    protected void onPostExecute(File file) {
+      if (file == null) {
+        if (getActivity() != null) {
+          Toast.makeText(getActivity(),
+              "Fehler beim Herunterladen des Updates.", Toast.LENGTH_LONG).show();
+        }
+        return;
+      }
+
       Intent i = new Intent();
       i.setAction(Intent.ACTION_VIEW);
-      i.setDataAndType(Uri.fromFile(new File(s)), "application/vnd.android.package-archive");
+      i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      Uri fileUri = FileProvider.getUriForFile(getActivity(),
+        "de.s_paarmann.homeworkapp.fileprovider", file);
+      i.setDataAndType(fileUri, "application/vnd.android.package-archive");
 
       prefs.edit().putBoolean(MainActivity.PREF_UPDATED, true).apply();
 

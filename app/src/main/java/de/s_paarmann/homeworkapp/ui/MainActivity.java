@@ -13,7 +13,9 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -32,7 +34,8 @@ import de.s_paarmann.homeworkapp.network.LoginManager;
 import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+                                                    ActivityCompat.OnRequestPermissionsResultCallback {
   public static final String TAG = "MainActivity";
 
   public static final String ACTION_REMIND = "de.s_paarmann.homeworkapp.action.REMIND";
@@ -199,6 +202,14 @@ public class MainActivity extends AppCompatActivity {
         return true;
       default:
         return super.onOptionsItemSelected(item);
+    }
+  }
+
+  @Override
+  public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                         @NonNull int[] grantResults) {
+    if (currentView == Views.MAIN) {
+      ((MainFragment) fragment).onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
   }
 
