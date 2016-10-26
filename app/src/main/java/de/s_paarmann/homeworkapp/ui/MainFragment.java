@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.annotation.NonNull;
@@ -333,12 +334,21 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
         return;
       }
 
+
       Intent i = new Intent();
-      i.setAction(Intent.ACTION_VIEW);
-      i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-      Uri fileUri = FileProvider.getUriForFile(getActivity(),
-        "de.s_paarmann.homeworkapp.fileprovider", file);
-      i.setDataAndType(fileUri, "application/vnd.android.package-archive");
+      // Android N requires using content:// URIs for sharing private files, however devices with
+      // older versions may not have an .apk installer that can deal with those URIs so we use a
+      // normal file:// URI there.
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        i.setAction(Intent.ACTION_VIEW);
+        i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        Uri fileUri = FileProvider.getUriForFile(getActivity(),
+            "de.s_paarmann.homeworkapp.fileprovider", file);
+        i.setDataAndType(fileUri, "application/vnd.android.package-archive");
+      } else {
+        i.setAction(Intent.ACTION_VIEW);
+        i.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+      }
 
       prefs.edit().putBoolean(MainActivity.PREF_UPDATED, true).apply();
 
