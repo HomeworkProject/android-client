@@ -77,11 +77,6 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     return layout;
   }
 
-  public void ontbnTmpClick(View v) {
-    Intent intent = new Intent(getActivity(), LoginActivity.class);
-    startActivity(intent);
-  }
-
   @Override
   public void onActivityCreated(Bundle savedInstanceState) {
     super.onActivityCreated(savedInstanceState);
@@ -197,7 +192,8 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
   private void askForUpdate(int newVersionCode, String newVersionName) {
     DialogFragment dialog = new UpdateDialog().setVersionName(newVersionName);
     if (getActivity() != null) {
-      dialog.show(getFragmentManager(), "updateDialog");
+      if (isPaused) dialogsToShow.add(dialog);
+      else dialog.show(getFragmentManager(), "updateDialog");
     }
   }
 
