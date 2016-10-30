@@ -61,7 +61,7 @@
     <string name="pref_mobile_data">Mobile Daten benutzen</string>
     <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
     <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>
-    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-E2b zu Q1b geändert\n-\'Sofort erinnern\' hinzugefügt\n-Mehrere Bugs behoben</string>
+    <string name="changelog">Erste Early-Access Version der neuen App.</string>
     <string name="title_activity_add_homework">Hausaufgabe hinzufügen</string>
     <string name="title_activity_login">Login</string>
     <string name="action_delete">Löschen</string>
