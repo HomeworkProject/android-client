@@ -51,7 +51,7 @@ public class AddHomeworkFragment extends Fragment {
       initialDate = selectedDate;
     } else {
       initialDate = Calendar.getInstance();
-      selectedDate = initialDate;
+      //selectedDate = initialDate;
       initialDate.add(Calendar.DAY_OF_MONTH, 1);
     }
 
@@ -67,6 +67,9 @@ public class AddHomeworkFragment extends Fragment {
   }
 
   private void setDate(int y, int m, int d) {
+    if (selectedDate == null) {
+      selectedDate = Calendar.getInstance();
+    }
     selectedDate.set(y, m, d, 0, 0, 0);
 
     Button btnChooseDate = (Button) getView().findViewById(R.id.btnChooseDate);
