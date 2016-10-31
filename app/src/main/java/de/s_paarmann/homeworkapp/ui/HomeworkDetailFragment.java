@@ -428,6 +428,8 @@ public class HomeworkDetailFragment extends Fragment {
   }
 
   public void setData(List<HAElement> data) {
+    if (getView() == null) return;
+
     ListView list = (ListView) getView().findViewById(R.id.lsViewHomework);
     list.clearChoices();
     list.requestLayout();
