@@ -12,12 +12,12 @@ android {
             storePassword 'dummy'
         }
     }
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 25
+    buildToolsVersion "25"
     defaultConfig {
         applicationId "de.s_paarmann.homeworkapp"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 0
         versionName "1.0.0-alpha1"
         signingConfig signingConfigs.key
