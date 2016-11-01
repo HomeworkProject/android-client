@@ -8,7 +8,7 @@ checkout:
 dependencies:
   override:
     - echo y | android update sdk --no-ui --all --filter tools,platform-tools
-    - echo y | android update skd --no-ui --all --filter build-tools-25,android-25
+    - echo y | android update sdk --no-ui --all --filter build-tools-25,android-25
     - echo y | android update sdk --no-ui --all --filter extra-android-m2repository,extra-google-m2repository,extra-android-support
     - chmod +x ./gradlew
     - ./gradlew dependencies
