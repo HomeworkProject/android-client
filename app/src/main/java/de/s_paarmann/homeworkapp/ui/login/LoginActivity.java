@@ -160,11 +160,11 @@ public class LoginActivity extends AppCompatActivity {
 
     try {
       mgr.connect().registerListener(connFuture -> {
-        if (connFuture.getErrorCode() == IHWFuture.ERRORCodes.OK) {
+        if (((IHWFuture)connFuture).getErrorCode() == IHWFuture.ERRORCodes.OK) {
           mgr.isCompatible().registerListener(compFuture -> {
-            if (((boolean) compFuture.getOrElse(Boolean.FALSE)) ) {
+            if (((boolean) ((IHWFuture<Boolean>)(compFuture)).getOrElse(Boolean.FALSE))) {
               mgr.getGroups("").registerListener(getGrpFuture -> {
-                if (getGrpFuture.getErrorCode() == IHWFuture.ERRORCodes.OK) {
+                if (((IHWFuture)getGrpFuture).getErrorCode() == IHWFuture.ERRORCodes.OK) {
                   groups = ((IHWFuture<IHWGroupMapping>) getGrpFuture).get();
 
                   runOnUiThread(() -> {

@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 
 import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.data.IHWFutureListener;
 import de.mlessmann.api.data.IHWProvider;
 import de.mlessmann.api.data.IHWSession;
 import de.mlessmann.api.data.IHWUser;
@@ -20,6 +19,7 @@ import de.mlessmann.api.logging.LogLevel;
 import de.mlessmann.api.logging.Types;
 import de.mlessmann.api.main.HWMgr;
 import de.mlessmann.api.networking.CloseReason;
+import de.mlessmann.common.parallel.IFutureListener;
 import de.mlessmann.exceptions.StillConnectedException;
 import de.mlessmann.internals.data.HWProvider;
 import de.mlessmann.internals.data.HWSession;
@@ -310,8 +310,7 @@ public class LoginManager {
             if (!compFuture.get()) {
               listener.onLoginDone(LoginResultListener.Result.SERVER_INCOMPATIBLE);
             } else {
-
-              IHWFutureListener l = (loginFuture -> {
+              IFutureListener l = (loginFuture -> {
                 IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
                 if (userFuture.getErrorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
                   Log.d(TAG, "Error code: " + userFuture.getErrorCode());

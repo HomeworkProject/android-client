@@ -113,8 +113,8 @@ public class HomeworkManager {
         IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
 
         mgr.addHW(carrier).registerListener(future -> {
-          if (future.getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
-            CloseReason closeReason = (CloseReason) future.getError();
+          if (((IHWFuture)future).getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
+            CloseReason closeReason = (CloseReason) ((IHWFuture)future).getError();
             if (closeReason != CloseReason.KILL) {
               mgr.addHW(carrier).registerListener(f -> {
                 OnAddHWDone((IHWFuture<Boolean>) f, listener);
@@ -152,8 +152,8 @@ public class HomeworkManager {
             Integer.parseInt(sd[2]),
             };
         mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
-          if (future.getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
-            CloseReason closeReason = (CloseReason) future.getError();
+          if (((IHWFuture)future).getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
+            CloseReason closeReason = (CloseReason) ((IHWFuture)future).getError();
             if (closeReason != CloseReason.KILL) {
               mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(f -> {
                 OnDeleteHWDone((IHWFuture<Boolean>) f, listener);
