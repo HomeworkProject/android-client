@@ -55,15 +55,15 @@ import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import static android.view.View.GONE;
 
-public class HomeworkDetailFragment extends Fragment {
+public class HomeworkListFragment extends Fragment {
 
-  public static final String TAG = "HomeworkDetailFragment";
+  public static final String TAG = "HomeworkListFragment";
 
   public static final String EXTRA_DATE = "de.s_paarmann.homeworkapp.extra.date";
 
   private String strDate;
 
-  public HomeworkDetailFragment() {
+  public HomeworkListFragment() {
   }
 
   private DialogFragment reminderDialog;
@@ -74,7 +74,7 @@ public class HomeworkDetailFragment extends Fragment {
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
     Bundle savedInstanceState) {
 
-    View root = inflater.inflate(R.layout.fragment_homework_detail, container, false);
+    View root = inflater.inflate(R.layout.fragment_homework_list, container, false);
 
     strDate = getArguments().getString(EXTRA_DATE);
 

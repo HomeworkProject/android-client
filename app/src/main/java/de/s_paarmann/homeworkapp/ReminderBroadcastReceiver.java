@@ -19,7 +19,7 @@ import android.os.Vibrator;
 
 import java.util.List;
 
-import de.s_paarmann.homeworkapp.ui.HomeworkDetailFragment;
+import de.s_paarmann.homeworkapp.ui.HomeworkListFragment;
 import de.s_paarmann.homeworkapp.ui.MainActivity;
 
 /**
@@ -37,7 +37,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
     Reminder reminder = Reminder.fromUri(context, data);
 
     Intent clickIntent = new Intent(context, MainActivity.class);
-    clickIntent.putExtra(HomeworkDetailFragment.EXTRA_DATE, "all");
+    clickIntent.putExtra(HomeworkListFragment.EXTRA_DATE, "all");
     clickIntent.putExtra(MainActivity.EXTRA_OPEN_VIEW, MainActivity.Views.HOMEWORK_DETAIL.name());
 
     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);

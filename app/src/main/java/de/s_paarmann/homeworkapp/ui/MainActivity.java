@@ -218,7 +218,7 @@ public class MainActivity extends AppCompatActivity implements
 
     if (frag instanceof MainFragment)
       currentView = Views.MAIN;
-    else if (frag instanceof HomeworkDetailFragment)
+    else if (frag instanceof HomeworkListFragment)
       currentView = Views.HOMEWORK_DETAIL;
     else if (frag instanceof AddHomeworkFragment)
       currentView = Views.ADD_HOMEWORK;
@@ -285,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements
         showMainView();
         break;
       case HOMEWORK_DETAIL:
-        showHomeworkDetailView(getIntent().getStringExtra(HomeworkDetailFragment.EXTRA_DATE));
+        showHomeworkDetailView(getIntent().getStringExtra(HomeworkListFragment.EXTRA_DATE));
         break;
       case ADD_HOMEWORK:
         showAddHomeworkView();
@@ -304,12 +304,12 @@ public class MainActivity extends AppCompatActivity implements
   }
 
   public void showHomeworkDetailView(String strDate) {
-    Fragment frag = new HomeworkDetailFragment();
+    Fragment frag = new HomeworkListFragment();
     Bundle args = new Bundle();
     if (strDate == null) {
-      args.putString(HomeworkDetailFragment.EXTRA_DATE, "all");
+      args.putString(HomeworkListFragment.EXTRA_DATE, "all");
     } else {
-      args.putString(HomeworkDetailFragment.EXTRA_DATE, strDate);
+      args.putString(HomeworkListFragment.EXTRA_DATE, strDate);
     }
     frag.setArguments(args);
 
