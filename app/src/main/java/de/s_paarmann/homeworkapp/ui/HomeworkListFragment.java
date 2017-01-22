@@ -31,7 +31,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import de.mlessmann.api.data.IHWFuture;
+import de.mlessmann.homework.api.error.Error;
+import de.s_paarmann.homeworkapp.AutomaticReminderManager;
+import de.s_paarmann.homeworkapp.HAElement;
+import de.s_paarmann.homeworkapp.HAElementArrayAdapter;
+import de.s_paarmann.homeworkapp.Log;
+import de.s_paarmann.homeworkapp.R;
+import de.s_paarmann.homeworkapp.network.HomeworkManager;
+import de.s_paarmann.homeworkapp.network.LoginResultListener;
+import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,16 +50,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import de.mlessmann.api.networking.CloseReason;
-import de.s_paarmann.homeworkapp.AutomaticReminderManager;
-import de.s_paarmann.homeworkapp.HAElement;
-import de.s_paarmann.homeworkapp.HAElementArrayAdapter;
-import de.s_paarmann.homeworkapp.Log;
-import de.s_paarmann.homeworkapp.R;
-import de.s_paarmann.homeworkapp.network.HomeworkManager;
-import de.s_paarmann.homeworkapp.network.LoginResultListener;
-import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import static android.view.View.GONE;
 
@@ -72,7 +70,7 @@ public class HomeworkListFragment extends Fragment {
   @Nullable
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
-    Bundle savedInstanceState) {
+                           Bundle savedInstanceState) {
 
     View root = inflater.inflate(R.layout.fragment_homework_list, container, false);
 
@@ -163,7 +161,7 @@ public class HomeworkListFragment extends Fragment {
         // using the new HAElement system)
         boolean unmarkItems = false;
         for (int position : checkedItems) {
-         HAElement element = (HAElement) listView.getItemAtPosition(position);
+          HAElement element = (HAElement) listView.getItemAtPosition(position);
           if (doneItems.contains(element.id)) {
             unmarkItems = true;
             break;
@@ -251,7 +249,7 @@ public class HomeworkListFragment extends Fragment {
    */
   private void copyCurrentItems() {
     ClipboardManager clipboard = (ClipboardManager) getActivity()
-      .getSystemService(Context.CLIPBOARD_SERVICE);
+        .getSystemService(Context.CLIPBOARD_SERVICE);
     ListView listView = (ListView) getView().findViewById(R.id.lsViewHomework);
     SparseBooleanArray items = listView.getCheckedItemPositions();
     String toCopy = "";
@@ -265,8 +263,8 @@ public class HomeworkListFragment extends Fragment {
     ClipData data = ClipData.newPlainText("homework", toCopy);
     clipboard.setPrimaryClip(data);
     Toast.makeText(getActivity(),
-                   (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert",
-                   Toast.LENGTH_SHORT).show();
+        (items.size() == 1 ? "Eintrag" : "Einträge") + " in die Zwischenablage kopiert",
+        Toast.LENGTH_SHORT).show();
   }
 
   private void setNewReminder() {
@@ -287,14 +285,14 @@ public class HomeworkListFragment extends Fragment {
       HAElement element = selectedItems.get(0);
 
       HomeworkManager.deleteHomework(getActivity(), element, result -> {
-        if (result == IHWFuture.ERRORCodes.OK) {
+        if (result == Error.ErrorCode.OK) {
           getActivity().runOnUiThread(() -> {
             Toast.makeText(getActivity(), "Hausaufgabe gelöscht.", Toast.LENGTH_SHORT).show();
             loadHomework(getView(), true);
           });
         } else {
           String msg;
-          if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
+          if (result == Error.ErrorCode.FORBIDDEN) {
             msg = "Du bist nicht berechtigt, diese Hausaufgabe zu löschen.";
           } else {
             msg = "Beim Löschen der Hausaufgabe ist ein Fehler aufgetreten.";
@@ -389,21 +387,20 @@ public class HomeworkListFragment extends Fragment {
     loadingIcon.setVisibility(View.VISIBLE);
 
     HomeworkManager.GetHWListener myListener = (hw, loginResult, error) -> {
-      if (getActivity() != null) getActivity().runOnUiThread(() -> {
-        if (loginResult == LoginResultListener.Result.NO_CREDENTIALS_PRESENT
-            || loginResult == LoginResultListener.Result.INVALID_CREDENTIALS) {
-          Toast.makeText(getActivity(), "Ungültige Zugangsdaten", Toast.LENGTH_LONG).show();
+      if (getActivity() != null) {
+        getActivity().runOnUiThread(() -> {
+          if (loginResult == LoginResultListener.Result.NO_CREDENTIALS_PRESENT
+              || loginResult == LoginResultListener.Result.INVALID_CREDENTIALS) {
+            Toast.makeText(getActivity(), "Ungültige Zugangsdaten", Toast.LENGTH_LONG).show();
 
-          startActivity(new Intent(getActivity(), LoginActivity.class));
-        } else if (loginResult == LoginResultListener.Result.CONNECTION_CLOSED && !secondTry) {
-          CloseReason closeReason = (CloseReason) error;
-          if (closeReason != CloseReason.KILL) {
+            startActivity(new Intent(getActivity(), LoginActivity.class));
+          } else if (loginResult == LoginResultListener.Result.CONNECTION_CLOSED && !secondTry) {
             loadHomework(root, forceDownload, true);
+          } else {
+            setData(hw);
           }
-        } else {
-          setData(hw);
-        }
-      });
+        });
+      }
     };
 
     if (strDate.equals("all")) {
@@ -428,7 +425,9 @@ public class HomeworkListFragment extends Fragment {
   }
 
   public void setData(List<HAElement> data) {
-    if (getView() == null) return;
+    if (getView() == null) {
+      return;
+    }
 
     ListView list = (ListView) getView().findViewById(R.id.lsViewHomework);
     list.clearChoices();

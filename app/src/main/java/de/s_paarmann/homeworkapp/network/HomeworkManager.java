@@ -7,19 +7,18 @@ package de.s_paarmann.homeworkapp.network;
 
 import android.content.Context;
 
-import de.mlessmann.api.data.IHWCarrier;
-import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.data.IHWObj;
+import de.mlessmann.homework.api.error.Error;
+import de.mlessmann.homework.api.future.IHWFuture;
+import de.mlessmann.homework.api.homework.IHWCarrier;
+import de.mlessmann.homework.api.homework.IHomework;
+import de.s_paarmann.homeworkapp.AutomaticReminderManager;
+import de.s_paarmann.homeworkapp.HAElement;
+import de.s_paarmann.homeworkapp.Log;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
-import de.mlessmann.api.networking.CloseReason;
-import de.s_paarmann.homeworkapp.AutomaticReminderManager;
-import de.s_paarmann.homeworkapp.HAElement;
-import de.s_paarmann.homeworkapp.Log;
 
 // TODO: Caching
 public class HomeworkManager {
@@ -51,8 +50,8 @@ public class HomeworkManager {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         mgr.getHWOn(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH) + 1,
-                    cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-          OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener, result);
+            cal.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
+          OnGetHWDone(ctx, (IHWFuture<List<IHomework>>) future, listener, result);
         });
       } else {
         OnGetHWDone(ctx, null, listener, result);
@@ -75,10 +74,10 @@ public class HomeworkManager {
         calStart.setTime(startDate);
         calEnd.setTime(endDate);
         mgr.getHWBetween(calStart.get(Calendar.YEAR), calStart.get(Calendar.MONTH) + 1,
-                         calStart.get(Calendar.DAY_OF_MONTH),
-                         calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
-                         calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
-          OnGetHWDone(ctx, (IHWFuture<List<IHWObj>>) future, listener, result);
+            calStart.get(Calendar.DAY_OF_MONTH),
+            calEnd.get(Calendar.YEAR), calEnd.get(Calendar.MONTH) + 1,
+            calEnd.get(Calendar.DAY_OF_MONTH)).registerListener(future -> {
+          OnGetHWDone(ctx, (IHWFuture<List<IHomework>>) future, listener, result);
         });
       } else {
         OnGetHWDone(ctx, null, listener, result);
@@ -92,38 +91,26 @@ public class HomeworkManager {
 
   public static void addHomework(Context ctx, HAElement element, AddHWListener listener,
                                  boolean silent) {
-    LoginManager.getHWMgr(ctx, (mgr, result) -> {
+    LoginManager.getHWMgr(ctx, (connection, result) -> {
       if (result == LoginResultListener.Result.LOGGED_IN) {
-        if (mgr == null) {
-          listener.onHomeworkAdded(IHWFuture.ERRORCodes.LOGINREQ);
-          return;
-        }
-
         IHWCarrier.Builder builder = IHWCarrier.Builder.builder();
         IHWCarrier.JSONBuilder jsonBuilder = new IHWCarrier.JSONBuilder();
 
         String[] d = element.date.split("-");
         jsonBuilder.date(Integer.parseInt(d[0]),
-                         Integer.parseInt(d[1]),
-                         Integer.parseInt(d[2]));
+            Integer.parseInt(d[1]),
+            Integer.parseInt(d[2]));
         jsonBuilder.subject(element.subject);
         jsonBuilder.title(element.title);
         jsonBuilder.description(element.desc);
 
         IHWCarrier carrier = builder.json(jsonBuilder.build()).build();
 
-        mgr.addHW(carrier).registerListener(future -> {
-          if (((IHWFuture)future).getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
-            CloseReason closeReason = (CloseReason) ((IHWFuture)future).getError();
-            if (closeReason != CloseReason.KILL) {
-              mgr.addHW(carrier).registerListener(f -> {
-                OnAddHWDone((IHWFuture<Boolean>) f, listener);
-              });
-            } else {
-              OnAddHWDone((IHWFuture<Boolean>) future, listener);
-            }
-          } else {
+        connection.postHW(carrier).registerListener(future -> {
+          if (((IHWFuture) future).getError() == Error.OK) {
             OnAddHWDone((IHWFuture<Boolean>) future, listener);
+          } else {
+            OnAddHWDone(null, listener);
           }
         });
       } else {
@@ -138,30 +125,16 @@ public class HomeworkManager {
 
   public static void deleteHomework(Context ctx, HAElement element, DeleteHWListener listener,
                                     boolean silent) {
-    LoginManager.getHWMgr(ctx, (mgr, result) -> {
+    LoginManager.getHWMgr(ctx, (connection, result) -> {
       if (result == LoginResultListener.Result.LOGGED_IN) {
-        if (mgr == null) {
-          listener.onHomeworkDeleted(IHWFuture.ERRORCodes.LOGINREQ);
-          return;
-        }
-
         String[] sd = element.date.split("-");
         int[] d = new int[]{
             Integer.parseInt(sd[0]),
             Integer.parseInt(sd[1]),
             Integer.parseInt(sd[2]),
             };
-        mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
-          if (((IHWFuture)future).getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
-            CloseReason closeReason = (CloseReason) ((IHWFuture)future).getError();
-            if (closeReason != CloseReason.KILL) {
-              mgr.delHW(element.id, d[0], d[1], d[2]).registerListener(f -> {
-                OnDeleteHWDone((IHWFuture<Boolean>) f, listener);
-              });
-            } else {
-              OnDeleteHWDone((IHWFuture<Boolean>) future, listener);
-            }
-          }
+
+        connection.delHW(element.id, d[0], d[1], d[2]).registerListener(future -> {
           OnDeleteHWDone((IHWFuture<Boolean>) future, listener);
         });
       } else {
@@ -170,7 +143,7 @@ public class HomeworkManager {
     }, silent);
   }
 
-  private static void OnGetHWDone(Context ctx, IHWFuture<List<IHWObj>> hwFuture,
+  private static void OnGetHWDone(Context ctx, IHWFuture<List<IHomework>> hwFuture,
                                   GetHWListener listener, LoginResultListener.Result loginResult) {
     HAElement error = new HAElement();
     error.id = "0";
@@ -186,20 +159,20 @@ public class HomeworkManager {
       } else {
         error.subject = "Fehler beim einloggen.";
       }
-    } else if (hwFuture.getErrorCode() != IHWFuture.ERRORCodes.OK) {
-      Log.e(TAG, "GetHW returned error: " + hwFuture.getErrorCode());
-      error.subject = String.valueOf(hwFuture.getErrorCode()); // TODO
+    } else if (hwFuture.getError() != Error.OK) {
+      Log.e(TAG, "GetHW returned error: " + hwFuture.getError());
+      error.subject = String.valueOf(hwFuture.getError().getCode()); // TODO
     }
-    if (hwFuture == null || hwFuture.getErrorCode() != IHWFuture.ERRORCodes.OK) {
+    if (hwFuture == null || hwFuture.getError() != Error.OK) {
       list.add(error);
       listener.onHomeworkReceived(list, loginResult, hwFuture == null ? null : hwFuture.getError());
       return;
     }
 
-    List<IHWObj> hwObjs = hwFuture.get();
+    List<IHomework> hwObjs = hwFuture.get();
     List<HAElement> elements = new ArrayList<>(hwObjs.size());
 
-    for (IHWObj obj : hwObjs) {
+    for (IHomework obj : hwObjs) {
       HAElement elem = new HAElement();
       elem.id = obj.getId();
       int[] d = obj.getDate();
@@ -216,11 +189,13 @@ public class HomeworkManager {
   }
 
   private static void OnAddHWDone(IHWFuture<Boolean> future, AddHWListener listener) {
-    listener.onHomeworkAdded(future == null ? IHWFuture.ERRORCodes.UNKNOWN : future.getErrorCode());
+    listener
+        .onHomeworkAdded(future == null ? Error.ErrorCode.UNKNOWN : future.getError().getCode());
   }
 
   private static void OnDeleteHWDone(IHWFuture<Boolean> future, DeleteHWListener listener) {
-    listener.onHomeworkDeleted(future == null ? IHWFuture.ERRORCodes.UNKNOWN : future.getErrorCode());
+    listener
+        .onHomeworkDeleted(future.getError().getCode());
   }
 
 }

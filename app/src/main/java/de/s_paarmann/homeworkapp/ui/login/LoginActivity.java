@@ -19,11 +19,16 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.data.IHWGroupMapping;
-import de.mlessmann.api.data.IHWProvider;
-import de.mlessmann.api.main.HWMgr;
-import de.mlessmann.exceptions.StillConnectedException;
+import de.mlessmann.homework.api.CDK;
+import de.mlessmann.homework.api.ICDKConnection;
+import de.mlessmann.homework.api.error.Error;
+import de.mlessmann.homework.api.event.ICDKConnectionEvent;
+import de.mlessmann.homework.api.event.ICDKEvent;
+import de.mlessmann.homework.api.event.ICDKListener;
+import de.mlessmann.homework.api.event.network.ConnectionStatus;
+import de.mlessmann.homework.api.future.IHWFuture;
+import de.mlessmann.homework.api.provider.IHWProvider;
+import de.mlessmann.homework.api.session.IHWGroupMapping;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.LoginManager;
 import de.s_paarmann.homeworkapp.network.LoginResultListener;
@@ -38,7 +43,8 @@ public class LoginActivity extends AppCompatActivity {
   private FrameLayout contentFrame;
   private LayoutInflater inflater;
 
-  private HWMgr mgr;
+  private CDK cdk;
+  private ICDKConnection connection;
   private List<IHWProvider> providers;
 
   private IHWProvider selectedProvider;
@@ -83,17 +89,15 @@ public class LoginActivity extends AppCompatActivity {
   }
 
   private void loadProviders() {
-    if (mgr == null) {
-      mgr = new HWMgr();
-      mgr.registerLogListener(LoginManager.LogListener);
-    } else {
-      mgr.release(true);
+    if (cdk == null) {
+      cdk = CDK.getInstance();
+      cdk.registerListener(LoginManager.LogListener);
     }
 
-    mgr.getAvailableProvidersOBJ(null).registerListener(future -> {
+    cdk.listProviders(null).registerListener(future -> {
       IHWFuture<List<IHWProvider>> providerFuture = (IHWFuture<List<IHWProvider>>) future;
 
-      if (providerFuture.getErrorCode() == IHWFuture.ERRORCodes.OK) {
+      if (providerFuture.getError() == Error.OK) {
         providers = providerFuture.get();
         runOnUiThread(this::displayProviderSelect);
       } else {
@@ -124,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                                                      providerNames);
+        providerNames);
     lsProviders.setAdapter(adapter);
 
     lsProviders.setOnItemClickListener((parent, view, position, id) -> {
@@ -147,43 +151,41 @@ public class LoginActivity extends AppCompatActivity {
 
     contentFrame.removeView(contentFrame.findViewById(R.id.content_login_provider));
 
-    try {
-      mgr.setProvider(selectedProvider);
-    } catch (StillConnectedException e) {
-      mgr.release(true);
-      try {
-        mgr.setProvider(selectedProvider);
-      } catch (StillConnectedException e2) {
-        // Impossible
-      }
-    }
+    cdk.registerListener(new ICDKListener() {
+      @Override
+      public void onEvent(ICDKEvent event) {
+        if (event instanceof ICDKConnectionEvent) {
+          if (event.getConnection() != connection) {
+            event.getConnection().kill();
+            return;
+          }
 
-    try {
-      mgr.connect().registerListener(connFuture -> {
-        if (((IHWFuture)connFuture).getErrorCode() == IHWFuture.ERRORCodes.OK) {
-          mgr.isCompatible().registerListener(compFuture -> {
-            if (((boolean) ((IHWFuture<Boolean>)(compFuture)).getOrElse(Boolean.FALSE))) {
-              mgr.getGroups("").registerListener(getGrpFuture -> {
-                if (((IHWFuture)getGrpFuture).getErrorCode() == IHWFuture.ERRORCodes.OK) {
-                  groups = ((IHWFuture<IHWGroupMapping>) getGrpFuture).get();
+          ICDKConnectionEvent connEvent = (ICDKConnectionEvent) event;
 
-                  runOnUiThread(() -> {
-                    displayGroupSelect();
-                  });
-                } else {
-                  runOnUiThread(() -> {
-                    new AlertDialog.Builder(this)
-                        .setTitle("Error")
-                        .setMessage("Fehler beim Herunterladen der Liste von Klassen.")
-                        .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
-                          dialog.dismiss();
-                          loadGroups();
-                        }))
-                        .show();
-                  });
-                }
-              });
-            } else {
+          if (connEvent.getStatus() == ConnectionStatus.CONNECTING) {
+            return;
+          }
+
+          if (connEvent.getStatus() == ConnectionStatus.CONNECTED) {
+            connection.getGroups(null).registerListener(getGrpFuture -> {
+              if (((IHWFuture) getGrpFuture).getError() == Error.OK) {
+                groups = ((IHWFuture<IHWGroupMapping>) getGrpFuture).get();
+
+                runOnUiThread(LoginActivity.this::displayGroupSelect);
+              } else {
+                runOnUiThread(() -> {
+                  new AlertDialog.Builder(LoginActivity.this)
+                      .setTitle("Error")
+                      .setMessage("Fehler beim Herunterladen der Liste von Klassen.")
+                      .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
+                        dialog.dismiss();
+                        loadGroups();
+                      }))
+                      .show();
+                });
+              }
+            });
+            /*} else {
               runOnUiThread(() -> {
                 new AlertDialog.Builder(this)
                     .setTitle("Error")
@@ -194,24 +196,30 @@ public class LoginActivity extends AppCompatActivity {
                     }))
                     .show();
               });
-            }
-          });
-        } else {
-          runOnUiThread(() -> {
-            new AlertDialog.Builder(this)
-                .setTitle("Error")
-                .setMessage("Fehler beim Verbinden zum Server")
-                .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
-                  dialog.dismiss();
-                  loadGroups();
-                }))
-                .show();
-          });
+            }*/
+          } else if (connEvent.getStatus() == ConnectionStatus.CONNECTING_INTERRUPTED) {
+            // TODO: Handle this
+            return;
+          } else if (connEvent.getStatus() != ConnectionStatus.CONNECTING) {
+            runOnUiThread(() -> {
+              new AlertDialog.Builder(LoginActivity.this)
+                  .setTitle("Error")
+                  .setMessage("Fehler beim Verbinden zum Server")
+                  .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
+                    dialog.dismiss();
+                    loadGroups();
+                  }))
+                  .show();
+            });
+          }
         }
-      });
-    } catch (StillConnectedException e) {
-      // impossible
-    }
+
+        cdk.unregisterListener(this);
+      }
+    });
+
+    connection = cdk.connect(selectedProvider);
+    connection.start();
   }
 
   private void displayGroupSelect() {
@@ -225,7 +233,7 @@ public class LoginActivity extends AppCompatActivity {
     ListView lsGroups = (ListView) contentFrame.findViewById(R.id.lsViewGroups);
 
     ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                                                      groups.getGroups());
+        groups.getGroups());
     lsGroups.setAdapter(adapter);
 
     lsGroups.setOnItemClickListener((parent, view, position, id) -> {
@@ -255,7 +263,7 @@ public class LoginActivity extends AppCompatActivity {
     ListView lsUsers = (ListView) contentFrame.findViewById(R.id.lsViewUsers);
 
     ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                                                      groups.getUsersFor(selectedGroup));
+        groups.getUsersFor(selectedGroup));
     lsUsers.setAdapter(adapter);
 
     lsUsers.setOnItemClickListener((parent, view, position, id) -> {

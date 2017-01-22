@@ -9,20 +9,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import de.mlessmann.api.data.IHWFuture;
-import de.mlessmann.api.data.IHWProvider;
-import de.mlessmann.api.data.IHWSession;
-import de.mlessmann.api.data.IHWUser;
-import de.mlessmann.api.logging.IHWLogContext;
-import de.mlessmann.api.logging.ILogListener;
-import de.mlessmann.api.logging.LogLevel;
-import de.mlessmann.api.logging.Types;
-import de.mlessmann.api.main.HWMgr;
-import de.mlessmann.api.networking.CloseReason;
 import de.mlessmann.common.parallel.IFutureListener;
-import de.mlessmann.exceptions.StillConnectedException;
-import de.mlessmann.internals.data.HWProvider;
-import de.mlessmann.internals.data.HWSession;
+import de.mlessmann.homework.api.CDK;
+import de.mlessmann.homework.api.ICDKConnection;
+import de.mlessmann.homework.api.error.Error;
+import de.mlessmann.homework.api.event.ICDKConnectionEvent;
+import de.mlessmann.homework.api.event.ICDKEvent;
+import de.mlessmann.homework.api.event.ICDKListener;
+import de.mlessmann.homework.api.event.ICDKLogEvent;
+import de.mlessmann.homework.api.event.network.ConnectionStatus;
+import de.mlessmann.homework.api.event.network.InterruptReason;
+import de.mlessmann.homework.api.future.IHWFuture;
+import de.mlessmann.homework.api.logging.IHWLogContext;
+import de.mlessmann.homework.api.logging.ILogLevel;
+import de.mlessmann.homework.api.logging.LogType;
+import de.mlessmann.homework.api.provider.IHWProvider;
+import de.mlessmann.homework.api.session.IHWSession;
+import de.mlessmann.homework.api.session.IHWUser;
+import de.mlessmann.homework.internal.event.CDKConnInterruptEvent;
+import de.mlessmann.homework.internal.homework.HWSession;
+import de.mlessmann.homework.internal.providers.HWProvider;
 import de.s_paarmann.homeworkapp.Log;
 import de.s_paarmann.homeworkapp.ui.MainActivity;
 import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
@@ -36,8 +42,8 @@ import java.util.List;
 
 public class LoginManager {
 
-  public interface GetHWMgrListener {
-    public void receiveHWMgr(HWMgr mgr, LoginResultListener.Result result);
+  public interface GetConnectionListener {
+    public void receiveConnection(ICDKConnection conn, LoginResultListener.Result result);
   }
 
   public static final String TAG = "LoginManager";
@@ -48,32 +54,44 @@ public class LoginManager {
 
   private static IHWSession session;
   private static boolean loggedIn = false;
-  private static HWMgr mgr;
-  private static final List<GetHWMgrListener> listenersWaitingForMgr = new ArrayList<>();
+  private static ICDKConnection connection;
+  private static final List<GetConnectionListener> listenersWaitingForMgr = new ArrayList<>();
   private static boolean nonSilentListenerPresent = false;
   private static boolean creatingManager = false;
   private static boolean waitingForLoginActivity = false;
 
-  public static ILogListener LogListener = new ILogListener() {
+  public static ICDKListener LogListener = new ICDKListener() {
     @Override
-    public void onMessage(IHWLogContext context) {
+    public void onEvent(ICDKEvent event) {
+      if (event instanceof ICDKConnectionEvent) {
+        if (((ICDKConnectionEvent) event).getStatus() == ConnectionStatus.DISCONNECTED) {
+          loggedIn = false;
+        }
+      }
+
+      if (!(event instanceof ICDKLogEvent)) {
+        return;
+      }
+      ICDKLogEvent logEvent = (ICDKLogEvent) event;
+      IHWLogContext context = logEvent.getContext();
+
       String msg = context.getSender().toString() + ": " + context.getPayload().toString();
       int level = context.getLevel();
-      boolean isException = context.getType().equals(Types.EXC)
-                            || context.getType().equals(Types.CDKEXC);
-      if (level == LogLevel.DEBUG) {
+      boolean isException = context.getType().equals(LogType.EXC)
+                            || context.getType().equals(LogType.CDKEXC);
+      if (level == ILogLevel.DEBUG) {
         if (isException) {
           Log.d("CDK", msg, (Exception) context.getPayload());
         } else {
           Log.d("CDK", msg);
         }
-      } else if (level == LogLevel.WARNING) {
+      } else if (level == ILogLevel.WARNING) {
         if (isException) {
           Log.w("CDK", msg, (Exception) context.getPayload());
         } else {
           Log.w("CDK", msg);
         }
-      } else if (level == LogLevel.SEVERE) {
+      } else if (level == ILogLevel.SEVERE) {
         if (isException) {
           Log.e("CDK", msg, (Exception) context.getPayload());
         } else {
@@ -87,11 +105,7 @@ public class LoginManager {
         }
       }
     }
-    @Override
-    public void onConnectionLost(CloseReason reason) {
-      Log.w("CDK", "Connection to server lost: " + reason.name());
-      loggedIn = false;
-    }
+
   };
 
   public static void setCredentials(Context ctx, IHWProvider provider, String group, String user,
@@ -116,8 +130,8 @@ public class LoginManager {
 
     if (listenersWaitingForMgr != null && listenersWaitingForMgr.size() > 0) {
       for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
-        listenersWaitingForMgr.get(i).receiveHWMgr(null,
-                                                   LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+        listenersWaitingForMgr.get(i).receiveConnection(null,
+            LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
         listenersWaitingForMgr.remove(i);
       }
     }
@@ -144,7 +158,13 @@ public class LoginManager {
       if (prefs.contains(MainActivity.PREF_CRED_TOKEN)) {
         session = new HWSession(new JSONObject(prefs.getString(MainActivity.PREF_CRED_TOKEN, "")));
       }
-      provider = new HWProvider(new JSONObject(prefs.getString(MainActivity.PREF_PROVIDER, "")));
+
+      HWProvider myProvider = new HWProvider(new JSONObject(prefs.getString(MainActivity.PREF_PROVIDER, "")));
+      if (myProvider.isValid()) {
+        provider = myProvider;
+      } else {
+        return false;
+      }
     } catch (JSONException e) {
       // Basically impossible, unless something else messed with the prefs
       Log.wtf(TAG, e);
@@ -195,8 +215,8 @@ public class LoginManager {
       waitingForLoginActivity = false;
 
       for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
-        listenersWaitingForMgr.get(i).receiveHWMgr(null,
-                                                   LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+        listenersWaitingForMgr.get(i).receiveConnection(null,
+            LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
         listenersWaitingForMgr.remove(i);
       }
 
@@ -206,18 +226,19 @@ public class LoginManager {
     }
   }
 
-  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener l) {
+  public synchronized static void getHWMgr(Context ctx, GetConnectionListener l) {
     getHWMgr(ctx, l, false, false);
   }
 
-  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener l, boolean silent) {
+  public synchronized static void getHWMgr(Context ctx, GetConnectionListener l, boolean silent) {
     getHWMgr(ctx, l, silent, false);
   }
 
-  public synchronized static void getHWMgr(Context ctx, GetHWMgrListener listener, boolean silent,
+  public synchronized static void getHWMgr(Context ctx, GetConnectionListener listener,
+                                           boolean silent,
                                            boolean loginActivity) {
     if (loggedIn) {
-      listener.receiveHWMgr(mgr, LoginResultListener.Result.LOGGED_IN);
+      listener.receiveConnection(connection, LoginResultListener.Result.LOGGED_IN);
       return;
     }
 
@@ -232,16 +253,14 @@ public class LoginManager {
       }
 
       creatingManager = true;
-      if (mgr == null) {
-        mgr = new HWMgr();
-        mgr.registerLogListener(LogListener);
-      }
+
+      CDK.getInstance().registerListener(LogListener);
 
       if (!loadCredentials(ctx)) {
         if (!nonSilentListenerPresent) {
           for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
-            listenersWaitingForMgr.get(i).receiveHWMgr(null,
-                                                       LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+            listenersWaitingForMgr.get(i).receiveConnection(null,
+                LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
             listenersWaitingForMgr.remove(i);
           }
           creatingManager = false;
@@ -254,7 +273,7 @@ public class LoginManager {
             waitingForLoginActivity = false;
             for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
               listenersWaitingForMgr.get(i)
-                  .receiveHWMgr(null, LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
+                  .receiveConnection(null, LoginResultListener.Result.NO_CREDENTIALS_PRESENT);
               listenersWaitingForMgr.remove(i);
             }
             creatingManager = false;
@@ -267,7 +286,7 @@ public class LoginManager {
             case LOGGED_IN:
               for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
                 listenersWaitingForMgr.get(i)
-                    .receiveHWMgr(mgr, LoginResultListener.Result.LOGGED_IN);
+                    .receiveConnection(connection, LoginResultListener.Result.LOGGED_IN);
                 listenersWaitingForMgr.remove(i);
               }
               loggedIn = true;
@@ -276,8 +295,8 @@ public class LoginManager {
               break;
             case INVALID_CREDENTIALS:
               for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
-                listenersWaitingForMgr.get(i).receiveHWMgr(null,
-                                                           LoginResultListener.Result.INVALID_CREDENTIALS);
+                listenersWaitingForMgr.get(i).receiveConnection(null,
+                    LoginResultListener.Result.INVALID_CREDENTIALS);
                 listenersWaitingForMgr.remove(i);
               }
               loggedIn = false;
@@ -286,7 +305,7 @@ public class LoginManager {
               break;
             default:
               for (int i = listenersWaitingForMgr.size() - 1; i >= 0; i--) {
-                listenersWaitingForMgr.get(i).receiveHWMgr(null, result);
+                listenersWaitingForMgr.get(i).receiveConnection(null, result);
                 listenersWaitingForMgr.remove(i);
               }
               loggedIn = false;
@@ -300,58 +319,77 @@ public class LoginManager {
   }
 
   private static void login(Context ctx, LoginResultListener listener) {
-    try {
-      mgr.connect(provider).registerListener(connFuture -> {
-        if (connFuture.isPresent()) {
+    CDK.getInstance().registerListener(new ICDKListener() {
+      @Override
+      public void onEvent(ICDKEvent event) {
+        if (!(event instanceof ICDKConnectionEvent)) {
+          return;
+        }
+
+        ICDKConnectionEvent connEvent = (ICDKConnectionEvent) event;
+        if (connEvent.getConnection() != connection) {
+          connEvent.getConnection().kill();
+          return;
+        }
+
+        if (connEvent.getStatus() == ConnectionStatus.CONNECTING) {
+          return;
+        }
+
+        if (connEvent.getStatus() == ConnectionStatus.CONNECTING_INTERRUPTED) {
+          CDKConnInterruptEvent interruptEvent = (CDKConnInterruptEvent) connEvent;
+          if ( interruptEvent.getInterruptReason() == InterruptReason.POSSIBLY_INCOMPATIBLE) {
+            listener.onLoginDone(LoginResultListener.Result.SERVER_INCOMPATIBLE);
+            CDK.getInstance().unregisterListener(this);
+          }
+          return;
+        }
+
+        if (connEvent.getStatus() != ConnectionStatus.CONNECTED) {
           listener.onLoginDone(LoginResultListener.Result.CONNECTION_FAILED);
         } else {
-          mgr.isCompatible().registerListener(compatibleFuture -> {
-            IHWFuture<Boolean> compFuture = (IHWFuture<Boolean>) compatibleFuture;
-            if (!compFuture.get()) {
-              listener.onLoginDone(LoginResultListener.Result.SERVER_INCOMPATIBLE);
-            } else {
-              IFutureListener l = (loginFuture -> {
-                IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
-                if (userFuture.getErrorCode() != IHWFuture.ERRORCodes.LOGGEDIN) {
-                  Log.d(TAG, "Error code: " + userFuture.getErrorCode());
-                  if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.INVALIDCREDERR) {
-                    listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
-                  } else if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.NOTFOUNDERR) {
-                    listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
-                  } else if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.CLOSED) {
-                    listener.onLoginDone(LoginResultListener.Result.CONNECTION_CLOSED);
-                  } else if (userFuture.getErrorCode() == IHWFuture.ERRORCodes.EXPIRED) {
-                    Log.d(TAG, "Server says token expired, retrying with creds");
-                    session = null;
-                    mgr.release();
-                    login(ctx, listener);
-                  } else {
-                    listener.onLoginDone(LoginResultListener.Result.UNKNOWN);
-                  }
-                } else {
-                  session = userFuture.get().session();
-                  saveCredentials(ctx);
-                  listener.onLoginDone(LoginResultListener.Result.LOGGED_IN);
-                }
-              });
-
-              if (session != null && !isSessionExpired(session)) {
-                Log.d(TAG, "Connecting with session token.");
-                mgr.login(session.getToken()).registerListener(l);
+          IFutureListener l = (loginFuture -> {
+            IHWFuture<IHWUser> userFuture = (IHWFuture<IHWUser>) loginFuture;
+            if (userFuture.getError() != Error.OK) {
+              Log.d(TAG, "Error code: " + userFuture.getError());
+              int errorCode = userFuture.getError().getCode();
+              if (errorCode == Error.ErrorCode.BADLOGIN) {
+                listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
+              } else if (errorCode == Error.ErrorCode.NOTFOUND) {
+                listener.onLoginDone(LoginResultListener.Result.INVALID_CREDENTIALS);
+              } else if (errorCode == Error.ErrorCode.CLOSED) {
+                listener.onLoginDone(LoginResultListener.Result.CONNECTION_CLOSED);
+              } else if (errorCode == Error.ErrorCode.BADTOKEN) {
+                Log.d(TAG, "Server says token expired, retrying with creds");
+                session = null;
+                connection.kill();
+                CDK.getInstance().unregisterListener(this);
+                login(ctx, listener);
               } else {
-                Log.d(TAG, "Connecting with credentials.");
-                Log.d(TAG, "Session is: " + session);
-                mgr.login(group, user, auth).registerListener(l);
+                listener.onLoginDone(LoginResultListener.Result.UNKNOWN);
               }
+            } else {
+              session = userFuture.get().session();
+              saveCredentials(ctx);
+              listener.onLoginDone(LoginResultListener.Result.LOGGED_IN);
             }
           });
+
+          CDK.getInstance().unregisterListener(this);
+          if (session != null && !isSessionExpired(session)) {
+            Log.d(TAG, "Connecting with session token.");
+            connection.login(session).registerListener(l);
+          } else {
+            Log.d(TAG, "Connecting with credentials.");
+            Log.d(TAG, "Session is: " + session);
+            connection.login(group, user, auth).registerListener(l);
+          }
         }
-      });
-    } catch (StillConnectedException e) {
-      Log.i(TAG, "StillConnectedException, reconnecting");
-      mgr.release();
-      login(ctx, listener);
-    }
+      }
+    });
+
+    connection = CDK.getInstance().connect(provider);
+    connection.start();
   }
 
 

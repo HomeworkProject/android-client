@@ -17,12 +17,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import de.mlessmann.api.data.IHWFuture;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import de.mlessmann.homework.api.error.Error;
 import de.s_paarmann.homeworkapp.HAElement;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.HomeworkManager;
@@ -108,7 +107,7 @@ public class AddHomeworkFragment extends Fragment {
       "Hausaufgabe wird hinzugefügt.", true, false);
 
     HomeworkManager.addHomework(getActivity(), element, result -> {
-      if (result == IHWFuture.ERRORCodes.OK) {
+      if (result == Error.ErrorCode.OK) {
         if (getActivity() != null) getActivity().runOnUiThread(() -> {
           Toast.makeText(getActivity(), "Hausaufgabe hinzugefügt.", Toast.LENGTH_SHORT).show();
           dialog.dismiss();
@@ -117,7 +116,7 @@ public class AddHomeworkFragment extends Fragment {
         });
       } else {
         String msg;
-        if (result == IHWFuture.ERRORCodes.INSUFFPERM) {
+        if (result == Error.ErrorCode.FORBIDDEN) {
           msg = "Unzureichende Berechtigungen um Hausaufgaben hinzuzufügen.";
         } else {
           msg = "Unbekannter Fehler beim hinzufügen der Hausaufgabe.";
