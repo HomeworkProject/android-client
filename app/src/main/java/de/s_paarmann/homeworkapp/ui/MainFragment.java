@@ -68,6 +68,8 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
+    container.clearDisappearingChildren();
+
     View layout = inflater.inflate(R.layout.fragment_main, container, false);
 
     layout.findViewById(R.id.btnAllHomework).setOnClickListener(this::onBtnAllHomeworkClick);

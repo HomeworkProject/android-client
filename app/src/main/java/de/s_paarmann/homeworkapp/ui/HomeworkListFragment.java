@@ -71,6 +71,7 @@ public class HomeworkListFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
+    container.clearDisappearingChildren();
 
     View root = inflater.inflate(R.layout.fragment_homework_list, container, false);
 

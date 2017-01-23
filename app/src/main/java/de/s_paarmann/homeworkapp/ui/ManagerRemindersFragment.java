@@ -46,6 +46,8 @@ public class ManagerRemindersFragment extends Fragment {
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
                            Bundle savedInstanceState) {
+    container.clearDisappearingChildren();
+
     View root = inflater.inflate(R.layout.fragment_manage_reminders, container, false);
 
     final ListView listView = (ListView) root.findViewById(R.id.lsViewReminders);
