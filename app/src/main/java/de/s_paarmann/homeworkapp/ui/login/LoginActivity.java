@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ListView;
@@ -29,9 +30,11 @@ import de.mlessmann.homework.api.event.network.ConnectionStatus;
 import de.mlessmann.homework.api.future.IHWFuture;
 import de.mlessmann.homework.api.provider.IHWProvider;
 import de.mlessmann.homework.api.session.IHWGroupMapping;
+import de.mlessmann.homework.internal.providers.HWProvider;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.LoginManager;
 import de.s_paarmann.homeworkapp.network.LoginResultListener;
+import de.s_paarmann.homeworkapp.network.ManualHWProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -121,6 +124,7 @@ public class LoginActivity extends AppCompatActivity {
     inflater.inflate(R.layout.login_provider_select, contentFrame, true);
 
     ListView lsProviders = (ListView) contentFrame.findViewById(R.id.lsViewProviders);
+    Button btnManualEntry = (Button) contentFrame.findViewById(R.id.btnManualProviderEntry);
 
     List<String> providerNames = new ArrayList<>(providers.size());
     for (IHWProvider provider : providers) {
@@ -137,6 +141,10 @@ public class LoginActivity extends AppCompatActivity {
       loadGroups();
     });
 
+    btnManualEntry.setOnClickListener(v -> {
+      loadManualEntry();
+    });
+
     backAction = () -> {
       if (LoginManager.loadCredentials(this)) {
         finish();
@@ -146,10 +154,44 @@ public class LoginActivity extends AppCompatActivity {
     };
   }
 
+  private void loadManualEntry() {
+    contentFrame.removeView(contentFrame.findViewById(R.id.content_login_provider));
+    inflater.inflate(R.layout.login_manual_entry, contentFrame, true);
+
+    Button btnSubmit = (Button) contentFrame.findViewById(R.id.btnManualEntrySubmit);
+    btnSubmit.setOnClickListener(v -> {
+      EditText txtHost = (EditText) contentFrame.findViewById(R.id.txtManualEntryServer);
+      EditText txtPort = (EditText) contentFrame.findViewById(R.id.txtManualEntryPort);
+      CheckBox checkSSL = (CheckBox) contentFrame.findViewById(R.id.checkManualEntrySSL);
+
+      String host = txtHost.getText().toString();
+      int port = -1;
+      try {
+        port = Integer.valueOf(txtPort.getText().toString());
+      } catch (NumberFormatException e) {
+        // Leave port at -1, the error will be caught below
+      }
+
+      if (!(port > 0 && port < 65536)) {
+        Toast.makeText(this, "Ungültiger Port.", Toast.LENGTH_LONG).show();
+        return;
+      }
+
+      boolean ssl = checkSSL.isChecked();
+
+      selectedProvider = ManualHWProvider.createProvider(host, port, ssl);
+
+      loadGroups();
+    });
+  }
+
   private void loadGroups() {
     findViewById(R.id.login_loadingIcon).setVisibility(View.VISIBLE);
 
+    // We can come here through either of these, so just remove both to be sure.
+    // Attempting to remove a view that does not exist does not cause any issues.
     contentFrame.removeView(contentFrame.findViewById(R.id.content_login_provider));
+    contentFrame.removeView(contentFrame.findViewById(R.id.content_login_manual_entry));
 
     cdk.registerListener(new ICDKListener() {
       @Override
@@ -208,6 +250,10 @@ public class LoginActivity extends AppCompatActivity {
                   .setNeutralButton("Erneut versuchen", ((dialog, which) -> {
                     dialog.dismiss();
                     loadGroups();
+                  }))
+                  .setNegativeButton("Abbrechen", ((dialog, which) -> {
+                    dialog.dismiss();
+                    loadProviders();
                   }))
                   .show();
             });
