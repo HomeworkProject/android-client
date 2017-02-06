@@ -31,7 +31,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import de.mlessmann.homework.api.error.Error;
+import de.homeworkproject.homework.api.error.Error;
 import de.s_paarmann.homeworkapp.AutomaticReminderManager;
 import de.s_paarmann.homeworkapp.HAElement;
 import de.s_paarmann.homeworkapp.HAElementArrayAdapter;

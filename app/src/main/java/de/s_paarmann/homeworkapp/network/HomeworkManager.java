@@ -7,10 +7,10 @@ package de.s_paarmann.homeworkapp.network;
 
 import android.content.Context;
 
-import de.mlessmann.homework.api.error.Error;
-import de.mlessmann.homework.api.future.IHWFuture;
-import de.mlessmann.homework.api.homework.IHWCarrier;
-import de.mlessmann.homework.api.homework.IHomework;
+import de.homeworkproject.homework.api.error.Error;
+import de.homeworkproject.homework.api.future.IHWFuture;
+import de.homeworkproject.homework.api.homework.IHWCarrier;
+import de.homeworkproject.homework.api.homework.IHomework;
 import de.s_paarmann.homeworkapp.AutomaticReminderManager;
 import de.s_paarmann.homeworkapp.HAElement;
 import de.s_paarmann.homeworkapp.Log;

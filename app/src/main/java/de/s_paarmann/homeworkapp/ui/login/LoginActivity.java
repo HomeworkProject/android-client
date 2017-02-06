@@ -20,18 +20,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import de.mlessmann.homework.api.CDK;
-import de.mlessmann.homework.api.ICDKConnection;
-import de.mlessmann.homework.api.error.Error;
-import de.mlessmann.homework.api.event.ICDKConnectionEvent;
-import de.mlessmann.homework.api.event.ICDKEvent;
-import de.mlessmann.homework.api.event.ICDKListener;
-import de.mlessmann.homework.api.event.network.ConnectionStatus;
-import de.mlessmann.homework.api.future.IHWFuture;
-import de.mlessmann.homework.api.provider.IHWProvider;
-import de.mlessmann.homework.api.session.IHWGroupMapping;
-import de.mlessmann.homework.internal.providers.HWProvider;
+import de.homeworkproject.homework.api.CDK;
+import de.homeworkproject.homework.api.ICDKConnection;
+import de.homeworkproject.homework.api.error.Error;
+import de.homeworkproject.homework.api.event.ICDKConnectionEvent;
+import de.homeworkproject.homework.api.event.ICDKEvent;
+import de.homeworkproject.homework.api.event.ICDKListener;
+import de.homeworkproject.homework.api.event.network.ConnectionStatus;
+import de.homeworkproject.homework.api.event.network.InterruptReason;
+import de.homeworkproject.homework.api.future.IHWFuture;
+import de.homeworkproject.homework.api.provider.IHWProvider;
+import de.homeworkproject.homework.api.session.IHWGroupMapping;
 import de.s_paarmann.homeworkapp.R;
+import de.s_paarmann.homeworkapp.Utils;
 import de.s_paarmann.homeworkapp.network.LoginManager;
 import de.s_paarmann.homeworkapp.network.LoginResultListener;
 import de.s_paarmann.homeworkapp.network.ManualHWProvider;
@@ -227,9 +228,12 @@ public class LoginActivity extends AppCompatActivity {
                 });
               }
             });
-            /*} else {
+          } else if (connEvent.getStatus() == ConnectionStatus.CONNECTING_INTERRUPTED) {
+            ICDKConnectionEvent.Interrupted interruptedEvent =
+                (ICDKConnectionEvent.Interrupted) connEvent;
+            if (interruptedEvent.getInterruptReason() == InterruptReason.POSSIBLY_INCOMPATIBLE) {
               runOnUiThread(() -> {
-                new AlertDialog.Builder(this)
+                new AlertDialog.Builder(LoginActivity.this)
                     .setTitle("Error")
                     .setMessage("Der ausgewählte Server hat eine inkompatible Version.")
                     .setNeutralButton("Anderen Server auswählen", ((dialog, which) -> {
@@ -238,9 +242,54 @@ public class LoginActivity extends AppCompatActivity {
                     }))
                     .show();
               });
-            }*/
-          } else if (connEvent.getStatus() == ConnectionStatus.CONNECTING_INTERRUPTED) {
-            // TODO: Handle this
+              interruptedEvent.setCancelled(true);
+            } else if (interruptedEvent.getInterruptReason() == InterruptReason.SSL_UNAVAILABLE) {
+              Utils.LambdaWrapper<Boolean> done = new Utils.LambdaWrapper<Boolean>(false);
+              runOnUiThread(() -> {
+                new AlertDialog.Builder(LoginActivity.this)
+                    .setTitle("Error")
+                    .setMessage(
+                        "Die Verbindung mit SSL ist fehlgeschlagen. Unverschlüsselt versuchen?")
+                    .setPositiveButton("Ja", ((dialog, which) -> {
+                      dialog.dismiss();
+                      done.set(true);
+                    }))
+                    .setNegativeButton("Nein", ((dialog, which) -> {
+                      dialog.dismiss();
+                      interruptedEvent.setCancelled(true);
+                      loadProviders();
+                      done.set(true);
+                    }))
+                    .show();
+              });
+
+              while (!done.get()) { /* Idle to prevent unwanted connection being built*/ }
+            } else if (interruptedEvent.getInterruptReason() == InterruptReason.REJECTING_X509) {
+              ICDKConnectionEvent.Interrupted.X509RejectInterrupt
+                  rejectEvent =
+                  (ICDKConnectionEvent.Interrupted.X509RejectInterrupt) interruptedEvent;
+              Utils.LambdaWrapper<Boolean> done = new Utils.LambdaWrapper<Boolean>(false);
+              runOnUiThread(() -> {
+                // TODO: display certificate
+                new AlertDialog.Builder(LoginActivity.this)
+                    .setTitle("Error")
+                    .setMessage("Das SSL-Zertifikat ist nicht vertraunswürdig. Trotzdem verbinden?")
+                    .setPositiveButton("Einmal vertrauen", ((dialog, which) -> {
+                      rejectEvent.exemptOnce(true);
+                      done.set(true);
+                    }))
+                    .setNeutralButton("Ohne Verschlüsselung verbinden", ((dialog, which) -> {
+                      done.set(true);
+                    }))
+                    .setNegativeButton("Nein", ((dialog, which) -> {
+                      rejectEvent.setCancelled(true);
+                      done.set(true);
+                    }))
+                    .show();
+              });
+
+              while (!done.get()) { /* Idle to prevent unwanted connection being built*/ }
+            }
             return;
           } else if (connEvent.getStatus() != ConnectionStatus.CONNECTING) {
             runOnUiThread(() -> {

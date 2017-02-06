@@ -14,6 +14,10 @@ buildscript {
 
 allprojects {
     repositories {
+        mavenLocal()
+        maven {
+            url uri("http://maven.fearnixx.de/maven2")
+        }
         jcenter()
     }
 }

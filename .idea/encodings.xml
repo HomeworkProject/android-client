@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/AutomaticReminderManager.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/AutomaticUpdateService.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/BootCompleteBroadcastReceiver.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/HAElement.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/HAElementArrayAdapter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/Log.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/NumberPickerPreference.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/Reminder.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ReminderArrayAdapter.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ReminderBroadcastReceiver.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/TimePreference.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/Utils.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/AddHomeworkFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/ChangelogDialog.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/DatePickerFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/HomeworkListFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/MainActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/MainFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/ManagerRemindersFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/NoUpdateDialog.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/ReminderDateTimePickerFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/SettingsFragment.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/UpdateDialog.java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/login/LoginActivity.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/app/src/main/java/de/s_paarmann/homeworkapp/ui/login/LoginActivityFragment.java" charset="UTF-8" />
     <file url="PROJECT" charset="UTF-8" />
   </component>
 </project>

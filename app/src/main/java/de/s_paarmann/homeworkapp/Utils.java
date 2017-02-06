@@ -21,4 +21,17 @@ public abstract class Utils {
     long diffInMillies = date2.getTime() - date1.getTime();
     return timeUnit.convert(diffInMillies, TimeUnit.MILLISECONDS);
   }
+
+  public static class LambdaWrapper<T> {
+    private T value;
+    public LambdaWrapper(T def) {
+      value = def;
+    }
+    public T get() {
+      return value;
+    }
+    public void set(T val) {
+      value = val;
+    }
+  }
 }

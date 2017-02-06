@@ -21,7 +21,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-import de.mlessmann.homework.api.error.Error;
+import de.homeworkproject.homework.api.error.Error;
 import de.s_paarmann.homeworkapp.HAElement;
 import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.HomeworkManager;

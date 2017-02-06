@@ -7,8 +7,8 @@ package de.s_paarmann.homeworkapp.network;
 
 
 import de.mlessmann.common.annotations.NotNull;
-import de.mlessmann.homework.api.provider.IHWProvider;
-import de.mlessmann.homework.internal.providers.HWProvider;
+import de.homeworkproject.homework.api.provider.IHWProvider;
+import de.homeworkproject.homework.internal.providers.HWProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
