@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
-  tools:context=".ManageRemindersActivity" >
+  tools:context=".ui.ManageRemindersActivity" >
 
   <item android:id="@+id/action_reminder_delete"
     android:title="@string/action_reminder_delete"

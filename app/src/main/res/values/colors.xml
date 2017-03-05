@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2016  Sebastian Paarmann
+  ~ Licensed under the MIT license, see the LICENSE file
+  -->
+
+<resources>
+    <color name="primary">#00B742</color>
+    <color name="primary_dark">#00D864</color>
+    <color name="accent">#F4511E</color>
+
+    <color name="actionBarColor">@color/primary</color>
+</resources>

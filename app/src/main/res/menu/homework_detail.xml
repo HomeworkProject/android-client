@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="paarmann.physikprofil.HomeworkDetailActivity" >
+    tools:context=".ui.HomeworkDetailActivity" >
     <item android:id="@+id/action_refresh"
       android:title="@string/refreshText"
       android:icon="@drawable/ic_action_refresh"

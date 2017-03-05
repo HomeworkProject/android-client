@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-	<!-- <string name="server_uri">http://192.168.178.29/PhysikProfil_testing</string> -->
-	<string name="server_uri">https://schule.s-paarmann.de/PhysikProfil</string>
-
-</resources>

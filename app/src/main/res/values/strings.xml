@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Physik/Bio Profil</string>
+    <string name="app_name">Hausaufgaben</string>
     <string name="action_copy">Kopieren</string>
     <string name="action_remind">Erinnern</string>
     <string name="action_reminder_delete">Löschen</string>
@@ -25,7 +25,7 @@
     <string name="dates_unavailable">Termine werden in einem zukünftigen Update hinzugefügt</string>
     <string name="updating">Update wird heruntergeladen...</string>
     <string name="noUpdateDialogText">Die neueste Version ist bereits installiert.</string>
-    <string name="noAutoUpdatesDialogText">Diese Option macht vor allem Sinn, wenn auch "Automatische Aktualisierungen" aktiviert ist, ansonsten wird immer erst eine Erinnerung erstellt, wenn die Hausaufgabe in der App angesehen wurde.</string>
+    <string name="noAutoUpdatesDialogText">Diese Option ergibt vor allem Sinn, wenn auch "Automatische Aktualisierungen" aktiviert ist, ansonsten wird immer erst eine Erinnerung erstellt, wenn die Hausaufgabe in der App angesehen wurde.</string>
     <string name="setReminder">Erinnerung erstellen</string>
     <string name="noReminders">Keine Erinnerungen</string>
     <string name="reminder_datetime_picker_title">Erinnerung hinzufügen</string>
@@ -46,8 +46,8 @@
     <string name="pref_homeworktoday_summary">Hausaufgaben zu heute werden nicht angezeigt.</string>
     <string name="pref_homeworktoday_summary_true">Hausaufgaben zu heute werden angezeigt.</string>
     <string name="pref_autoupdates">Automatische Aktualisierungen</string>
-    <string name="pref_autoupdates_summary">Daten werden nur aktualisiert, wenn die Hausaufgaben angesehen werden und die Daten älter als 1,5 Stunden sind.</string>
-    <string name="pref_autoupdates_summary_true">Daten werden zweimal täglich automatisch und wenn Daten, die älter als 1,5 Stunden sind, angezeigt werden aktualisiert.</string>
+    <string name="pref_autoupdates_summary">Daten werden nur aktualisiert, wenn Hausaufgaben angesehen werden.</string>
+    <string name="pref_autoupdates_summary_true">Daten werden zweimal täglich automatisch aktualisiert.</string>
     <string name="pref_autoreminders">Automatische Erinnerungen</string>
     <string name="pref_autoreminders_summary">Es werden nicht automatisch Erinnerungen erstellt.</string>
     <string name="pref_autoreminders_summary_true">Es wird für alle Hausaufgaben eine automatische Erinnerung erstellt.</string>
@@ -55,12 +55,18 @@
     <string name="pref_instantautoreminders_summary">Automatische Erinnerungen werden zum angegeben Zeitpunkt angezeigt.</string>
     <string name="pref_instantautoreminders_summary_true">Es gibt eine Erinnerung sobald neue Hausaufgaben gefunden werden.</string>
     <string name="pref_reminderday">Tag für automatische Erinnerungen</string>
-    <string name="pref_reminderday_summary">Auf wie viele Tage im Vorraus automatische Erinerrungen gesetzt werden.</string>
+    <string name="pref_reminderday_summary">Auf wie viele Tage im Vorraus automatische Erinnerungen gesetzt werden.</string>
     <string name="pref_remindertime">Uhrzeit für automatische Erinnerungen</string>
     <string name="pref_remindertime_summary">Die Uhrzeit für die automatische Erinnerungen gesetzt werden.</string>
     <string name="pref_mobile_data">Mobile Daten benutzen</string>
     <string name="pref_mobile_data_summary">Hausaufgaben werden über WLAN und Mobile Daten heruntergeladen.</string>
     <string name="pref_mobile_data_summary_false">Hausaufgaben werden nur über WLAN heruntergeladen.</string>
-    <string name="changelog">Diese Version enthält folgende Verbesserungen:\n-E2b zu Q1b geändert\n-\'Sofort erinnern\' hinzugefügt\n-Mehrere Bugs behoben</string>
+    <string name="changelog">Erste Early-Access Version der neuen App.</string>
+    <string name="title_activity_add_homework">Hausaufgabe hinzufügen</string>
+    <string name="title_activity_login">Login</string>
+    <string name="action_delete">Löschen</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
 
+    <string name="update_server_uri">https://schule.s-paarmann.de/HomeworkApp</string>
 </resources>

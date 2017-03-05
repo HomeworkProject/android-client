@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <PreferenceScreen
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:custom="http://schemas.android.com/apk/res/paarmann.physikprofil" >
+    xmlns:custom="http://schemas.android.com/apk/res/de.s_paarmann.homeworkapp" >
   <PreferenceCategory
     android:title="@string/pref_category_filter_title"
-    android:key="paarmann.physikprofil.CategoryFilter" >
+    android:key="de.s_paarmann.homeworkapp.CategoryFilter" >
 
       <CheckBoxPreference
-        android:key="paarmann.physikprofil.FilterSubjects"
+        android:key="de.s_paarmann.homeworkapp.FilterSubjects"
         android:title="@string/pref_filter"
         android:summary="@string/pref_filter_summary"
         android:defaultValue="false" />
 
       <EditTextPreference
-        android:key="paarmann.physikprofil.ChosenSubjects"
+        android:key="de.s_paarmann.homeworkapp.ChosenSubjects"
         android:title="@string/pref_subjects"
         android:summary="@string/pref_subjects_summary"
         android:defaultValue="@string/pref_subjects_default" />
 
       <CheckBoxPreference
-          android:key="paarmann.physikprofil.HomeworkToday"
+          android:key="de.s_paarmann.homeworkapp.HomeworkToday"
           android:title="@string/pref_homeworktoday"
           android:summary="@string/pref_homeworktoday_summary"
-          android:defaultValue="false" />
+          android:defaultValue="true" />
 
   </PreferenceCategory>
 
   <PreferenceCategory
     android:title="@string/pref_category_automatic_reminders_title"
-    android:key="paarmann.physikprofil.CategoryAutomaticReminders" >
+    android:key="de.s_paarmann.homeworkapp.CategoryAutomaticReminders" >
 
     <CheckBoxPreference
-      android:key="paarmann.physikprofil.AutomaticUpdates"
+      android:key="de.s_paarmann.homeworkapp.AutomaticUpdates"
       android:title="@string/pref_autoupdates"
       android:summary="@string/pref_autoupdates_summary"
-      android:defaultValue="false" />
+      android:defaultValue="true" />
 
     <CheckBoxPreference
-      android:key="paarmann.physikprofil.AutomaticReminders"
+      android:key="de.s_paarmann.homeworkapp.AutomaticReminders"
       android:title="@string/pref_autoreminders"
       android:summary="@string/pref_autoreminders_summary"
-      android:defaultValue="false" />
+      android:defaultValue="true" />
 
     <CheckBoxPreference
-      android:key="paarmann.physikprofil.InstantAutomaticReminders"
+      android:key="de.s_paarmann.homeworkapp.InstantAutomaticReminders"
       android:title="@string/pref_instantautoreminders"
       android:summary="@string/pref_instantautoreminders_summary"
       android:defaultValue="false" />
 
-    <paarmann.physikprofil.NumberPickerPreference
-      android:key="paarmann.physikprofil.ReminderDay"
+    <de.s_paarmann.homeworkapp.NumberPickerPreference
+      android:key="de.s_paarmann.homeworkapp.ReminderDay"
       android:title="@string/pref_reminderday"
       android:summary="@string/pref_reminderday_summary"
-      custom:maxValue="14"
-      custom:minValue="1"
       android:defaultValue="1" />
+<!--custom:maxValue="14"
+      custom:minValue="1"-->
 
-     <paarmann.physikprofil.TimePreference
-      android:key="paarmann.physikprofil.ReminderTime"
+     <de.s_paarmann.homeworkapp.TimePreference
+      android:key="de.s_paarmann.homeworkapp.ReminderTime"
       android:title="@string/pref_remindertime"
       android:summary="@string/pref_remindertime_summary"
       android:defaultValue="1420290000000" /> <!-- 14:00 -->
@@ -66,10 +66,10 @@
 
   <PreferenceCategory
     android:title="@string/pref_category_data_usage"
-    android:key="paarmann.physikprofil.CategoryDataUsage" >
+    android:key="de.s_paarmann.homeworkapp.CategoryDataUsage" >
 
     <CheckBoxPreference
-      android:key="paarmann.physikprofil.UseMobileData"
+      android:key="de.s_paarmann.homeworkapp.UseMobileData"
       android:title="@string/pref_mobile_data"
       android:summary="@string/pref_mobile_data_summary"
       android:defaultValue="true" />
