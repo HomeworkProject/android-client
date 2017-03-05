@@ -33,6 +33,8 @@ import de.s_paarmann.homeworkapp.R;
 import de.s_paarmann.homeworkapp.network.LoginManager;
 import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
+import java.util.Date;
+
 
 public class MainActivity extends AppCompatActivity implements
                                                     ActivityCompat.OnRequestPermissionsResultCallback {
@@ -68,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements
   private static final String STATE_VIEW = "view";
 
   public enum Views {
-    MAIN, HOMEWORK_DETAIL, ADD_HOMEWORK, MANAGE_REMINDERS, SETTINGS
+    MAIN, HOMEWORK_LIST, HOMEWORK_DETAIL, ADD_HOMEWORK, MANAGE_REMINDERS, SETTINGS
   }
 
   private Views currentView;
@@ -171,9 +173,10 @@ public class MainActivity extends AppCompatActivity implements
       case MAIN:
         getMenuInflater().inflate(R.menu.main, menu);
         break;
-      case HOMEWORK_DETAIL:
+      case HOMEWORK_LIST:
         getMenuInflater().inflate(R.menu.homework_detail, menu);
         break;
+      case HOMEWORK_DETAIL:
       case ADD_HOMEWORK:
       case MANAGE_REMINDERS:
       case SETTINGS:
@@ -219,6 +222,8 @@ public class MainActivity extends AppCompatActivity implements
     if (frag instanceof MainFragment)
       currentView = Views.MAIN;
     else if (frag instanceof HomeworkListFragment)
+      currentView = Views.HOMEWORK_LIST;
+    else if (frag instanceof HomeworkDetailFragment)
       currentView = Views.HOMEWORK_DETAIL;
     else if (frag instanceof AddHomeworkFragment)
       currentView = Views.ADD_HOMEWORK;
@@ -262,8 +267,7 @@ public class MainActivity extends AppCompatActivity implements
   private void updateNavDrawerSelection(Views view) {
     switch (view) {
       case MAIN:
-        navigationView.setCheckedItem(R.id.nav_home);
-        break;
+      case HOMEWORK_LIST:
       case HOMEWORK_DETAIL:
         navigationView.setCheckedItem(R.id.nav_home);
         break;
@@ -284,8 +288,8 @@ public class MainActivity extends AppCompatActivity implements
       case MAIN:
         showMainView();
         break;
-      case HOMEWORK_DETAIL:
-        showHomeworkDetailView(getIntent().getStringExtra(HomeworkListFragment.EXTRA_DATE));
+      case HOMEWORK_LIST:
+        showHomeworkListView(getIntent().getStringExtra(HomeworkListFragment.EXTRA_DATE));
         break;
       case ADD_HOMEWORK:
         showAddHomeworkView();
@@ -303,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements
     showView(new MainFragment(), Views.MAIN);
   }
 
-  public void showHomeworkDetailView(String strDate) {
+  public void showHomeworkListView(String strDate) {
     Fragment frag = new HomeworkListFragment();
     Bundle args = new Bundle();
     if (strDate == null) {
@@ -311,6 +315,16 @@ public class MainActivity extends AppCompatActivity implements
     } else {
       args.putString(HomeworkListFragment.EXTRA_DATE, strDate);
     }
+    frag.setArguments(args);
+
+    showView(frag, Views.HOMEWORK_LIST);
+  }
+
+  public void showHomeworkDetailView(String id, Date date) {
+    Fragment frag = new HomeworkDetailFragment();
+    Bundle args = new Bundle();
+    args.putString(HomeworkDetailFragment.EXTRA_HOMEWORK_ID, id);
+    args.putSerializable(HomeworkDetailFragment.EXTRA_HOMEWORK_DATE, date);
     frag.setArguments(args);
 
     showView(frag, Views.HOMEWORK_DETAIL);

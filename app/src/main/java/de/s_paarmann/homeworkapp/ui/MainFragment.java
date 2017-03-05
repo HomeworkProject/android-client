@@ -30,7 +30,6 @@ import android.widget.Toast;
 
 import de.s_paarmann.homeworkapp.Log;
 import de.s_paarmann.homeworkapp.R;
-import de.s_paarmann.homeworkapp.ui.login.LoginActivity;
 
 import org.apache.commons.io.IOUtils;
 
@@ -136,7 +135,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
   }
 
   public void onBtnAllHomeworkClick(View view) {
-    ((MainActivity) getActivity()).showHomeworkDetailView("all");
+    ((MainActivity) getActivity()).showHomeworkListView("all");
   }
 
   public void onBtnTomorrowClick(View view) {
@@ -153,7 +152,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     String date = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(
         Calendar.DAY_OF_MONTH);
 
-    ((MainActivity) getActivity()).showHomeworkDetailView(date);
+    ((MainActivity) getActivity()).showHomeworkListView(date);
   }
 
   public void onBtnAfterTomorrowClick(View view) {
@@ -171,7 +170,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
     String date = cal.get(Calendar.YEAR) + "-" + (cal.get(Calendar.MONTH) + 1) + "-" + cal.get(
         Calendar.DAY_OF_MONTH);
 
-    ((MainActivity) getActivity()).showHomeworkDetailView(date);
+    ((MainActivity) getActivity()).showHomeworkListView(date);
   }
 
   public void onBtnPickDateClick(View view) {
@@ -183,7 +182,7 @@ public class MainFragment extends Fragment implements DatePickerDialog.OnDateSet
   public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
     String date = year + "-" + (monthOfYear + 1) + "-" + dayOfMonth;
 
-    ((MainActivity) getActivity()).showHomeworkDetailView(date);
+    ((MainActivity) getActivity()).showHomeworkListView(date);
   }
 
   public void checkForUpdates(boolean userInitiated) {

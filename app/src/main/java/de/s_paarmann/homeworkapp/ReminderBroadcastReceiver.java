@@ -38,7 +38,7 @@ public class ReminderBroadcastReceiver extends BroadcastReceiver {
 
     Intent clickIntent = new Intent(context, MainActivity.class);
     clickIntent.putExtra(HomeworkListFragment.EXTRA_DATE, "all");
-    clickIntent.putExtra(MainActivity.EXTRA_OPEN_VIEW, MainActivity.Views.HOMEWORK_DETAIL.name());
+    clickIntent.putExtra(MainActivity.EXTRA_OPEN_VIEW, MainActivity.Views.HOMEWORK_LIST.name());
 
     TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
     stackBuilder.addParentStack(MainActivity.class);

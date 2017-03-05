@@ -205,10 +205,18 @@ public class HomeworkListFragment extends Fragment {
         return true;
       }
     });
-    listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-      public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        listView.setItemChecked(position, true);
-        return true;
+    listView.setOnItemLongClickListener((parent, view, position, id) -> {
+      listView.setItemChecked(position, true);
+      return true;
+    });
+    listView.setOnItemClickListener((parent, view, position, id) -> {
+      HAElement element = (HAElement) listView.getItemAtPosition(position);
+
+      try {
+        ((MainActivity) getActivity()).showHomeworkDetailView(element.id, element.getDate());
+      } catch (ParseException e) {
+        // Impossible
+        Toast.makeText(getActivity(), "Failed to parse date", Toast.LENGTH_LONG).show();
       }
     });
 
