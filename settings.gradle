@@ -1,4 +1,1 @@
-include ':javacommon'
-project(':javacommon').projectDir = new File('homework_server_cdk/submodules/javacommon')
-
-include ':app', ':homework_server_cdk'
+include ':app'
